@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="ED1iIK" name="LTLA" displaySplashScreen="1" reportAppUsage="1"
+              splashScreenColour="Dark" projectType="guiapp" version="1.0.0"
+              bundleIdentifier="com.yourcompany.LTLA" includeBinaryInAppConfig="1"
+              jucerVersion="5.0.2">
+  <MAINGROUP id="PRrKAX" name="LTLA">
+    <GROUP id="{793C7987-EDF1-70BF-F31C-B9924CA5CB4B}" name="Source">
+      <FILE id="Vw4UIn" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+      <FILE id="QEoFAX" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <VS2017 targetFolder="Builds/VisualStudio2017">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="LTLA"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="LTLA"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../Coding/JUCE 4.3.0/modules"/>
+      </MODULEPATHS>
+    </VS2017>
+    <VS2015 targetFolder="Builds/VisualStudio2015">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="LTLA"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="LTLA"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../Coding/JUCE 4.3.0/modules"/>
+      </MODULEPATHS>
+    </VS2015>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
+  </MODULES>
+  <JUCEOPTIONS/>
+</JUCERPROJECT>
