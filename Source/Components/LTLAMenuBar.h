@@ -2,21 +2,27 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../Source/LTLA_GUI.h"
+#include "../Source/Main.h"
 
 class LTLAMenuBar : public Component,
-	public MenuBarModel
+					public MenuBarModel//,
+					//public ApplicationCommandTarget
 {
 public:
 
 	LTLAMenuBar()
 	{
 		addAndMakeVisible(menuBar = new MenuBarComponent(this));
+
+	//	auto& commandManager = LTLAApplication::MainWindow::getApplicationCommandManager();
+	//	commandManager.registerAllCommandsForTarget(this);
+	//	commandManager.registerAllCommandsForTarget(JUCEApplication::getInstance());
 	}
 
 	~LTLAMenuBar()
 	{
 		PopupMenu::dismissAllActiveMenus();
-		delete menuBar;	// Is this needed?
+		delete menuBar;
 	}
 
 	void resized() override
@@ -32,14 +38,19 @@ public:
 
 	PopupMenu getMenuForIndex(int menuIndex, const String& menuBar) override
 	{
+		ApplicationCommandManager* commandManager = &LTLAApplication::MainWindow::getApplicationCommandManager();
 		PopupMenu menu;
-
-
-
+		
 		if (menuIndex == CalibrationIndexID)
 		{
 			PopupMenu CalibrationIntervalSubMenu;
+					
+				menu.addCommandItem(commandManager, 1);
+				menu.addCommandItem(commandManager, 2);
+			
 
+
+			/*
 			menu.addItem(CalibrateFrontLeftID, "Calibrate Front Left", true, false);
 			menu.addItem(CalibrateFrontRightID, "Calibrate Front Right", true, false);
 			menu.addItem(CalibrateBackLeftID, "Calibrate Back Left", true, false);
@@ -52,67 +63,57 @@ public:
 			menu.addSubMenu("Calibration Interval", CalibrationIntervalSubMenu, true);
 
 			menu.addItem(StartCalibrationID, "Start Calibration (" + (String)CalibrationInterval + " Seconds)", true, false);
+			*/
 			
 		}
 		return menu;
 	}
 	
-	virtual void menuItemSelected(int menuItemID, int topLevelMenuIndex) override
+	void menuItemSelected(int menuItemID, int topLevelMenuIndex) override
 	{
-
-		switch (menuItemID)
-		{
-			case CalibrateFrontLeftID:
-			{
-				
-			}
-			break;
-			case CalibrateFrontRightID:
-			{
-
-			}
-			break;
-			case CalibrateBackLeftID:
-			{
-
-			}
-			break;
-			case CalibrateBackRightID:
-			{
-
-			}
-			break;
-			case CalibrationIntervalID:
-			{
-
-			}
-			break;
-			case StartCalibrationID:
-			{
-
-			}
-			break;
-			case IntervalID_5seconds:
-			{
-				CalibrationInterval = 5;
-			}
-			break;
-			case IntervalID_10seconds:
-			{
-				CalibrationInterval = 10;
-			}
-			break;
-			case IntervalID_20seconds:
-			{
-				CalibrationInterval = 20;
-
-			}
-			break;
-			default: break;
-
-		}
 		
 	}
+
+	/*
+	ApplicationCommandTarget* getNextCommandTarget()
+	{
+		return findFirstTargetParentComponent();
+	}
+
+	void getAllCommands(Array<CommandID>& commands)
+	{
+		const CommandID ids[] = { 1, 2 };
+		commands.addArray(ids, numElementsInArray(ids));
+	}
+
+	void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result)
+	{
+		switch (commandID)
+		{
+		case 1:
+			result.setInfo("Test1ShortName", "TestDesvription", "Test1 Category", 0);
+			break;
+		case 2:
+			result.setInfo("Test2ShortName", "Test2Desvription", "Test2 Category", 0);
+			break;
+		}
+	}
+
+	bool perform(const InvocationInfo& info)
+	{
+		switch (info.commandID)
+		{
+		case 1: DBG("Test1 Prssed");
+			break;
+		case 2: DBG("Test2 Prssed");
+			break;
+		default: return false;
+		}
+
+		return true;
+
+	}
+	/*
 	/** Getters and Setters */
 
 	int GetStageCalibrationInterval()

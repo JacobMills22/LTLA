@@ -11,6 +11,7 @@
 #include "KinectTracking.h"
 #include "Components\LTLAMenuBar.h"
 
+
 #define SKELETON_COUNT 2
 
 //==============================================================================
@@ -20,7 +21,8 @@
 */
 class MainContentComponent   : public AudioAppComponent,
 							   private MultiTimer,
-							   public Button::Listener
+							   public Button::Listener,
+							   public ApplicationCommandTarget
 							
 {
 public:
@@ -35,7 +37,8 @@ public:
 	
 		addAndMakeVisible(MenuBar);
 
-		
+		auto& commandManager = LTLAApplication::MainWindow::getApplicationCommandManager();
+		commandManager.registerAllCommandsForTarget(this);
     }
 
     ~MainContentComponent()
@@ -96,6 +99,48 @@ public:
 	void MainContentComponent::buttonClicked(Button* button) override
 	{
 		
+	}
+
+	//==============================================================================
+	
+
+	ApplicationCommandTarget* MainContentComponent::getNextCommandTarget() override
+	{
+		return findFirstTargetParentComponent();
+	}
+
+	void MainContentComponent::getAllCommands(Array<CommandID>& commands) override
+	{
+		const CommandID ids[] = { 1, 2 };
+		commands.addArray(ids, numElementsInArray(ids));
+	}
+
+	void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override
+	{
+		switch (commandID)
+		{
+		case 1:
+			result.setInfo("Test1ShortName", "TestDesvription", "Test1 Category", 0);
+			break;
+		case 2:
+			result.setInfo("Test2ShortName", "Test2Desvription", "Test2 Category", 0);
+			break;
+		}
+	}
+
+	bool MainContentComponent::perform(const InvocationInfo& info) override
+	{
+		switch (info.commandID)
+		{
+		case 1: DBG("Test1 Prssed");
+			break;
+		case 2: DBG("Test2 Prssed");
+			break;
+		default: return false;
+		}
+
+		return true;
+
 	}
 
 
