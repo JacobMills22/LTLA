@@ -6,6 +6,16 @@
               jucerVersion="5.0.2">
   <MAINGROUP id="PRrKAX" name="LTLA">
     <GROUP id="{793C7987-EDF1-70BF-F31C-B9924CA5CB4B}" name="Source">
+      <GROUP id="{D72C7A8E-DF15-287E-06E8-2732F081C84A}" name="Components">
+        <FILE id="uP9a2x" name="LTLAMenuBar.cpp" compile="1" resource="0" file="Source/Components/LTLAMenuBar.cpp"/>
+        <FILE id="XpQb5p" name="LTLAMenuBar.h" compile="0" resource="0" file="Source/Components/LTLAMenuBar.h"/>
+      </GROUP>
+      <FILE id="lTxaHV" name="KinectTracking.cpp" compile="1" resource="0"
+            file="Source/KinectTracking.cpp"/>
+      <FILE id="DSyXSZ" name="KinectTracking.h" compile="0" resource="0"
+            file="Source/KinectTracking.h"/>
+      <FILE id="AnN82u" name="LTLA_GUI.cpp" compile="1" resource="0" file="Source/LTLA_GUI.cpp"/>
+      <FILE id="fMXRIu" name="LTLA_GUI.h" compile="0" resource="0" file="Source/LTLA_GUI.h"/>
       <FILE id="Vw4UIn" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
       <FILE id="QEoFAX" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
@@ -20,20 +30,20 @@
                        isDebug="0" optimisation="3" targetName="LTLA"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_events" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_video" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_core" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_events" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_graphics" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_data_structures" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_cryptography" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_video" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_opengl" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
       </MODULEPATHS>
     </VS2017>
     <VS2015 targetFolder="Builds/VisualStudio2015">
@@ -44,20 +54,20 @@
                        isDebug="0" optimisation="3" targetName="LTLA"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_events" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_video" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../Coding/JUCE 4.3.0/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../Coding/JUCE 4.3.0/modules"/>
+        <MODULEPATH id="juce_core" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_events" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_graphics" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_data_structures" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_cryptography" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_video" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_opengl" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
       </MODULEPATHS>
     </VS2015>
   </EXPORTFORMATS>

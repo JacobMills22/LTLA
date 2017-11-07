@@ -9,8 +9,9 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LTLA_GUI.h"
 #include "KinectTracking.h"
+#include "Components\LTLAMenuBar.h"
 
-#define SKELETON_COUNT 6
+#define SKELETON_COUNT 2
 
 //==============================================================================
 /*
@@ -20,6 +21,7 @@
 class MainContentComponent   : public AudioAppComponent,
 							   private MultiTimer,
 							   public Button::Listener
+							
 {
 public:
     //==============================================================================
@@ -30,10 +32,10 @@ public:
 		KinectSensor.StartKinectST();
 		startTimer(KinectUpdateTimer, 40);
 		startTimer(GUITimer, 30);
+	
+		addAndMakeVisible(MenuBar);
 
-		CalibrationButton.setButtonText("Calibrate Front Left");
-		CalibrationButton.addListener(this);
-		addAndMakeVisible(&CalibrationButton);
+		
     }
 
     ~MainContentComponent()
@@ -67,7 +69,7 @@ public:
     void resized() override
     {
 		GUI.resized();
-		CalibrationButton.setBounds(100, 500, 300, 100);
+		MenuBar.setBounds(10, 10, 140, 40);
     }
 
 	void MainContentComponent::timerCallback(int timerID) override
@@ -90,18 +92,12 @@ public:
 			repaint();	
 		}
 	}
-
+	
 	void MainContentComponent::buttonClicked(Button* button) override
 	{
-		if (button == &CalibrationButton)
-		{
-			if (KinectSensor.GetKinectTrackingState(0) == true)
-			{			
-				GUI.CalibrateStageButtonPressed(button, CalibrationTimesPressed, KinectSensor.GetX(0), KinectSensor.GetY(0));	// CHANGE 0? 
-				CalibrationTimesPressed < 3 ? CalibrationTimesPressed++ : CalibrationTimesPressed = 0;
-			}	
-		}
+		
 	}
+
 
 private:
     //==============================================================================
@@ -109,14 +105,13 @@ private:
     // Your private member variables go here...
 	LTLA_GUI GUI;
 	KinectTracker KinectSensor;
+	LTLAMenuBar MenuBar;
 
 	enum TimerID {KinectUpdateTimer, GUITimer, NumOfTimerIDs };
 
-	TextButton CalibrationButton;
-	int CalibrationTimesPressed = 0;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
+
 
 
 // (This function is called by the app startup code to create our main component)

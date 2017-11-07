@@ -2,7 +2,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#define SKELETON_COUNT 6
+#define SKELETON_COUNT 2
 
 class LTLA_GUI : public Component
 {
@@ -33,9 +33,7 @@ public:
 	//==============================================================================	
 							/** Object Specific Functions */
 
-/** Callibrates the stage for PaintStage. 
-	Called in MainComponent - ButtonClicked. */
-	void CalibrateStageButtonPressed(Button* button, int TimesPressed, float LocationDataX, float LocationDataY);
+
 
 	//==============================================================================	
 							 /** Getters and Setters */
@@ -47,7 +45,7 @@ public:
 	void SetStageCalibrationState(bool State);
 
 /** Sets the stage Coordinates. */
-	void SetStageCoordinates(int StagePosition, float x, float y);
+//	void SetStageCoordinates(int StagePosition, float x, float y);
 
 /** Sets the tracking state of each performer. */
 	void SetKinectTrackingState(int PerformerNum, bool State);
@@ -66,7 +64,7 @@ private:
 		float x = 0.00;
 		float y = 0.00;
 	};
-	LTLACoordinates StageCoordinates[NumOfStagePositions];
-	LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
+//	LTLACoordinates StageCoordinates[NumOfStagePositions];
+	 LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
 
 };
