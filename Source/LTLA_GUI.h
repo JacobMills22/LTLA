@@ -44,27 +44,33 @@ public:
 /** Sets Stage Callibration State, used to determine whether the stage should be drawn. */
 	void SetStageCalibrationState(bool State);
 
+/** Gets the Stage Callibration State, used to determine whether the stage should be drawn. */
+	bool GetStageCalibrationState();
+
 /** Sets the stage Coordinates. */
-//	void SetStageCoordinates(int StagePosition, float x, float y);
+	void SetStageCoordinates(int StagePosition, float x, float y);
 
 /** Sets the tracking state of each performer. */
 	void SetKinectTrackingState(int PerformerNum, bool State);
 
 	//==============================================================================	
 
+	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfStagePositions };
+	int StageCalibrationCounter = 0;
+	int StageCalibrationInterval = 5;
+
 private:
 
 	// Stage Drawing Variables
-	bool StageCalibrated = false;
+	bool StageCalibrated = true;
 	bool TrackingState[2];
 
-	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfStagePositions };
 	struct LTLACoordinates
 	{
 		float x = 0.00;
 		float y = 0.00;
 	};
-//	LTLACoordinates StageCoordinates[NumOfStagePositions];
+	 LTLACoordinates StageCoordinates[NumOfStagePositions];
 	 LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
 
 };
