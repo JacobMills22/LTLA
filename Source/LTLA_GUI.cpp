@@ -5,8 +5,6 @@
 // Constructor
 LTLA_GUI::LTLA_GUI()
 {
-	setSize(800, 400);	// Set size of GUI Component
-
 	// Set all Stage Positions to 0.0
 	for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
 	{
@@ -16,6 +14,12 @@ LTLA_GUI::LTLA_GUI()
 
 	TrackingState[0] = false;
 	TrackingState[1] = false;
+
+	addAndMakeVisible(GUILabel[StageCalCountDownLabelID]);
+	//GUILabel[StageCalCountDownLabelID].setText("Not Calibrating", dontSendNotification);
+	Font LabelFont;
+	LabelFont.setSizeAndStyle(20, 1, 1, 0.25);
+	GUILabel[StageCalCountDownLabelID].setFont(LabelFont);
 }
 
 // Main GUI Functions
@@ -40,7 +44,7 @@ void LTLA_GUI::PaintTrackedEllipse(Graphics& g, float PositionX, float PositionY
 void LTLA_GUI::PaintStage(Graphics& g)
 {
 	// Draw stage if calibrated.
-	if (StageCalibrated == true)
+	if (DrawStageState == true)
 	{
 		g.setColour(Colours::black);
 		g.drawLine(StageCoordinates[FrontLeft].x, StageCoordinates[FrontLeft].y,
@@ -58,11 +62,10 @@ void LTLA_GUI::PaintStage(Graphics& g)
 
 }
 
-void LTLA_GUI::resized() 
+void LTLA_GUI::resized()
 {
-
+	GUILabel[StageCalCountDownLabelID].setBounds(getBounds().getWidth() - 200, getBounds().getHeight() - 100, 200, 100);
 }
-
 // Getters and Setters.
 
 void LTLA_GUI::SetEllipseCoordinates(float PositionX, float PositionY, int SkeltonNum)
@@ -83,14 +86,19 @@ void LTLA_GUI::SetStageCoordinates(int StagePosition, float x, float y)
 }
 
 
-void LTLA_GUI::SetStageCalibrationState(bool State)
+void LTLA_GUI::SetStageDrawingState(bool State)
 {
-	StageCalibrated = State;
+	DrawStageState	= State;
 }
 
-bool LTLA_GUI::GetStageCalibrationState()
+bool LTLA_GUI::GetStageDrawingState()
 {
-	return StageCalibrated;
+	return DrawStageState;
+}
+
+void LTLA_GUI::SetStageCalCountdownText(String Text)
+{
+	GUILabel[StageCalCountDownLabelID].setText(Text, dontSendNotification);
 }
 
 

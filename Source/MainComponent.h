@@ -23,7 +23,7 @@ public:
 	void releaseResources() override;
 	
 	//==============================================================================
-	/** Content Component GUI Function Callers*/
+	/** GUI Function Callers*/
 	void paint(Graphics& g) override;
 	void resized() override;
 

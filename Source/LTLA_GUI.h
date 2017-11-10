@@ -42,16 +42,18 @@ public:
 	void SetEllipseCoordinates(float PositionX, float PositionY, int SkeltonNum);
 
 /** Sets Stage Callibration State, used to determine whether the stage should be drawn. */
-	void SetStageCalibrationState(bool State);
+	void SetStageDrawingState(bool State);
 
 /** Gets the Stage Callibration State, used to determine whether the stage should be drawn. */
-	bool GetStageCalibrationState();
+	bool GetStageDrawingState();
 
 /** Sets the stage Coordinates. */
 	void SetStageCoordinates(int StagePosition, float x, float y);
 
 /** Sets the tracking state of each performer. */
 	void SetKinectTrackingState(int PerformerNum, bool State);
+
+	void SetStageCalCountdownText(String Text);
 
 	//==============================================================================	
 
@@ -62,7 +64,7 @@ public:
 private:
 
 	// Stage Drawing Variables
-	bool StageCalibrated = true;
+	bool DrawStageState = true;
 	bool TrackingState[2];
 
 	struct LTLACoordinates
@@ -73,4 +75,6 @@ private:
 	 LTLACoordinates StageCoordinates[NumOfStagePositions];
 	 LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
 
+	 enum {StageCalCountDownLabelID = 1, NumOfGUILabels};
+	 Label GUILabel[NumOfGUILabels];
 };

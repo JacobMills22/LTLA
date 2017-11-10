@@ -24,11 +24,12 @@
 		startTimer(KinectUpdateTimer, 40);
 		startTimer(GUITimer, 30);
 
+		addAndMakeVisible(GUI);
 		addAndMakeVisible(MenuBar);
 		
 		auto& commandManager = LTLAApplication::MainWindow::getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
-		
+
 	}
 
 	MainContentComponent::~MainContentComponent()
@@ -36,10 +37,10 @@
 		shutdownAudio();
 	}
 
+	// MAIN AUDIO FUNCTIONS
 	//==============================================================================
 	void MainContentComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 	{
-
 	}
 
 	void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
@@ -53,16 +54,17 @@
 		stopTimer(GUITimer);
 	}
 
+	// GUI FUNCTION CALLERS
 	//==============================================================================
 	void MainContentComponent::paint(Graphics& g)
 	{
-		GUI.paint(g);
 	}
 
 	void MainContentComponent::resized()
 	{
 		GUI.resized();
 		MenuBar.setBounds(10, 10, 140, 40);
+		GUI.setBounds(getBounds());
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
@@ -88,21 +90,20 @@
 		{
 			switch (GUI.StageCalibrationCounter)
 			{
-			case 0: GUI.SetStageCoordinates(GUI.FrontLeft, KinectSensor.GetX(0), KinectSensor.GetY(0)); DBG("!!!!FRONT LEFT SET!!!!");
-				break;
-			case 1: GUI.SetStageCoordinates(GUI.FrontRight, KinectSensor.GetX(0), KinectSensor.GetY(0)); DBG("!!!!FRONT RIGHT SET!!!!");
-				break;
-			case 2: GUI.SetStageCoordinates(GUI.BackRight, KinectSensor.GetX(0), KinectSensor.GetY(0)); DBG("!!!!BACK LEFT SET!!!!");
-				break;
-			case 3:
-			{
-				GUI.SetStageCoordinates(GUI.BackLeft, KinectSensor.GetX(0), KinectSensor.GetY(0));
-				stopTimer(CalibrationIntervalTimer);
-				DBG("!!!!BACK RIGHT SET!!!!");
+			case 0: GUI.SetStageCoordinates(GUI.FrontLeft, KinectSensor.GetX(0), KinectSensor.GetY(0)); 
+					GUI.SetStageCalCountdownText("Calibrating Front Right");
+					break;
+			case 1: GUI.SetStageCoordinates(GUI.FrontRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
+					GUI.SetStageCalCountdownText("Calibrating Back Right");
+					break;
+			case 2: GUI.SetStageCoordinates(GUI.BackRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
+					GUI.SetStageCalCountdownText("Calibrating Back Left");
+					break;
+			case 3:	GUI.SetStageCoordinates(GUI.BackLeft, KinectSensor.GetX(0), KinectSensor.GetY(0));
+					stopTimer(CalibrationIntervalTimer);
+					GUI.SetStageCalCountdownText("");
+					break;
 			}
-			break;
-			}
-
 			GUI.StageCalibrationCounter++;
 		}
 	}
@@ -110,9 +111,8 @@
 	void MainContentComponent::buttonClicked(Button* button)
 	{
 	}
-	
-	//==============================================================================
-	//============================ COMMAND MANAGER =================================
+
+	// COMMAND MANAGER FUNCTIONS
 	//==============================================================================
 
 	ApplicationCommandTarget* MainContentComponent::getNextCommandTarget()
@@ -145,18 +145,22 @@
 			break;
 		case LTLAMenuBar::Interval5Seconds:
 			result.setInfo("5 Seconds", "Set the Interval to 5 seconds", "Calibration", 0);
+			if (GUI.StageCalibrationInterval == 5 ) result.setTicked(true);
 			break;
 		case LTLAMenuBar::Interval10Seconds:
 			result.setInfo("10 Seconds", "Set the Interval to 10 seconds", "Calibration", 0);
+			if (GUI.StageCalibrationInterval == 10) result.setTicked(true);
 			break;
 		case LTLAMenuBar::Interval20Seconds:
 			result.setInfo("20 Seconds", "Set the Interval to 20 seconds", "Calibration", 0);
+			if (GUI.StageCalibrationInterval == 20) result.setTicked(true);
 			break;
 		case LTLAMenuBar::CalibrationStartID:
 			result.setInfo("Start Calibration", "Starts the calibration sequence.", "Calibration", 0);
 			break;
 		case LTLAMenuBar::DrawStageID: 
 			result.setInfo("Draw Stage", "Draws the stage once calibrated.", "Calibration", 0);
+			result.setTicked(GUI.GetStageDrawingState());
 			break;
 		}
 	}
@@ -183,9 +187,10 @@
 		{
 			GUI.StageCalibrationCounter = 0; 
 			startTimer(CalibrationIntervalTimer, GUI.StageCalibrationInterval * 1000);
+			GUI.SetStageCalCountdownText("Calibrating Front Left");
 		}
 			break;
-		case LTLAMenuBar::DrawStageID: GUI.GetStageCalibrationState() == true ? GUI.SetStageCalibrationState(false) : GUI.SetStageCalibrationState(true); DBG("Draw stage is " + (String)GUI.GetStageCalibrationState());
+		case LTLAMenuBar::DrawStageID: GUI.GetStageDrawingState() == true ? GUI.SetStageDrawingState(false) : GUI.SetStageDrawingState(true); DBG("Draw stage is " + (String)GUI.GetStageDrawingState());
 			break;
 		default: return false;
 		}
