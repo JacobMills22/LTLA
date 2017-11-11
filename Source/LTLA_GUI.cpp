@@ -101,6 +101,19 @@ void LTLA_GUI::SnapStageToGrid()
 	}
 }
 
+void LTLA_GUI::mouseDown(const MouseEvent &event)
+{
+
+	for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
+	{
+		if (GetMouseDrawingStageState(StagePos) == true)
+		{
+			StageCoordinates[StagePos].x = event.x;
+			StageCoordinates[StagePos].y = event.y;
+		}
+	}
+}
+
 
 void LTLA_GUI::resized()
 {
@@ -123,6 +136,21 @@ void LTLA_GUI::SetStageCoordinates(int StagePosition, float x, float y)
 {
 	StageCoordinates[StagePosition].x = getLocalBounds().getWidth() * 0.5 * x;
 	StageCoordinates[StagePosition].y = getLocalBounds().getHeight() * 0.5 * y;
+}
+
+void LTLA_GUI::SetMouseDrawingStageState(int StagePosition, bool state)
+{
+	for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
+	{
+		MouseDrawingStageState[StagePos] = false;
+	}
+	
+	MouseDrawingStageState[StagePosition] = state;
+}
+
+bool LTLA_GUI::GetMouseDrawingStageState(int StagePosition)
+{
+	return MouseDrawingStageState[StagePosition];
 }
 
 void LTLA_GUI::SetGridDrawingState(bool state)

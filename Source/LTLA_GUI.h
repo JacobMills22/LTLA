@@ -4,7 +4,8 @@
 
 #define SKELETON_COUNT 2
 
-class LTLA_GUI : public Component
+class LTLA_GUI : public Component,
+			     public MouseListener
 {
 
 public:
@@ -35,7 +36,11 @@ public:
 	//==============================================================================	
 							/** Object Specific Functions */
 
+/** Converts Stage Coordinates to be in-line with the Grid*/
 	void SnapStageToGrid();
+
+/** Called when a mouse is clicked */
+	void mouseDown(const MouseEvent &event);
 
 	//==============================================================================	
 							 /** Getters and Setters */
@@ -51,6 +56,10 @@ public:
 
 /** Sets the stage Coordinates. */
 	void SetStageCoordinates(int StagePosition, float x, float y);
+
+	void SetMouseDrawingStageState(int StagePosition, bool state);
+
+	bool GetMouseDrawingStageState(int StagePosition);
 
 /** Sets the state of Grid Drawing*/
 	void SetGridDrawingState(bool state);
@@ -89,6 +98,7 @@ private:
 	bool GridDrawingState = false;
 	bool TrackingState[2];
 	bool GridSnappingState = false;
+	bool MouseDrawingStageState[NumOfStagePositions];
 
 	struct LTLACoordinates
 	{
