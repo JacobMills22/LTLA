@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "LTLA_GUI.h"
 #include "KinectTracking.h"
 #include "Components\LTLAMenuBar.h"

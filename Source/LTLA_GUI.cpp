@@ -1,4 +1,5 @@
 #include "LTLA_GUI.h"
+#include <math.h>
 
 // GUI Class, Handles GUI Related functions called from MainComponent.
 
@@ -32,6 +33,9 @@ void LTLA_GUI::paint(Graphics& g)
 	if (TrackingState[1] == true) { PaintTrackedEllipse(g, EllipseCoordinates[1].x, EllipseCoordinates[1].y, Colours::red);  }
 
 	PaintStage(g); // Draw stage if calibrated.
+
+	if(GetGridDrawingState()) 
+		PaintGrid(g);
 }
 
 void LTLA_GUI::PaintTrackedEllipse(Graphics& g, float PositionX, float PositionY, Colour colour)
@@ -43,8 +47,11 @@ void LTLA_GUI::PaintTrackedEllipse(Graphics& g, float PositionX, float PositionY
 
 void LTLA_GUI::PaintStage(Graphics& g)
 {
+	if (GetGridSnappingState()) 
+		SnapStageToGrid();
+
 	// Draw stage if calibrated.
-	if (DrawStageState == true)
+	if (StageDrawingState == true)
 	{
 		g.setColour(Colours::black);
 		g.drawLine(StageCoordinates[FrontLeft].x, StageCoordinates[FrontLeft].y,
@@ -61,6 +68,39 @@ void LTLA_GUI::PaintStage(Graphics& g)
 	}
 
 }
+
+void LTLA_GUI::PaintGrid(Graphics& g)
+{
+	g.setColour(Colours::grey);
+
+	int LocalWidth = getLocalBounds().getWidth();
+	int LocalHeight = getLocalBounds().getHeight();
+	
+	int IncrementedX = 0;
+	int IncremnetedY = 0;
+
+	for (int LineNum = 0; LineNum < LocalWidth / GridIncrement; LineNum++)
+	{
+		g.drawLine(IncrementedX, 0, IncrementedX, LocalHeight, 0.2);
+		IncrementedX += GridIncrement;
+	}
+
+	for (int LineNum = 0; LineNum < LocalHeight / GridIncrement; LineNum++)
+	{
+		g.drawLine(0, IncremnetedY, LocalWidth, IncremnetedY, 0.2);
+		IncremnetedY += GridIncrement;
+	}
+}
+
+void LTLA_GUI::SnapStageToGrid()
+{
+	for (int StagePosition = 0; StagePosition < NumOfStagePositions; StagePosition++)
+	{
+		StageCoordinates[StagePosition].x = round((StageCoordinates[StagePosition].x / GridIncrement)) * GridIncrement;
+		StageCoordinates[StagePosition].y = round((StageCoordinates[StagePosition].y / GridIncrement)) * GridIncrement;
+	}
+}
+
 
 void LTLA_GUI::resized()
 {
@@ -85,15 +125,44 @@ void LTLA_GUI::SetStageCoordinates(int StagePosition, float x, float y)
 	StageCoordinates[StagePosition].y = getLocalBounds().getHeight() * 0.5 * y;
 }
 
+void LTLA_GUI::SetGridDrawingState(bool state)
+{
+	GridDrawingState = state;
+}
+
+bool LTLA_GUI::GetGridDrawingState()
+{
+	return GridDrawingState;
+}
+
+void LTLA_GUI::SetGridSnappingState(bool state)
+{
+	GridSnappingState = state;
+}
+
+bool LTLA_GUI::GetGridSnappingState()
+{
+	return GridSnappingState;
+}
+
+void LTLA_GUI::SetGridIncrement(int Value)
+{
+	GridIncrement = Value;
+}
+
+int LTLA_GUI::GetGridIncrement()
+{
+	return GridIncrement;
+}
 
 void LTLA_GUI::SetStageDrawingState(bool State)
 {
-	DrawStageState	= State;
+	StageDrawingState = State;
 }
 
 bool LTLA_GUI::GetStageDrawingState()
 {
-	return DrawStageState;
+	return StageDrawingState;
 }
 
 void LTLA_GUI::SetStageCalCountdownText(String Text)

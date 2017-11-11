@@ -19,6 +19,8 @@ public:
 	Handles all the GUI drawing code.*/
 	void paint(Graphics& g) override;
 
+	void PaintGrid(Graphics& g);
+
 /** Overrides JUCE resized function called in MainComponent.
 	Handles all the GUI positioning code.*/
 	void resized() override;
@@ -33,7 +35,7 @@ public:
 	//==============================================================================	
 							/** Object Specific Functions */
 
-
+	void SnapStageToGrid();
 
 	//==============================================================================	
 							 /** Getters and Setters */
@@ -50,9 +52,28 @@ public:
 /** Sets the stage Coordinates. */
 	void SetStageCoordinates(int StagePosition, float x, float y);
 
+/** Sets the state of Grid Drawing*/
+	void SetGridDrawingState(bool state);
+
+/** Gets the state of Grid Drawing*/
+	bool GetGridDrawingState();
+
+/** Sets the state of Grid Snapping*/
+	void SetGridSnappingState(bool state);
+
+/** Gets the state of Grid Snapping*/
+	bool GetGridSnappingState();
+
+/** Sets the Increment Value of Grid Snapping*/
+	void SetGridIncrement(int Value);
+
+/** Gets the Increment Value of Grid Snapping*/
+	int GetGridIncrement();
+
 /** Sets the tracking state of each performer. */
 	void SetKinectTrackingState(int PerformerNum, bool State);
 
+/** Sets the state of the stage calibration countdown text*/
 	void SetStageCalCountdownText(String Text);
 
 	//==============================================================================	
@@ -64,8 +85,10 @@ public:
 private:
 
 	// Stage Drawing Variables
-	bool DrawStageState = true;
+	bool StageDrawingState = true;
+	bool GridDrawingState = false;
 	bool TrackingState[2];
+	bool GridSnappingState = false;
 
 	struct LTLACoordinates
 	{
@@ -77,4 +100,7 @@ private:
 
 	 enum {StageCalCountDownLabelID = 1, NumOfGUILabels};
 	 Label GUILabel[NumOfGUILabels];
+
+	 int GridIncrement = 15;
+
 };

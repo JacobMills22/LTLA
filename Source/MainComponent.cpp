@@ -63,7 +63,7 @@
 	void MainContentComponent::resized()
 	{
 		GUI.resized();
-		MenuBar.setBounds(10, 10, 140, 40);
+		MenuBar.setBounds(10, 10, 200, 40);
 		GUI.setBounds(getBounds());
 	}
 
@@ -123,7 +123,9 @@
 	void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 	{
 		const CommandID ids[] = { MenuBar.FrontLeftID, MenuBar.FrontRightID, MenuBar.BackRightID, MenuBar.BackLeftID, 
-								  MenuBar.Interval5Seconds, MenuBar.Interval10Seconds, MenuBar.Interval20Seconds, MenuBar.CalibrationStartID, MenuBar.DrawStageID };
+								  MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID, 
+								  MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID, 
+								  MenuBar.GridSize15ID, MenuBar.GridSize20ID, };
 		commands.addArray(ids, numElementsInArray(ids));
 	}
 
@@ -143,15 +145,15 @@
 		case LTLAMenuBar::BackLeftID:
 			result.setInfo("Calibrate Back Left", "Instantly Calibrate the Back Left corner of the Stage", "Calibration", 0);
 			break;
-		case LTLAMenuBar::Interval5Seconds:
+		case LTLAMenuBar::Interval5SecondsID:
 			result.setInfo("5 Seconds", "Set the Interval to 5 seconds", "Calibration", 0);
 			if (GUI.StageCalibrationInterval == 5 ) result.setTicked(true);
 			break;
-		case LTLAMenuBar::Interval10Seconds:
+		case LTLAMenuBar::Interval10SecondsID:
 			result.setInfo("10 Seconds", "Set the Interval to 10 seconds", "Calibration", 0);
 			if (GUI.StageCalibrationInterval == 10) result.setTicked(true);
 			break;
-		case LTLAMenuBar::Interval20Seconds:
+		case LTLAMenuBar::Interval20SecondsID:
 			result.setInfo("20 Seconds", "Set the Interval to 20 seconds", "Calibration", 0);
 			if (GUI.StageCalibrationInterval == 20) result.setTicked(true);
 			break;
@@ -161,6 +163,23 @@
 		case LTLAMenuBar::DrawStageID: 
 			result.setInfo("Draw Stage", "Draws the stage once calibrated.", "Calibration", 0);
 			result.setTicked(GUI.GetStageDrawingState());
+			break;
+		case LTLAMenuBar::DrawGridID:
+			result.setInfo("Draw Grid", "Draws a Grid.", "Grid", 0);
+			result.setTicked(GUI.GetGridDrawingState());
+			break;
+		case LTLAMenuBar::SnaptoGridID:
+			result.setInfo("Enable Grid Snapping", "", "Grid", 0);
+			result.setTicked(GUI.GetGridSnappingState());
+			break;
+		case LTLAMenuBar::GridSize10ID:
+			result.setInfo("Grid Size 10", "", "Grid", 0);
+			break;
+		case LTLAMenuBar::GridSize15ID:
+			result.setInfo("Grid Size 15", "", "Grid", 0);
+			break;
+		case LTLAMenuBar::GridSize20ID:
+			result.setInfo("Grid Size 20", "", "Grid", 0);
 			break;
 		}
 	}
@@ -177,11 +196,11 @@
 			break;
 		case LTLAMenuBar::BackLeftID: GUI.SetStageCoordinates(GUI.BackLeft , KinectSensor.GetX(0), KinectSensor.GetY(0)); DBG("BR SET");
 			break;
-		case LTLAMenuBar::Interval5Seconds: GUI.StageCalibrationInterval = 5;
+		case LTLAMenuBar::Interval5SecondsID: GUI.StageCalibrationInterval = 5;
 			break;
-		case LTLAMenuBar::Interval10Seconds: GUI.StageCalibrationInterval = 10;
+		case LTLAMenuBar::Interval10SecondsID: GUI.StageCalibrationInterval = 10;
 			break;
-		case LTLAMenuBar::Interval20Seconds: GUI.StageCalibrationInterval = 20;
+		case LTLAMenuBar::Interval20SecondsID: GUI.StageCalibrationInterval = 20;
 			break;
 		case LTLAMenuBar::CalibrationStartID:
 		{
@@ -190,7 +209,17 @@
 			GUI.SetStageCalCountdownText("Calibrating Front Left");
 		}
 			break;
-		case LTLAMenuBar::DrawStageID: GUI.GetStageDrawingState() == true ? GUI.SetStageDrawingState(false) : GUI.SetStageDrawingState(true); DBG("Draw stage is " + (String)GUI.GetStageDrawingState());
+		case LTLAMenuBar::DrawStageID: GUI.GetStageDrawingState() == true ? GUI.SetStageDrawingState(false) : GUI.SetStageDrawingState(true);
+			break;
+		case LTLAMenuBar::DrawGridID: GUI.GetGridDrawingState() == true ? GUI.SetGridDrawingState(false) : GUI.SetGridDrawingState(true);
+			break;
+		case LTLAMenuBar::SnaptoGridID: GUI.GetGridSnappingState() == true ? GUI.SetGridSnappingState(false) : GUI.SetGridSnappingState(true);
+			break;
+		case LTLAMenuBar::GridSize10ID: GUI.SetGridIncrement(10);
+			break;
+		case LTLAMenuBar::GridSize15ID: GUI.SetGridIncrement(15);
+			break;
+		case LTLAMenuBar::GridSize20ID: GUI.SetGridIncrement(20);
 			break;
 		default: return false;
 		}
