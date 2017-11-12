@@ -13,6 +13,15 @@ LTLA_GUI::LTLA_GUI()
 		StageCoordinates[StagePos].y = 0.00;
 	}
 
+	StageCoordinates[FrontLeft].x = 50.00;
+	StageCoordinates[FrontLeft].y = 50.00;
+	StageCoordinates[FrontRight].x = 200.00;
+	StageCoordinates[FrontRight].y = 50.00;
+	StageCoordinates[BackRight].x = 200.00;
+	StageCoordinates[BackRight].y = 100.00;
+	StageCoordinates[BackLeft].x = 50.00;
+	StageCoordinates[BackLeft].y = 100.00;
+	
 	TrackingState[0] = false;
 	TrackingState[1] = false;
 
@@ -42,8 +51,8 @@ void LTLA_GUI::paint(Graphics& g)
 void LTLA_GUI::PaintTrackedEllipse(Graphics& g, float PositionX, float PositionY, Colour colour)
 {	
 	// Draw Circle to represent tracked position.
-	int Diameter = 20;
-	int Radius = Diameter * 0.5;
+	float Diameter = 20.f;
+	float Radius = Diameter * 0.5;
 	g.setColour(colour);
 	g.drawEllipse(PositionX - Radius, PositionY - Radius, Diameter, Diameter, 2);
 }
@@ -91,6 +100,22 @@ void LTLA_GUI::PaintStage(Graphics& g)
 
 		g.setColour(Colours::black);
 		g.strokePath(StagePath, PathStrokeType(1.0));	// Draw black outline of stage.
+
+		if (StageEditState == true)
+		{
+			g.setColour(Colours::white);
+			if (StageCornerSelected[FrontLeft] == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)StageCoordinates[FrontLeft].x - 5, (int)StageCoordinates[FrontLeft].y - 5, 10, 10, 1.0);
+			g.setColour(Colours::white);
+			if (StageCornerSelected[FrontRight] == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)StageCoordinates[FrontRight].x - 5, (int)StageCoordinates[FrontRight].y - 5, 10, 10, 1.0);
+			g.setColour(Colours::white);
+			if (StageCornerSelected[BackRight] == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)StageCoordinates[BackRight].x - 5, (int)StageCoordinates[BackRight].y - 5, 10, 10, 1.0);
+			g.setColour(Colours::white);
+			if (StageCornerSelected[BackLeft] == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)StageCoordinates[BackLeft].x - 5, (int)StageCoordinates[BackLeft].y - 5, 10, 10, 1.0);
+		}
 	}
 }
 
@@ -128,13 +153,44 @@ void LTLA_GUI::SnapStageToGrid()
 
 void LTLA_GUI::mouseDown(const MouseEvent &event)
 {
-
-	for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
+	if (StageEditState == true)
 	{
-		if (GetMouseDrawingStageState(StagePos) == true)
+		for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
 		{
-			StageCoordinates[StagePos].x = event.x;
-			StageCoordinates[StagePos].y = event.y;
+			if (event.getMouseDownX() <= StageCoordinates[StagePos].x + 10 && event.getMouseDownX() >= StageCoordinates[StagePos].x - 10)
+			{
+				if (event.getMouseDownY() <= StageCoordinates[StagePos].y + 10 && event.getMouseDownY() >= StageCoordinates[StagePos].y - 10)
+				{
+					StageCornerSelected[StagePos] = true;
+					break;
+				}
+			}
+		}
+	}
+}
+
+void LTLA_GUI::mouseDrag(const MouseEvent& event)
+{
+	if (StageEditState == true)
+	{
+		for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
+		{
+			if (StageCornerSelected[StagePos] == true)
+			{
+				StageCoordinates[StagePos].x = event.x;
+				StageCoordinates[StagePos].y = event.y;
+			}
+		}
+	}
+}
+
+void LTLA_GUI::mouseUp(const MouseEvent& event)
+{
+	if (StageEditState == true)
+	{
+		for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
+		{
+			StageCornerSelected[StagePos] = false;
 		}
 	}
 }
@@ -144,7 +200,6 @@ void LTLA_GUI::resized()
 {
 	GUILabel[StageCalCountDownLabelID].setBounds(getBounds().getWidth() - 200, getBounds().getHeight() - 100, 200, 100);
 }
-
 								// GETTERS & SETTERS.
 
 void LTLA_GUI::SetEllipseCoordinates(float PositionX, float PositionY, int SkeltonNum)
@@ -166,19 +221,14 @@ void LTLA_GUI::SetStageCalCountdownText(String Text)
 	GUILabel[StageCalCountDownLabelID].setText(Text, dontSendNotification);
 }
 
-void LTLA_GUI::SetMouseDrawingStageState(int StagePosition, bool state)
+void LTLA_GUI::SetStageEditState(bool State)
 {
-	for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
-	{
-		MouseDrawingStageState[StagePos] = false;
-	}
-	
-	MouseDrawingStageState[StagePosition] = state;
+	StageEditState = State;
 }
 
-bool LTLA_GUI::GetMouseDrawingStageState(int StagePosition)
+bool LTLA_GUI::GetStageEditState()
 {
-	return MouseDrawingStageState[StagePosition];
+	return StageEditState;
 }
 
 	// GRID GETTERS & SETTERS

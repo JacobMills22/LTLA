@@ -63,7 +63,7 @@
 	void MainContentComponent::resized()
 	{
 		GUI.resized();
-		MenuBar.setBounds(10, 10, 200, 40);
+		MenuBar.setBounds(10, 10, 200, 30);
 		GUI.setBounds(getBounds());
 	}
 
@@ -122,9 +122,8 @@
 
 	void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 	{
-		const CommandID ids[] = { MenuBar.FrontLeftID, MenuBar.FrontRightID, MenuBar.BackRightID, MenuBar.BackLeftID, 
-								  MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID, 
-								  MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID, 
+		const CommandID ids[] = { MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID, 
+								  MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.EditStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID, 
 								  MenuBar.GridSize15ID, MenuBar.GridSize20ID };
 		commands.addArray(ids, numElementsInArray(ids));
 	}
@@ -133,18 +132,6 @@
 	{
 		switch (commandID)
 		{
-		case LTLAMenuBar::FrontLeftID:
-			result.setInfo("Draw Front Left", "Enables mouse clicking to assign the front left stage corners position", "Calibration", 0);
-			break;
-		case LTLAMenuBar::FrontRightID:
-			result.setInfo("Draw Front Right", "Enables mouse clicking to assign the front right stage corners position", "Calibration", 0);
-			break;
-		case LTLAMenuBar::BackRightID:         
-			result.setInfo("Draw Back Right", "Enables mouse clicking to assign the back right stage corners position", "Calibration", 0);
-			break;
-		case LTLAMenuBar::BackLeftID:
-			result.setInfo("Draw Back Left", "Enables mouse clicking to assign the back left stage corners position", "Calibration", 0);
-			break;
 		case LTLAMenuBar::Interval5SecondsID:
 			result.setInfo("5 Seconds", "Set the Interval to 5 seconds", "Calibration", 0);
 			if (GUI.StageCalibrationInterval == 5 ) result.setTicked(true);
@@ -163,6 +150,10 @@
 		case LTLAMenuBar::DrawStageID: 
 			result.setInfo("Draw Stage", "Draws the stage once calibrated.", "Calibration", 0);
 			result.setTicked(GUI.GetStageDrawingState());
+			break;
+		case LTLAMenuBar::EditStageID:
+			result.setInfo("Edit Stage", "Edits the stage shape.", "Calibration", 0);
+			result.setTicked(GUI.GetStageEditState());
 			break;
 		case LTLAMenuBar::DrawGridID:
 			result.setInfo("Draw Grid", "Draws a Grid.", "Grid", 0);
@@ -188,14 +179,6 @@
 	{
 		switch (info.commandID)
 		{
-		case LTLAMenuBar::FrontLeftID: GUI.SetMouseDrawingStageState(GUI.FrontLeft, true);
-			break;
-		case LTLAMenuBar::FrontRightID: GUI.SetMouseDrawingStageState(GUI.FrontRight, true);
-			break;
-		case LTLAMenuBar::BackRightID: GUI.SetMouseDrawingStageState(GUI.BackRight, true);
-			break;
-		case LTLAMenuBar::BackLeftID: GUI.SetMouseDrawingStageState(GUI.BackLeft, true);
-			break;
 		case LTLAMenuBar::Interval5SecondsID: GUI.StageCalibrationInterval = 5;
 			break;
 		case LTLAMenuBar::Interval10SecondsID: GUI.StageCalibrationInterval = 10;
@@ -210,6 +193,8 @@
 		}
 			break;
 		case LTLAMenuBar::DrawStageID: GUI.GetStageDrawingState() == true ? GUI.SetStageDrawingState(false) : GUI.SetStageDrawingState(true);
+			break;
+		case LTLAMenuBar::EditStageID: GUI.GetStageEditState() == true ? GUI.SetStageEditState(false) : GUI.SetStageEditState(true);
 			break;
 		case LTLAMenuBar::DrawGridID: GUI.GetGridDrawingState() == true ? GUI.SetGridDrawingState(false) : GUI.SetGridDrawingState(true);
 			break;

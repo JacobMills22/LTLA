@@ -42,6 +42,10 @@ public:
 /** Called when a mouse is clicked */
 	void mouseDown(const MouseEvent &event);
 
+	void mouseDrag(const MouseEvent& event);
+
+	void mouseUp(const MouseEvent& event);
+	
 	//==============================================================================	
 							 /** Getters & Setters */
 
@@ -62,11 +66,11 @@ public:
 /** Sets the state of the stage calibration countdown text*/
 	void SetStageCalCountdownText(String Text);
 
-/** Sets the state of which stage corner the mouse should assign */
-	void SetMouseDrawingStageState(int StagePosition, bool state);
+/** *Sets the Edit Stage State */
+	void SetStageEditState(bool State);
 
-/** Gets the state of which stage corner the mouse should assign */
-	bool GetMouseDrawingStageState(int StagePosition);
+/** *Gets the Edit Stage State */
+	bool GetStageEditState();
 
 	/** GRID */ 
 
@@ -102,11 +106,12 @@ public:
 private:
 
 	// Stage Drawing Variables
-	bool StageDrawingState = true;
+	bool StageDrawingState = false;
 	bool GridDrawingState = false;
 	bool TrackingState[2];
 	bool GridSnappingState = false;
-	bool MouseDrawingStageState[NumOfStagePositions];
+	bool StageCornerSelected[NumOfStagePositions];
+	bool StageEditState = false;
 
 	struct LTLACoordinates
 	{

@@ -43,10 +43,6 @@ public:
 
 		if (menuIndex == CalibrationIndexID)
 		{
-			menu.addCommandItem(commandManager, FrontLeftID);
-			menu.addCommandItem(commandManager, FrontRightID);
-			menu.addCommandItem(commandManager, BackRightID);
-			menu.addCommandItem(commandManager, BackLeftID);
 			menu.addSeparator();
 			PopupMenu CalibrationIntervalSubMenu;
 			CalibrationIntervalSubMenu.addCommandItem(commandManager, Interval5SecondsID);
@@ -56,6 +52,7 @@ public:
 			menu.addCommandItem(commandManager, CalibrationStartID);
 			menu.addSeparator();
 			menu.addCommandItem(commandManager, DrawStageID);
+			menu.addCommandItem(commandManager, EditStageID);
 		}
 		else if (menuIndex == GridIndexID)
 		{
@@ -78,9 +75,8 @@ public:
 
 	}
 	
-	enum MainCommandManagerIDs {FrontLeftID = 1, FrontRightID, BackRightID, 
-		BackLeftID, CalibrationStartID, Interval5SecondsID, Interval10SecondsID, 
-		Interval20SecondsID, DrawStageID, DrawGridID, SnaptoGridID, GridSize10ID, 
+	enum MainCommandManagerIDs {CalibrationStartID = 1, Interval5SecondsID, Interval10SecondsID, 
+		Interval20SecondsID, DrawStageID, EditStageID, DrawGridID, SnaptoGridID, GridSize10ID, 
 		GridSize15ID, GridSize20ID, NumOfCommandIDs};
 
 private:
