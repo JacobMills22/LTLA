@@ -43,10 +43,12 @@ public:
 	void mouseDown(const MouseEvent &event);
 
 	//==============================================================================	
-							 /** Getters and Setters */
+							 /** Getters & Setters */
 
 /** Sets Ellipse Coordinates. */
 	void SetEllipseCoordinates(float PositionX, float PositionY, int SkeltonNum);
+
+	/** STAGE */ 
 
 /** Sets Stage Callibration State, used to determine whether the stage should be drawn. */
 	void SetStageDrawingState(bool State);
@@ -57,9 +59,16 @@ public:
 /** Sets the stage Coordinates. */
 	void SetStageCoordinates(int StagePosition, float x, float y);
 
+/** Sets the state of the stage calibration countdown text*/
+	void SetStageCalCountdownText(String Text);
+
+/** Sets the state of which stage corner the mouse should assign */
 	void SetMouseDrawingStageState(int StagePosition, bool state);
 
+/** Gets the state of which stage corner the mouse should assign */
 	bool GetMouseDrawingStageState(int StagePosition);
+
+	/** GRID */ 
 
 /** Sets the state of Grid Drawing*/
 	void SetGridDrawingState(bool state);
@@ -79,11 +88,10 @@ public:
 /** Gets the Increment Value of Grid Snapping*/
 	int GetGridIncrement();
 
+	/** TRACKING */
+
 /** Sets the tracking state of each performer. */
 	void SetKinectTrackingState(int PerformerNum, bool State);
-
-/** Sets the state of the stage calibration countdown text*/
-	void SetStageCalCountdownText(String Text);
 
 	//==============================================================================	
 
@@ -107,6 +115,8 @@ private:
 	};
 	 LTLACoordinates StageCoordinates[NumOfStagePositions];
 	 LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
+
+	 enum { StageFront, StageRight, StageBack, StageLeft, NumOfStageSides };
 
 	 enum {StageCalCountDownLabelID = 1, NumOfGUILabels};
 	 Label GUILabel[NumOfGUILabels];

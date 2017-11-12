@@ -134,16 +134,16 @@
 		switch (commandID)
 		{
 		case LTLAMenuBar::FrontLeftID:
-			result.setInfo("Draw Front Left", "Instantly Calibrate the Front Left corner of the Stage", "Calibration", 0);
+			result.setInfo("Draw Front Left", "Enables mouse clicking to assign the front left stage corners position", "Calibration", 0);
 			break;
 		case LTLAMenuBar::FrontRightID:
-			result.setInfo("Draw Front Right", "Instantly Calibrate the Front Right corner of the Stage", "Calibration", 0);
+			result.setInfo("Draw Front Right", "Enables mouse clicking to assign the front right stage corners position", "Calibration", 0);
 			break;
-		case LTLAMenuBar::BackRightID:
-			result.setInfo("Draw Back Right", "Instantly Calibrate the Back Right corner of the Stage", "Calibration", 0);
+		case LTLAMenuBar::BackRightID:         
+			result.setInfo("Draw Back Right", "Enables mouse clicking to assign the back right stage corners position", "Calibration", 0);
 			break;
 		case LTLAMenuBar::BackLeftID:
-			result.setInfo("Draw Back Left", "Instantly Calibrate the Back Left corner of the Stage", "Calibration", 0);
+			result.setInfo("Draw Back Left", "Enables mouse clicking to assign the back left stage corners position", "Calibration", 0);
 			break;
 		case LTLAMenuBar::Interval5SecondsID:
 			result.setInfo("5 Seconds", "Set the Interval to 5 seconds", "Calibration", 0);
@@ -188,17 +188,13 @@
 	{
 		switch (info.commandID)
 		{
-		case LTLAMenuBar::FrontLeftID: //GUI.SetStageCoordinates(GUI.FrontLeft, KinectSensor.GetX(0), KinectSensor.GetY(0));
-			GUI.SetMouseDrawingStageState(GUI.FrontLeft, true);
+		case LTLAMenuBar::FrontLeftID: GUI.SetMouseDrawingStageState(GUI.FrontLeft, true);
 			break;
-		case LTLAMenuBar::FrontRightID: //GUI.SetStageCoordinates(GUI.FrontRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
-			GUI.SetMouseDrawingStageState(GUI.FrontRight, true);
+		case LTLAMenuBar::FrontRightID: GUI.SetMouseDrawingStageState(GUI.FrontRight, true);
 			break;
-		case LTLAMenuBar::BackRightID:// GUI.SetStageCoordinates(GUI.BackRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
-			GUI.SetMouseDrawingStageState(GUI.BackRight, true);
+		case LTLAMenuBar::BackRightID: GUI.SetMouseDrawingStageState(GUI.BackRight, true);
 			break;
-		case LTLAMenuBar::BackLeftID: //GUI.SetStageCoordinates(GUI.BackLeft , KinectSensor.GetX(0), KinectSensor.GetY(0));
-			GUI.SetMouseDrawingStageState(GUI.BackLeft, true);
+		case LTLAMenuBar::BackLeftID: GUI.SetMouseDrawingStageState(GUI.BackLeft, true);
 			break;
 		case LTLAMenuBar::Interval5SecondsID: GUI.StageCalibrationInterval = 5;
 			break;
