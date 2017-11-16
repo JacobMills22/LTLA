@@ -26,8 +26,13 @@
 
 		addAndMakeVisible(GUI);
 		addAndMakeVisible(MenuBar);
+
+		addAndMakeVisible(CalibrationCountDownLabel);
+		Font LabelFont;
+		LabelFont.setSizeAndStyle(20, 1, 1, 0.25);
+		CalibrationCountDownLabel.setFont(LabelFont);
 		
-		auto& commandManager = LTLAApplication::MainWindow::getApplicationCommandManager();
+		auto& commandManager = LTLACommandManager::getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
 
 	}
@@ -58,13 +63,17 @@
 	//==============================================================================
 	void MainContentComponent::paint(Graphics& g)
 	{
+		g.fillAll(Colours::darkgrey.darker());
+		g.setColour(Colours::black);
+		g.drawRect(getLocalBounds().reduced(49), 1);
 	}
 
 	void MainContentComponent::resized()
 	{
 		GUI.resized();
-		MenuBar.setBounds(10, 10, 200, 30);
-		GUI.setBounds(getBounds());
+		MenuBar.setBounds(10, 10, 300, 30);
+		GUI.setBounds(getBounds().reduced(50));
+		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
@@ -91,17 +100,17 @@
 			switch (GUI.StageCalibrationCounter)
 			{
 			case 0: GUI.SetStageCoordinates(GUI.FrontLeft, KinectSensor.GetX(0), KinectSensor.GetY(0)); 
-					GUI.SetStageCalCountdownText("Calibrating Front Right");
+					CalibrationCountDownLabel.setText("Calibrating Front Right", dontSendNotification);
 					break;
 			case 1: GUI.SetStageCoordinates(GUI.FrontRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
-					GUI.SetStageCalCountdownText("Calibrating Back Right");
+					CalibrationCountDownLabel.setText("Calibrating Back Right", dontSendNotification);
 					break;
 			case 2: GUI.SetStageCoordinates(GUI.BackRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
-					GUI.SetStageCalCountdownText("Calibrating Back Left");
+					CalibrationCountDownLabel.setText("Calibrating Back Left", dontSendNotification);
 					break;
 			case 3:	GUI.SetStageCoordinates(GUI.BackLeft, KinectSensor.GetX(0), KinectSensor.GetY(0));
 					stopTimer(CalibrationIntervalTimer);
-					GUI.SetStageCalCountdownText("");
+					CalibrationCountDownLabel.setText("", dontSendNotification);
 					break;
 			}
 			GUI.StageCalibrationCounter++;
@@ -111,108 +120,6 @@
 	void MainContentComponent::buttonClicked(Button* button)
 	{
 	}
-
-	// COMMAND MANAGER FUNCTIONS
-	//==============================================================================
-
-	ApplicationCommandTarget* MainContentComponent::getNextCommandTarget()
-	{
-		return findFirstTargetParentComponent();
-	}
-
-	void MainContentComponent::getAllCommands(Array<CommandID>& commands)
-	{
-		const CommandID ids[] = { MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID, 
-								  MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.EditStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID, 
-								  MenuBar.GridSize15ID, MenuBar.GridSize20ID };
-		commands.addArray(ids, numElementsInArray(ids));
-	}
-
-	void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result)
-	{
-		switch (commandID)
-		{
-		case LTLAMenuBar::Interval5SecondsID:
-			result.setInfo("5 Seconds", "Set the Interval to 5 seconds", "Calibration", 0);
-			if (GUI.StageCalibrationInterval == 5 ) result.setTicked(true);
-			break;
-		case LTLAMenuBar::Interval10SecondsID:
-			result.setInfo("10 Seconds", "Set the Interval to 10 seconds", "Calibration", 0);
-			if (GUI.StageCalibrationInterval == 10) result.setTicked(true);
-			break;
-		case LTLAMenuBar::Interval20SecondsID:
-			result.setInfo("20 Seconds", "Set the Interval to 20 seconds", "Calibration", 0);
-			if (GUI.StageCalibrationInterval == 20) result.setTicked(true);
-			break;
-		case LTLAMenuBar::CalibrationStartID:
-			result.setInfo("Start Calibration", "Starts the calibration sequence.", "Calibration", 0);
-			break;
-		case LTLAMenuBar::DrawStageID: 
-			result.setInfo("Draw Stage", "Draws the stage once calibrated.", "Calibration", 0);
-			result.setTicked(GUI.GetStageDrawingState());
-			break;
-		case LTLAMenuBar::EditStageID:
-			result.setInfo("Edit Stage", "Edits the stage shape.", "Calibration", 0);
-			result.setTicked(GUI.GetStageEditState());
-			break;
-		case LTLAMenuBar::DrawGridID:
-			result.setInfo("Draw Grid", "Draws a Grid.", "Grid", 0);
-			result.setTicked(GUI.GetGridDrawingState());
-			break;
-		case LTLAMenuBar::SnaptoGridID:
-			result.setInfo("Enable Grid Snapping", "", "Grid", 0);
-			result.setTicked(GUI.GetGridSnappingState());
-			break;
-		case LTLAMenuBar::GridSize10ID:
-			result.setInfo("Grid Size 10", "", "Grid", 0);
-			break;
-		case LTLAMenuBar::GridSize15ID:
-			result.setInfo("Grid Size 15", "", "Grid", 0);
-			break;
-		case LTLAMenuBar::GridSize20ID:
-			result.setInfo("Grid Size 20", "", "Grid", 0);
-			break;
-		}
-	}
-
-	bool MainContentComponent::perform(const InvocationInfo& info)
-	{
-		switch (info.commandID)
-		{
-		case LTLAMenuBar::Interval5SecondsID: GUI.StageCalibrationInterval = 5;
-			break;
-		case LTLAMenuBar::Interval10SecondsID: GUI.StageCalibrationInterval = 10;
-			break;
-		case LTLAMenuBar::Interval20SecondsID: GUI.StageCalibrationInterval = 20;
-			break;
-		case LTLAMenuBar::CalibrationStartID:
-		{
-			GUI.StageCalibrationCounter = 0; 
-			startTimer(CalibrationIntervalTimer, GUI.StageCalibrationInterval * 1000);
-			GUI.SetStageCalCountdownText("Calibrating Front Left");
-		}
-			break;
-		case LTLAMenuBar::DrawStageID: GUI.GetStageDrawingState() == true ? GUI.SetStageDrawingState(false) : GUI.SetStageDrawingState(true);
-			break;
-		case LTLAMenuBar::EditStageID: GUI.GetStageEditState() == true ? GUI.SetStageEditState(false) : GUI.SetStageEditState(true);
-			break;
-		case LTLAMenuBar::DrawGridID: GUI.GetGridDrawingState() == true ? GUI.SetGridDrawingState(false) : GUI.SetGridDrawingState(true);
-			break;
-		case LTLAMenuBar::SnaptoGridID: GUI.GetGridSnappingState() == true ? GUI.SetGridSnappingState(false) : GUI.SetGridSnappingState(true);
-			break;
-		case LTLAMenuBar::GridSize10ID: GUI.SetGridIncrement(10);
-			break;
-		case LTLAMenuBar::GridSize15ID: GUI.SetGridIncrement(15);
-			break;
-		case LTLAMenuBar::GridSize20ID: GUI.SetGridIncrement(20);
-			break;
-		default: return false;
-		}
-		return true;
-
-	}
-	
-	//==============================================================================
 	
 	// (This function is called by the app startup code to create our main component)
 	Component* createMainContentComponent() { return new MainContentComponent(); }

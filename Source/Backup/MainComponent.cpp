@@ -6,118 +6,120 @@
   ==============================================================================
 */
 
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "LTLA_GUI.h"
-#include "KinectTracking.h"
+#include "MainComponent.h"
 
-#define SKELETON_COUNT 6
+#define SKELETON_COUNT 2
 
-//==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
-class MainContentComponent   : public AudioAppComponent,
-							   private MultiTimer,
-							   public Button::Listener
-{
-public:
-    //==============================================================================
-    MainContentComponent()
-    {
-        setSize (800, 600);
-        setAudioChannels (0, 2);
+	//==============================================================================
+	/*
+		This component lives inside our window, and this is where you should put all
+		your controls and content.
+	*/
+	//==============================================================================
+	MainContentComponent::MainContentComponent()
+	{
+		setSize(800, 600);
+		setAudioChannels(0, 2);
 		KinectSensor.StartKinectST();
 		startTimer(KinectUpdateTimer, 40);
 		startTimer(GUITimer, 30);
 
-		CalibrationButton.setButtonText("Calibrate Front Left");
-		CalibrationButton.addListener(this);
-		addAndMakeVisible(&CalibrationButton);
-    }
+		addAndMakeVisible(GUI);
+		addAndMakeVisible(MenuBar);
 
-    ~MainContentComponent()
-    {
-        shutdownAudio();
-    }
+		addAndMakeVisible(CalibrationCountDownLabel);
+		Font LabelFont;
+		LabelFont.setSizeAndStyle(20, 1, 1, 0.25);
+		CalibrationCountDownLabel.setFont(LabelFont);
+		
+		auto& commandManager = LTLACommandManager::getApplicationCommandManager();
+		commandManager.registerAllCommandsForTarget(this);
 
-    //==============================================================================
-    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override
-    {
+	}
 
-    }
+	MainContentComponent::~MainContentComponent()
+	{
+		shutdownAudio();
+	}
 
-    void getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) override
-    {
-        // Right now we are not producing any data, in which case we need to clear the buffer
-        // (to prevent the output of random noise)
-        bufferToFill.clearActiveBufferRegion();
-    }
+	// MAIN AUDIO FUNCTIONS
+	//==============================================================================
+	void MainContentComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
+	{
+	}
 
-    void releaseResources() override
-    {
+	void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
+	{
+		bufferToFill.clearActiveBufferRegion();
+	}
+
+	void MainContentComponent::releaseResources()
+	{
 		stopTimer(KinectUpdateTimer);
 		stopTimer(GUITimer);
-    }
+	}
 
-    //==============================================================================
-    void paint (Graphics& g) override
-    {
-		GUI.paint(g);
-    }
+	// GUI FUNCTION CALLERS
+	//==============================================================================
+	void MainContentComponent::paint(Graphics& g)
+	{
+		g.fillAll(Colours::darkgrey.darker());
+		g.setColour(Colours::black);
+		g.drawRect(getLocalBounds().reduced(49), 1);
+	}
 
-    void resized() override
-    {
+	void MainContentComponent::resized()
+	{
 		GUI.resized();
-		CalibrationButton.setBounds(100, 500, 300, 100);
-    }
+		MenuBar.setBounds(10, 10, 300, 30);
+		GUI.setBounds(getBounds().reduced(50));
+		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
+	}
 
-	void MainContentComponent::timerCallback(int timerID) override
+	void MainContentComponent::timerCallback(int timerID)
 	{
 		if (timerID == KinectUpdateTimer)
 		{
 			KinectSensor.UpdateKinectST();
 		}
-		if (timerID == GUITimer && KinectSensor.SkeletonBeingTracked == true)
+		if (timerID == GUITimer)
 		{
-			for (int SkeletonNum = 0; SkeletonNum < SKELETON_COUNT; SkeletonNum++)
+			for (int CurrentSkel = 0; CurrentSkel < SKELETON_COUNT; ++CurrentSkel)
 			{
-				float PositionX = KinectSensor.GetConvertedXY(&KinectSensor, 'X', SkeletonNum);
-				float PositionY = KinectSensor.GetConvertedXY(&KinectSensor, 'Y', SkeletonNum);
+				if (KinectSensor.GetKinectTrackingState(CurrentSkel) == true)
+				{
+					GUI.SetEllipseCoordinates(KinectSensor.GetX(CurrentSkel), KinectSensor.GetY(CurrentSkel), CurrentSkel);
+				}
 
-				GUI.SetEllipseCoordinates(PositionX, PositionY, SkeletonNum);
+				GUI.SetKinectTrackingState(CurrentSkel, KinectSensor.GetKinectTrackingState(CurrentSkel));
 			}
-			repaint();	
+			repaint();
 		}
-	}
-
-	void MainContentComponent::buttonClicked(Button* button) override
-	{
-		if (button == &CalibrationButton)
+		if (timerID == CalibrationIntervalTimer)
 		{
-			if (KinectSensor.SkeletonBeingTracked == true)
-			{			
-				GUI.CalibrateStageButtonPressed(button, CalibrationTimesPressed, KinectSensor.LocationData[0].x + 1.0, KinectSensor.LocationData[0].z - 1.0);	// CHANGE [0]
-				CalibrationTimesPressed >= 3 ? CalibrationTimesPressed = 0 : CalibrationTimesPressed++;
-			}	
+			switch (GUI.StageCalibrationCounter)
+			{
+			case 0: GUI.SetStageCoordinates(GUI.FrontLeft, KinectSensor.GetX(0), KinectSensor.GetY(0)); 
+					CalibrationCountDownLabel.setText("Calibrating Front Right", dontSendNotification);
+					break;
+			case 1: GUI.SetStageCoordinates(GUI.FrontRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
+					CalibrationCountDownLabel.setText("Calibrating Back Right", dontSendNotification);
+					break;
+			case 2: GUI.SetStageCoordinates(GUI.BackRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
+					CalibrationCountDownLabel.setText("Calibrating Back Left", dontSendNotification);
+					break;
+			case 3:	GUI.SetStageCoordinates(GUI.BackLeft, KinectSensor.GetX(0), KinectSensor.GetY(0));
+					stopTimer(CalibrationIntervalTimer);
+					CalibrationCountDownLabel.setText("", dontSendNotification);
+					break;
+			}
+			GUI.StageCalibrationCounter++;
 		}
 	}
 
-private:
-    //==============================================================================
-
-    // Your private member variables go here...
-	LTLA_GUI GUI;
-
-	enum TimerID {KinectUpdateTimer, GUITimer, NumOfTimerIDs };
-	KinectTracker KinectSensor;
-
-	TextButton CalibrationButton;
-	int CalibrationTimesPressed = 0;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
-};
-
-
-// (This function is called by the app startup code to create our main component)
-Component* createMainContentComponent()     { return new MainContentComponent(); }
+	void MainContentComponent::buttonClicked(Button* button)
+	{
+	}
+	
+	// (This function is called by the app startup code to create our main component)
+	Component* createMainContentComponent() { return new MainContentComponent(); }
