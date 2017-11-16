@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Source/Components/TrackingGUI.h"
+#include "../Source/Components/TrackingGUI/TrackingGUI.h"
 #include "KinectTracking.h"
 #include "Components\LTLAMenuBar.h"
 

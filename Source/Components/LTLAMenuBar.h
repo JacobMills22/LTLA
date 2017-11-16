@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Source/Components/TrackingGUI.h"
+#include "../Source/Components/TrackingGUI/TrackingGUI.h"
 #include "../Source/Components/CommandManager.h"
 
 class LTLAMenuBar : public Component,

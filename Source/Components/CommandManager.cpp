@@ -67,9 +67,12 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 		break;
 	case LTLAMenuBar::EditStageAreasID:
 		result.setInfo("Edit Stage Areas", "Resize current stage areas", "Stage Areas", 0);
+		GUI.StageAreas.size() > 0 ? result.setActive(true) : result.setActive(false);
+		GUI.GetStageAreaEditState() == true ? result.setTicked(true) : result.setTicked(false);
 		break;
 	case LTLAMenuBar::RemoveStageAreaID:
 		result.setInfo("Remove Selected Area", "Removes the currently selected shape.", "Stage Areas", 0);
+		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
 		break;
 		
 	}
@@ -108,13 +111,33 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 		break;
 	case LTLAMenuBar::GridSize20ID: GUI.SetGridIncrement(20);
 		break;
-	case LTLAMenuBar::AddStageAreaID: GUI.StageAreas.add(new StageArea); DBG("Adding new Stage Area");
+	case LTLAMenuBar::AddStageAreaID: GUI.StageAreas.add(new StageArea);
 		break;
 	case LTLAMenuBar::EditStageAreasID: 
-		GUI.GetStageAreaEditState() == true ? GUI.SetStageAreaEditState(false) : GUI.SetStageAreaEditState(true);
+		if (GUI.GetStageAreaEditState() == true)
+		{
+			GUI.SetStageAreaEditState(false);
+			for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
+			{
+				GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
+			}
+		}
+		else
+		{
+			GUI.SetStageAreaEditState(true);
+			GUI.StageAreas[0]->SetAreaSelectedState(true);
+			GUI.SetCurrentlySelectedArea(GUI.GetCurrentlySelectedArea());
+		}
 		GUI.SetStageEditState(false);
 		break;
-	case LTLAMenuBar::RemoveStageAreaID: GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+	case LTLAMenuBar::RemoveStageAreaID: 
+		GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+		if (GUI.StageAreas.size() < 1) { GUI.SetStageAreaEditState(false); }
+		else 
+		{ 
+			GUI.SetCurrentlySelectedArea(0); 
+			GUI.StageAreas[0]->SetAreaSelectedState(true);
+		}
 		break;
 	default: return false;
 	}
