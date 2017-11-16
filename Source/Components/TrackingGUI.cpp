@@ -1,4 +1,4 @@
-#include "../Source/Components/LTLA_GUI.h"
+#include "../Source/Components/TrackingGUI.h"
 #include <math.h>
 
 // GUI Class, Handles GUI Related functions called from MainComponent.
@@ -38,6 +38,8 @@ void LTLA_GUI::paint(Graphics& g)
 		PaintGrid(g);
 
 	PaintStage(g); // Draw stage if calibrated.
+
+	PaintStageAreas(g);
 
 	if (TrackingState[0] == true) { PaintTrackedEllipse(g, EllipseCoordinates[0].x, EllipseCoordinates[0].y, Colours::blue); }
 	if (TrackingState[1] == true) { PaintTrackedEllipse(g, EllipseCoordinates[1].x, EllipseCoordinates[1].y, Colours::red); }
@@ -82,16 +84,18 @@ void LTLA_GUI::PaintStage(Graphics& g)
 								   StageOutline[StageBack].getEndX(), StageOutline[StageBack].getEndY());
 
 		// Set the Stage colour to Dimgrey.
-		g.setColour(Colours::dimgrey); 
+		g.setColour(Colours::black); 
+		g.setOpacity(0.25);
 
 		// If either ellipses are inside the stage path then set the colour to light cyan
-		if (StagePath.contains(EllipseCoordinates[0].x, EllipseCoordinates[0].y) == true)
-			g.setColour(Colours::lightcyan);
+//		if (StagePath.contains(EllipseCoordinates[0].x, EllipseCoordinates[0].y) == true)
+//			g.setColour(Colours::lightcyan);
 		
-		else if (StagePath.contains(EllipseCoordinates[1].x, EllipseCoordinates[1].y) == true)
-			g.setColour(Colours::lightcyan);
+//		else if (StagePath.contains(EllipseCoordinates[1].x, EllipseCoordinates[1].y) == true)
+//			g.setColour(Colours::lightcyan);
 	
 		g.fillPath(StagePath);	// Fill the stage with desiered colour
+		g.setOpacity(1.0);
 
 		g.setColour(Colours::black);
 		g.strokePath(StagePath, PathStrokeType(1.0));	// Draw black outline of stage.
@@ -113,6 +117,22 @@ void LTLA_GUI::PaintStage(Graphics& g)
 		}
 	}
 }
+
+void LTLA_GUI::PaintStageAreas(Graphics &g)
+{
+	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	{
+		g.setColour(Colours::lightblue);
+
+		if (StageAreas.getUnchecked(AreaIndex)->GetAreaPath().contains(EllipseCoordinates[0].x, EllipseCoordinates[0].y) == true)
+		g.setColour(Colours::lightcyan);
+		if (StageAreas.getUnchecked(AreaIndex)->GetAreaPath().contains(EllipseCoordinates[1].x, EllipseCoordinates[1].y) == true)
+		g.setColour(Colours::lightcyan);
+
+		StageAreas.getUnchecked(AreaIndex)->DrawArea(g, GetStageAreaEditState());
+	}
+}
+
 
 void LTLA_GUI::PaintGrid(Graphics& g)
 {
@@ -141,14 +161,25 @@ void LTLA_GUI::SnapStageToGrid()
 {
 	for (int StagePosition = 0; StagePosition < NumOfStagePositions; StagePosition++)
 	{
-		StageCoordinates[StagePosition].x = round((StageCoordinates[StagePosition].x / GridIncrement)) * GridIncrement;
-		StageCoordinates[StagePosition].y = round((StageCoordinates[StagePosition].y / GridIncrement)) * GridIncrement;
+		StageCoordinates[StagePosition].x = round(StageCoordinates[StagePosition].x / GridIncrement) * GridIncrement;
+		StageCoordinates[StagePosition].y = round(StageCoordinates[StagePosition].y / GridIncrement) * GridIncrement;
+	}
+
+	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	{
+		for (int Corner = 0; Corner < StageAreas.getUnchecked(AreaIndex)->NumOfAreaCorners; Corner++)
+		{
+			float SnappedAreaCornerX = round(StageAreas.getUnchecked(AreaIndex)->GetX(Corner) / GridIncrement) * GridIncrement;
+			float SnappedAreaCornerY = round(StageAreas.getUnchecked(AreaIndex)->GetY(Corner) / GridIncrement) * GridIncrement;
+			
+			StageAreas.getUnchecked(AreaIndex)->UpdateArea(Corner, SnappedAreaCornerX, SnappedAreaCornerY);
+		}
 	}
 }
 
 void LTLA_GUI::mouseDown(const MouseEvent &event)
 {
-	if (StageEditState == true)
+	if (GetStageEditState() == true)
 	{
 		for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
 		{
@@ -162,18 +193,61 @@ void LTLA_GUI::mouseDown(const MouseEvent &event)
 			}
 		}
 	}
+	else if (GetStageAreaEditState() == true)
+	{
+		for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+		{
+			StageAreas.getUnchecked(AreaIndex)->SetAreaSelectedState(false);
+
+			if (StageAreas.getUnchecked(AreaIndex)->GetAreaPath().contains(event.x, event.y))
+			{
+				StageAreas.getUnchecked(AreaIndex)->SetAreaSelectedState(true);
+				SetCurrentlySelectedArea(AreaIndex);
+			}
+
+			for (int Corner = 0; Corner < StageAreas.getUnchecked(AreaIndex)->NumOfAreaCorners; Corner++)
+			{
+				if (event.getMouseDownX() <= StageAreas.getUnchecked(AreaIndex)->GetX(Corner) + 10 && event.getMouseDownX() >= StageAreas.getUnchecked(AreaIndex)->GetX(Corner) - 10)
+				{
+					if (event.getMouseDownY() <= StageAreas.getUnchecked(AreaIndex)->GetY(Corner) + 10 && event.getMouseDownY() >= StageAreas.getUnchecked(AreaIndex)->GetY(Corner) - 10)
+					{
+						StageAreas.getUnchecked(AreaIndex)->SetCornerSelectedState(Corner, true);
+						break;
+					}
+				}
+
+			}
+		}
+	}
+
+
 }
 
 void LTLA_GUI::mouseDrag(const MouseEvent& event)
 {
 	if (StageEditState == true)
 	{
+
 		for (int StagePos = 0; StagePos < NumOfStagePositions; StagePos++)
 		{
 			if (StageCornerSelected[StagePos] == true)
 			{
 				StageCoordinates[StagePos].x = event.x;
 				StageCoordinates[StagePos].y = event.y;
+			}
+		}
+	}
+	else if (GetStageAreaEditState() == true)
+	{
+		for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+		{
+			for (int Corner = 0; Corner < StageAreas.getUnchecked(AreaIndex)->NumOfAreaCorners; Corner++)
+			{
+				if (StageAreas.getUnchecked(AreaIndex)->GetCornerSelectedState(Corner) == true)
+				{
+					StageAreas.getUnchecked(AreaIndex)->UpdateArea(Corner, event.x, event.y);
+					break;
+				}
 			}
 		}
 	}
@@ -188,6 +262,16 @@ void LTLA_GUI::mouseUp(const MouseEvent& event)
 			StageCornerSelected[StagePos] = false;
 		}
 	}
+	if (GetStageAreaEditState() == true)
+	{
+		for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+		{
+			for (int Corner = 0; Corner < StageAreas.getUnchecked(AreaIndex)->NumOfAreaCorners; Corner++)
+			{
+				StageAreas.getUnchecked(AreaIndex)->SetCornerSelectedState(Corner, false);
+			}
+		}
+	}
 }
 
 
@@ -200,6 +284,15 @@ void LTLA_GUI::SetEllipseCoordinates(float PositionX, float PositionY, int Skelt
 {	// Coordinates are mapped based on the size of the window.
 	EllipseCoordinates[SkeltonNum].x = getLocalBounds().getWidth() * 0.5 * PositionX;
 	EllipseCoordinates[SkeltonNum].y = getLocalBounds().getHeight() * 0.5 * PositionY;	
+}
+
+void LTLA_GUI::SetCurrentlySelectedArea(int Index)
+{
+	SelectedAreaIndex = Index;
+}
+int LTLA_GUI::GetCurrentlySelectedArea()
+{
+	return SelectedAreaIndex;
 }
 
 	// STAGE GETTERS & SETTERS
@@ -219,6 +312,17 @@ bool LTLA_GUI::GetStageEditState()
 {
 	return StageEditState;
 }
+
+void LTLA_GUI::SetStageAreaEditState(bool State)
+{
+	StageAreaEditState = State;
+}
+
+bool LTLA_GUI::GetStageAreaEditState()
+{
+	return StageAreaEditState;
+}
+
 
 	// GRID GETTERS & SETTERS
 
