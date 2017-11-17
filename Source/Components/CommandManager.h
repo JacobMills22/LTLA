@@ -16,5 +16,7 @@ public:
 
 		return *applicationCommandManager;
 	}
+
+	 
 };
 

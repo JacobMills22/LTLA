@@ -42,16 +42,27 @@ public:
 /** Converts Stage Coordinates to be in-line with the Grid*/
 	void SnapStageToGrid();
 
-/** Called when a mouse is clicked */
+/** Called when a mouse is clicked 
+	If Area edit State is Enabled, this will find the corner of the area that's currently
+	selected and nearest to the mouse click so that the areas corners position can be updated.
+	Works for both the Stage and its Areas.*/
 	void mouseDown(const MouseEvent &event);
 
-	void mouseDrag(const MouseEvent& event);
-
-	void mouseUp(const MouseEvent& event);
-
+/** Called when the mouse is couble clicked
+	If Area Edit State is Enabled, this will find the StageArea that was double clicked
+	and then deselect the CurrentlySelected Stage area, select the area that was double clicked
+	and also update the Index of the CurrentlySelectedArea for use of TrackingGUI. */
 	void mouseDoubleClick(const MouseEvent &event);
 
-	
+/** Called when a mouse click is held down and moved.
+	This will find the stage/areas corner which is selected and update its coordinates based
+	on the mouses new position.	*/
+	void mouseDrag(const MouseEvent& event);
+
+/** Called when a mouse click is released.
+	This will simply ensure that all corners are deselected.*/
+	void mouseUp(const MouseEvent& event);
+		
 	//==============================================================================	
 							 /** Getters & Setters */
 

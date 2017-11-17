@@ -111,36 +111,54 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 		break;
 	case LTLAMenuBar::GridSize20ID: GUI.SetGridIncrement(20);
 		break;
-	case LTLAMenuBar::AddStageAreaID: GUI.StageAreas.add(new StageArea);
+	case LTLAMenuBar::AddStageAreaID: AddStageAreaIDPressed();
 		break;
-	case LTLAMenuBar::EditStageAreasID: 
-		if (GUI.GetStageAreaEditState() == true)
-		{
-			GUI.SetStageAreaEditState(false);
-			for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
-			{
-				GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
-			}
-		}
-		else
-		{
-			GUI.SetStageAreaEditState(true);
-			GUI.StageAreas[0]->SetAreaSelectedState(true);
-			GUI.SetCurrentlySelectedArea(GUI.GetCurrentlySelectedArea());
-		}
-		GUI.SetStageEditState(false);
+	case LTLAMenuBar::EditStageAreasID: EditStageAreasIDPressed();
 		break;
-	case LTLAMenuBar::RemoveStageAreaID: 
-		GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
-		if (GUI.StageAreas.size() < 1) { GUI.SetStageAreaEditState(false); }
-		else 
-		{ 
-			GUI.SetCurrentlySelectedArea(0); 
-			GUI.StageAreas[0]->SetAreaSelectedState(true);
-		}
+	case LTLAMenuBar::RemoveStageAreaID: RemoveStageAreaIDPressed();
 		break;
 	default: return false;
 	}
 	return true;
+}
 
+void MainContentComponent::AddStageAreaIDPressed()
+{
+	GUI.StageAreas.add(new StageArea); // Add a new area.
+	GUI.SetStageEditState(false);
+	GUI.SetStageAreaEditState(true); // Enable menuBars edit area button.
+	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaSelectedState(false); // Deselect currently selected area.
+	GUI.StageAreas.getLast()->SetAreaSelectedState(true); // Select the newly created area.
+	GUI.SetCurrentlySelectedArea(GUI.StageAreas.size() - 1); // Set Selected Area Index to the newly created area.
+}
+
+
+void MainContentComponent::EditStageAreasIDPressed()
+{
+	if (GUI.GetStageAreaEditState() == false)
+	{
+		GUI.SetStageAreaEditState(true);
+		GUI.StageAreas[0]->SetAreaSelectedState(true);
+		GUI.SetCurrentlySelectedArea(0);
+	}
+	else if (GUI.GetStageAreaEditState() == true)
+	{
+		GUI.SetStageAreaEditState(false);
+		for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
+		{
+			GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
+		}
+	}
+	GUI.SetStageEditState(false);
+}
+
+void MainContentComponent::RemoveStageAreaIDPressed()
+{
+	GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+	if (GUI.StageAreas.size() < 1) { GUI.SetStageAreaEditState(false); }
+	else
+	{
+		GUI.SetCurrentlySelectedArea(0);
+		GUI.StageAreas[0]->SetAreaSelectedState(true);
+	}
 }

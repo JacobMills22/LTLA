@@ -44,6 +44,11 @@ public:
 	/** Called when the command is invoked, command function code goes here.*/
 	bool perform(const InvocationInfo& info) override;
 
+	/** Split Perform Functions, called when specific toolbar item is pressed.*/
+	void AddStageAreaIDPressed();
+	void EditStageAreasIDPressed();
+	void RemoveStageAreaIDPressed();
+
 private:
 	//==============================================================================
 
