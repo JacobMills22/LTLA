@@ -43,6 +43,9 @@ public:
 /** Gets the Selection State of the Area*/
 	bool GetAreaSelectedState();
 
+	void SetAreaColour(Colour colour);
+
+	Colour GetAreaColour();
 	//==============================================================================	
 
 	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfAreaCorners};
@@ -65,6 +68,8 @@ private:
 	Coordinates PerformerCoordinates;
 	
 	Path AreaPath;
+	Colour AreaColour = Colours::floralwhite;
 	
 	bool AreaSelectedState = false;
+
 };

@@ -16,6 +16,7 @@ void LTLA_GUI::paint(Graphics& g)
 {
 	// Colour Background. 
 	g.fillAll(Colours::darkgrey); // Colour background.
+	g.drawRect(getLocalBounds().expanded(1), 2);
 
 	if(GetGridDrawingState()) 
 		PaintGrid(g);
@@ -43,19 +44,23 @@ void LTLA_GUI::PaintStage(Graphics& g)
 		SnapStageToGrid();
 
 	if (StageDrawingState == true)
+	{
+		MainStageArea.SetAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));
 		MainStageArea.DrawArea(g, GetStageEditState());
+	}
 }
 
 void LTLA_GUI::PaintStageAreas(Graphics &g)
 {
 	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
 	{
-		g.setColour(Colours::floralwhite);
-
 		if (StageAreas[AreaIndex]->GetAreaPath().contains(EllipseCoordinates[0].x, EllipseCoordinates[0].y) == true)
-		g.setColour(Colours::lightblue);
+			StageAreas[AreaIndex]->SetAreaColour(StageAreas[AreaIndex]->GetAreaColour().withAlpha(0.5f));
+		else
+			StageAreas[AreaIndex]->SetAreaColour(StageAreas[AreaIndex]->GetAreaColour().withAlpha(0.3f));
+
 		if (StageAreas[AreaIndex]->GetAreaPath().contains(EllipseCoordinates[1].x, EllipseCoordinates[1].y) == true)
-		g.setColour(Colours::lightpink);
+		g.setColour(Colours::salmon);
 
 		StageAreas[AreaIndex]->DrawArea(g, StageAreas[AreaIndex]->GetAreaSelectedState());
 	}
@@ -107,6 +112,4 @@ void LTLA_GUI::SnapStageToGrid()
 
 void LTLA_GUI::resized()
 {
-}
-								
-
+}	

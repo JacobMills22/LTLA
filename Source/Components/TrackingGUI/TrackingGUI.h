@@ -145,6 +145,9 @@ private:
 	bool StageEditState = false;
 	bool StageAreaEditState = false;
 
+	int GridIncrement = 15;
+	int SelectedAreaIndex = 0;
+
 	struct LTLACoordinates
 	{
 		float x = 0.00;
@@ -154,7 +157,4 @@ private:
 	 LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
 
 	 enum { StageFront, StageRight, StageBack, StageLeft, NumOfStageSides };
-
-	 int GridIncrement = 15;
-	 int SelectedAreaIndex = 0;
 };

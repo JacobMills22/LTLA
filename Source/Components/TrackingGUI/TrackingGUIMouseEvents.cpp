@@ -31,6 +31,7 @@ void LTLA_GUI::mouseDown(const MouseEvent &event)
 			}
 		}
 	}
+
 }
 
 void LTLA_GUI::mouseDoubleClick(const MouseEvent & event)
@@ -52,6 +53,11 @@ void LTLA_GUI::mouseDoubleClick(const MouseEvent & event)
 			}
 		}
 	}
+
+	Rectangle<int> AreaToPointTo;
+	AreaToPointTo.setWidth(StageAreas[0]->GetAreaPath().getBounds().getWidth());
+	AreaToPointTo.setHeight(StageAreas[0]->GetAreaPath().getBounds().getHeight());
+	
 }
 
 void LTLA_GUI::mouseDrag(const MouseEvent& event)

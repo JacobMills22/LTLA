@@ -18,7 +18,7 @@
 	//==============================================================================
 	MainContentComponent::MainContentComponent()
 	{
-		setSize(800, 600);
+		setSize(1000, 600);
 		setAudioChannels(0, 2);
 		KinectSensor.StartKinectST();
 		startTimer(KinectUpdateTimer, 40);
@@ -26,6 +26,10 @@
 
 		addAndMakeVisible(GUI);
 		addAndMakeVisible(MenuBar);
+
+		addAndMakeVisible(AreaColourSelector);
+		AreaColourSelector.addChangeListener(this);
+		AreaColourSelector.setVisible(false);
 
 		addAndMakeVisible(CalibrationCountDownLabel);
 		Font LabelFont;
@@ -64,16 +68,16 @@
 	void MainContentComponent::paint(Graphics& g)
 	{
 		g.fillAll(Colours::darkgrey.darker());
-		g.setColour(Colours::black);
-		g.drawRect(getLocalBounds().reduced(49), 1);
 	}
 
 	void MainContentComponent::resized()
 	{
 		GUI.resized();
 		MenuBar.setBounds(10, 10, 300, 30);
-		GUI.setBounds(getBounds().reduced(50));
+		GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(80).getHeight());
 		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
+		AreaColourSelector.setBounds(GUI.getX(), GUI.getHeight() + 55, 150, getHeight() - GUI.getHeight() - 60);
+
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
@@ -119,6 +123,14 @@
 
 	void MainContentComponent::buttonClicked(Button* button)
 	{
+	}
+
+	void MainContentComponent::changeListenerCallback(ChangeBroadcaster* source)
+	{
+		if (source == &AreaColourSelector && GUI.StageAreas.size() > 0)
+		{
+			GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaColour(AreaColourSelector.getCurrentColour());
+		}
 	}
 	
 	// (This function is called by the app startup code to create our main component)

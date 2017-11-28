@@ -25,7 +25,8 @@ void StageArea::DrawArea(Graphics &g, bool Editmode)
 							  AreaPosition[FrontRight].x, AreaPosition[FrontRight].y,
 							  AreaPosition[BackRight].x, AreaPosition[BackRight].y,
 							  AreaPosition[BackLeft].x, AreaPosition[BackLeft].y);
-	g.setOpacity(0.25);
+
+	g.setColour(GetAreaColour());
 	g.fillPath(AreaPath);
 
 	g.setColour(Colours::black);
@@ -97,5 +98,15 @@ void StageArea::SetAreaSelectedState(bool State)
 bool StageArea::GetAreaSelectedState()
 {
 	return AreaSelectedState;
+}
+
+void StageArea::SetAreaColour(Colour colour)
+{
+	AreaColour = colour;
+}
+
+Colour StageArea::GetAreaColour()
+{
+	return AreaColour;
 }
 

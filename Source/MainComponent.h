@@ -7,7 +7,8 @@
 class MainContentComponent : public AudioAppComponent,
 							 private MultiTimer,
 							 public Button::Listener,
-							 public ApplicationCommandTarget
+							 public ApplicationCommandTarget,
+							 public ChangeListener
 
 {
 public:
@@ -28,6 +29,7 @@ public:
 
 	void timerCallback(int timerID) override;
 	void buttonClicked(Button* button) override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
 
 	//==============================================================================
 	/** Command Manager Functions. Implemented in Source/Components/CommandManager.cpp */
@@ -58,7 +60,8 @@ private:
 
 	Label CalibrationCountDownLabel;
 	
-
+	ColourSelector AreaColourSelector{(ColourSelector::showColourspace), 4, 7 };
+	
 	enum TimerID { KinectUpdateTimer, GUITimer, CalibrationIntervalTimer, NumOfTimerIDs };
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)

@@ -130,6 +130,7 @@ void MainContentComponent::AddStageAreaIDPressed()
 	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaSelectedState(false); // Deselect currently selected area.
 	GUI.StageAreas.getLast()->SetAreaSelectedState(true); // Select the newly created area.
 	GUI.SetCurrentlySelectedArea(GUI.StageAreas.size() - 1); // Set Selected Area Index to the newly created area.
+	AreaColourSelector.setVisible(true);	// Makes the colour selector visible.
 }
 
 
@@ -140,10 +141,12 @@ void MainContentComponent::EditStageAreasIDPressed()
 		GUI.SetStageAreaEditState(true);
 		GUI.StageAreas[0]->SetAreaSelectedState(true);
 		GUI.SetCurrentlySelectedArea(0);
+		AreaColourSelector.setVisible(true);
 	}
 	else if (GUI.GetStageAreaEditState() == true)
 	{
 		GUI.SetStageAreaEditState(false);
+		AreaColourSelector.setVisible(false);
 		for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
 		{
 			GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
@@ -155,7 +158,11 @@ void MainContentComponent::EditStageAreasIDPressed()
 void MainContentComponent::RemoveStageAreaIDPressed()
 {
 	GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
-	if (GUI.StageAreas.size() < 1) { GUI.SetStageAreaEditState(false); }
+	if (GUI.StageAreas.size() < 1) 
+	{ 
+		GUI.SetStageAreaEditState(false); 
+		AreaColourSelector.setVisible(false);
+	}
 	else
 	{
 		GUI.SetCurrentlySelectedArea(0);
