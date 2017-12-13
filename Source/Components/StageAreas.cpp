@@ -14,7 +14,10 @@ StageArea::StageArea()
 	AreaPosition[BackLeft].x = 50.0;
 	AreaPosition[BackLeft].y = 100.0;
 
+	valueTree = new ValueTree("Stage Area Value Tree");
+	valueTree->addListener(this);
 
+	valueTree->setProperty("AreaSelectedState", false, nullptr);	
 }
 
 void StageArea::DrawArea(Graphics &g, bool Editmode)
@@ -52,13 +55,11 @@ void StageArea::DrawArea(Graphics &g, bool Editmode)
 		g.drawRect((int)AreaPosition[BackRight].x - 5, (int)AreaPosition[BackRight].y - 5, 10, 10, 1.0);
 	}
 
-	if (AreaSelectedState == true)
+	if (valueTree->getPropertyAsValue("AreaSelectedState", nullptr) == true)
 	{
 		g.setColour(Colours::white);
 		g.strokePath(AreaPath, PathStrokeType(1.0));
 	}
-
-	
 }
 
 void StageArea::UpdateArea(int Corner, float X, float Y)
@@ -67,6 +68,9 @@ void StageArea::UpdateArea(int Corner, float X, float Y)
 	AreaPosition[Corner].y = Y;
 }
 
+void StageArea::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
+{
+}
 
 float StageArea::GetX(int CornerID)
 {
@@ -93,11 +97,13 @@ bool StageArea::GetCornerSelectedState(int Corner)
 
 void StageArea::SetAreaSelectedState(bool State)
 {
-	AreaSelectedState = State;
+	valueTree->setProperty("AreaSelectedState", State, nullptr);
+//	AreaSelectedState = State;
 }
 bool StageArea::GetAreaSelectedState()
 {
-	return AreaSelectedState;
+//	return AreaSelectedState;
+	return valueTree->getPropertyAsValue("AreaSelectedState", nullptr).getValue();
 }
 
 void StageArea::SetAreaColour(Colour colour)

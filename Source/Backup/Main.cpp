@@ -81,17 +81,6 @@ public:
             // whatever you need.
             JUCEApplication::getInstance()->systemRequestedQuit();
         }
-
-		// Creates the Application Command Manager.
-//		static ApplicationCommandManager& getApplicationCommandManager()
-//		{
-//			static ScopedPointer<ApplicationCommandManager> applicationCommandManager;
-//
-//			if (applicationCommandManager == nullptr)
-//				applicationCommandManager = new ApplicationCommandManager();
-//
-//			return *applicationCommandManager;
-//		}
 		
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)

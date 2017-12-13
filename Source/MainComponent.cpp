@@ -27,6 +27,8 @@
 		addAndMakeVisible(GUI);
 		addAndMakeVisible(MenuBar);
 
+		addAndMakeVisible(audioEngine);
+
 		addAndMakeVisible(AreaColourSelector);
 		AreaColourSelector.addChangeListener(this);
 		AreaColourSelector.setVisible(false);
@@ -50,15 +52,21 @@
 	//==============================================================================
 	void MainContentComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 	{
+		samplerate = sampleRate;
+		samplesPerBlock = samplesPerBlockExpected;
+		audioEngine.initialiseEngine(samplesPerBlockExpected, sampleRate);
+		audioEngine.prepareToPlay(samplesPerBlockExpected, sampleRate);
 	}
 
 	void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
 	{
-		bufferToFill.clearActiveBufferRegion();
+		bufferToFill.clearActiveBufferRegion();	
+		audioEngine.getNextAudioBlock(bufferToFill);
 	}
 
 	void MainContentComponent::releaseResources()
 	{
+		audioEngine.releaseResources();
 		stopTimer(KinectUpdateTimer);
 		stopTimer(GUITimer);
 	}
@@ -74,10 +82,16 @@
 	{
 		GUI.resized();
 		MenuBar.setBounds(10, 10, 300, 30);
-		GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(80).getHeight());
-		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
-		AreaColourSelector.setBounds(GUI.getX(), GUI.getHeight() + 55, 150, getHeight() - GUI.getHeight() - 60);
 
+		if (GUI.getAudioPanelState() == false)
+			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(50).getHeight());
+		else
+			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getHeight() * 0.5);
+
+		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
+		AreaColourSelector.setBounds(GUI.getX() + GUI.getWidth() * 0.9, GUI.getHeight() + 55, GUI.getWidth() * 0.1, (getHeight() - GUI.getHeight()) * 0.3);
+
+		audioEngine.setBounds(GUI.getX(), GUI.getHeight() + 50, GUI.getWidth() - AreaColourSelector.getWidth(), getHeight() - GUI.getHeight());
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
@@ -97,6 +111,37 @@
 
 				GUI.SetKinectTrackingState(CurrentSkel, KinectSensor.GetKinectTrackingState(CurrentSkel));
 			}
+
+			if (GUI.hasStageAreaChanged() == true)
+			{
+				GUI.setStageAreaHasChangedState(false);
+				audioEngine.reopenAudioPanel(GUI.GetCurrentlySelectedArea());
+			}
+
+			for (int performerNum = 0; performerNum < 2; performerNum++)
+			{
+				if (GUI.doesAnyAreaContainPerfomer(performerNum) == true)
+				{
+					if (audioEngine.getPerformerExitedAreaState(performerNum) == true)
+					{
+						audioEngine.setPerformerEnteredAreaState(performerNum, true);
+					}
+					else
+					{
+						audioEngine.setPerformerEnteredAreaState(performerNum, false);
+					}
+					
+					audioEngine.setAreaIDWhichContainsPerformer(performerNum, GUI.getAreaIDContainingPerformer(performerNum));
+					audioEngine.setPerformerExitedAreaState(performerNum, false);
+
+				}
+				else
+				{
+					audioEngine.setPerformerExitedAreaState(performerNum, true);
+					audioEngine.setPerformerEnteredAreaState(performerNum, false);
+				}
+			}
+
 			repaint();
 		}
 		if (timerID == CalibrationIntervalTimer)

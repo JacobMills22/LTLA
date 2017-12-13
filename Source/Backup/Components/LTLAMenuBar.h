@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Source/Components/TrackingGUI.h"
+#include "../Source/Components/TrackingGUI/TrackingGUI.h"
 #include "../Source/Components/CommandManager.h"
 
 class LTLAMenuBar : public Component,
@@ -69,6 +69,7 @@ public:
 			menu.addCommandItem(commandManager, AddStageAreaID);
 			menu.addCommandItem(commandManager, EditStageAreasID);
 			menu.addCommandItem(commandManager, RemoveStageAreaID);
+			menu.addCommandItem(commandManager, AudioParametersID);
 		}
 		return menu;
 	}
@@ -83,7 +84,8 @@ public:
 	
 	enum MainCommandManagerIDs {CalibrationStartID = 1, Interval5SecondsID, Interval10SecondsID, 
 		Interval20SecondsID, DrawStageID, EditStageID, DrawGridID, SnaptoGridID, GridSize10ID, 
-		GridSize15ID, GridSize20ID, AddStageAreaID, EditStageAreasID, RemoveStageAreaID, NumOfCommandIDs};
+		GridSize15ID, GridSize20ID, AddStageAreaID, EditStageAreasID, RemoveStageAreaID, 
+		AudioParametersID, NumOfCommandIDs};
 
 private:
 

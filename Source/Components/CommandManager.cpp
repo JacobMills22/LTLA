@@ -14,7 +14,8 @@ void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 {
 	const CommandID ids[] = { MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID,
 		MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.EditStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID,
-		MenuBar.GridSize15ID, MenuBar.GridSize20ID, MenuBar.AddStageAreaID, MenuBar.EditStageAreasID, MenuBar.RemoveStageAreaID };
+		MenuBar.GridSize15ID, MenuBar.GridSize20ID, MenuBar.AddStageAreaID, MenuBar.EditStageAreasID, MenuBar.RemoveStageAreaID, MenuBar.AudioParametersID };
+	
 	commands.addArray(ids, numElementsInArray(ids));
 }
 
@@ -74,7 +75,11 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 		result.setInfo("Remove Selected Area", "Removes the currently selected shape.", "Stage Areas", 0);
 		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
 		break;
-		
+	case LTLAMenuBar::AudioParametersID:
+		result.setInfo("Edit Area Parameters", "Open a panel to edit audio parameters", "Stage Areas", 0);
+		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
+		GUI.getAudioPanelState() == true ? result.setTicked(true) : result.setTicked(false);
+		break;
 	}
 }
 
@@ -117,6 +122,8 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 		break;
 	case LTLAMenuBar::RemoveStageAreaID: RemoveStageAreaIDPressed();
 		break;
+	case LTLAMenuBar::AudioParametersID: editAudioParametersPressed();
+		break;
 	default: return false;
 	}
 	return true;
@@ -130,7 +137,8 @@ void MainContentComponent::AddStageAreaIDPressed()
 	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaSelectedState(false); // Deselect currently selected area.
 	GUI.StageAreas.getLast()->SetAreaSelectedState(true); // Select the newly created area.
 	GUI.SetCurrentlySelectedArea(GUI.StageAreas.size() - 1); // Set Selected Area Index to the newly created area.
-	AreaColourSelector.setVisible(true);	// Makes the colour selector visible.
+
+	audioEngine.addNewStageAreaAudioPanel();
 }
 
 
@@ -141,12 +149,10 @@ void MainContentComponent::EditStageAreasIDPressed()
 		GUI.SetStageAreaEditState(true);
 		GUI.StageAreas[0]->SetAreaSelectedState(true);
 		GUI.SetCurrentlySelectedArea(0);
-		AreaColourSelector.setVisible(true);
 	}
 	else if (GUI.GetStageAreaEditState() == true)
 	{
 		GUI.SetStageAreaEditState(false);
-		AreaColourSelector.setVisible(false);
 		for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
 		{
 			GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
@@ -168,4 +174,22 @@ void MainContentComponent::RemoveStageAreaIDPressed()
 		GUI.SetCurrentlySelectedArea(0);
 		GUI.StageAreas[0]->SetAreaSelectedState(true);
 	}
+}
+
+void MainContentComponent::editAudioParametersPressed()
+{
+	GUI.setAudioPanelState(!GUI.getAudioPanelState());
+
+	if (GUI.getAudioPanelState() == true)
+	{
+		AreaColourSelector.setVisible(true);
+		audioEngine.setVisible(true);
+	}
+	else
+	{
+		AreaColourSelector.setVisible(false);
+		audioEngine.setVisible(false);
+	}
+
+	resized();
 }

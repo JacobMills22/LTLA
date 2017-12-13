@@ -18,7 +18,7 @@
 	//==============================================================================
 	MainContentComponent::MainContentComponent()
 	{
-		setSize(800, 600);
+		setSize(1000, 600);
 		setAudioChannels(0, 2);
 		KinectSensor.StartKinectST();
 		startTimer(KinectUpdateTimer, 40);
@@ -26,6 +26,12 @@
 
 		addAndMakeVisible(GUI);
 		addAndMakeVisible(MenuBar);
+
+		addAndMakeVisible(stageAreaAudioPanel[0]);
+
+		addAndMakeVisible(AreaColourSelector);
+		AreaColourSelector.addChangeListener(this);
+		AreaColourSelector.setVisible(false);
 
 		addAndMakeVisible(CalibrationCountDownLabel);
 		Font LabelFont;
@@ -46,15 +52,22 @@
 	//==============================================================================
 	void MainContentComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 	{
+		samplerate = sampleRate;
+		samplesPerBlock = samplesPerBlockExpected;
+
+		mixerAudioSource.addInputSource(stageAreaAudioPanel.getLast(), true);
+		mixerAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 	}
 
 	void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
 	{
-		bufferToFill.clearActiveBufferRegion();
+		bufferToFill.clearActiveBufferRegion();	
+		mixerAudioSource.getNextAudioBlock(bufferToFill);
 	}
 
 	void MainContentComponent::releaseResources()
 	{
+		mixerAudioSource.releaseResources();
 		stopTimer(KinectUpdateTimer);
 		stopTimer(GUITimer);
 	}
@@ -64,16 +77,25 @@
 	void MainContentComponent::paint(Graphics& g)
 	{
 		g.fillAll(Colours::darkgrey.darker());
-		g.setColour(Colours::black);
-		g.drawRect(getLocalBounds().reduced(49), 1);
 	}
 
 	void MainContentComponent::resized()
 	{
 		GUI.resized();
 		MenuBar.setBounds(10, 10, 300, 30);
-		GUI.setBounds(getBounds().reduced(50));
+
+		if (GUI.getAudioPanelState() == false)
+			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(50).getHeight());
+		else
+			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getHeight() * 0.5);
+
 		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
+		AreaColourSelector.setBounds(GUI.getX() + GUI.getWidth() * 0.9, GUI.getHeight() + 55, GUI.getWidth() * 0.1, (getHeight() - GUI.getHeight()) * 0.3);
+
+		for (int stageAreaAudioID = 0; stageAreaAudioID < stageAreaAudioPanel.size(); stageAreaAudioID++)
+		{
+			stageAreaAudioPanel[stageAreaAudioID]->setBounds(GUI.getX(), GUI.getHeight() + 50, GUI.getWidth() - AreaColourSelector.getWidth(), getHeight() - GUI.getHeight());
+		}
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
@@ -93,6 +115,10 @@
 
 				GUI.SetKinectTrackingState(CurrentSkel, KinectSensor.GetKinectTrackingState(CurrentSkel));
 			}
+
+			if (GUI.hasStageAreaChanged() == true)
+				reopenAudioPanel();
+			
 			repaint();
 		}
 		if (timerID == CalibrationIntervalTimer)
@@ -120,6 +146,28 @@
 	void MainContentComponent::buttonClicked(Button* button)
 	{
 	}
+
+	void MainContentComponent::changeListenerCallback(ChangeBroadcaster* source)
+	{
+		if (source == &AreaColourSelector && GUI.StageAreas.size() > 0)
+		{
+			GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaColour(AreaColourSelector.getCurrentColour());
+		}
+	}
+
+	void MainContentComponent::reopenAudioPanel()
+	{
+		GUI.setStageAreaHasChangedState(false);
+
+		for (int stageAreaAudioID = 0; stageAreaAudioID < stageAreaAudioPanel.size(); stageAreaAudioID++)
+		{
+			stageAreaAudioPanel[stageAreaAudioID]->setVisible(false);
+		}
+		stageAreaAudioPanel[GUI.GetCurrentlySelectedArea()]->setVisible(true);
+		stageAreaAudioPanel[GUI.GetCurrentlySelectedArea()]->toFront(false);
+	}
+
+
 	
 	// (This function is called by the app startup code to create our main component)
 	Component* createMainContentComponent() { return new MainContentComponent(); }

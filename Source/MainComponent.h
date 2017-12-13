@@ -3,6 +3,8 @@
 #include "../Source/Components/TrackingGUI/TrackingGUI.h"
 #include "KinectTracking.h"
 #include "Components\LTLAMenuBar.h"
+#include "Components\AudioEngine\AudioPanel.h"
+#include "Components\AudioEngine\AudioEngine.h"
 
 class MainContentComponent : public AudioAppComponent,
 							 private MultiTimer,
@@ -50,6 +52,7 @@ public:
 	void AddStageAreaIDPressed();
 	void EditStageAreasIDPressed();
 	void RemoveStageAreaIDPressed();
+	void editAudioParametersPressed();
 
 private:
 	//==============================================================================
@@ -57,12 +60,15 @@ private:
 	LTLA_GUI GUI;
 	KinectTracker KinectSensor;
 	LTLAMenuBar MenuBar;
+	LTLAAudioEngine audioEngine;
 
 	Label CalibrationCountDownLabel;
-	
 	ColourSelector AreaColourSelector{(ColourSelector::showColourspace), 4, 7 };
 	
 	enum TimerID { KinectUpdateTimer, GUITimer, CalibrationIntervalTimer, NumOfTimerIDs };
+
+	double samplerate = 0;
+	int samplesPerBlock = 0;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 

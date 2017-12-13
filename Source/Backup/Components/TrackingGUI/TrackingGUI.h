@@ -108,6 +108,7 @@ public:
 
 	bool getAudioPanelState();
 
+
 	/** GRID */ 
 
 /** Sets the state of Grid Drawing*/
@@ -132,10 +133,6 @@ public:
 
 /** Sets the tracking state of each performer. */
 	void SetKinectTrackingState(int PerformerNum, bool State);
-
-	bool doesAnyAreaContainPerfomer(int performerID);
-
-	int getAreaIDContainingPerformer(int performerID);
 
 	//==============================================================================	
 

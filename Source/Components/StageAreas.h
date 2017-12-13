@@ -1,8 +1,11 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "AudioEngine\AudioPanel.h"
 
-class StageArea : Component
+class StageArea : public Component,
+				  public ValueTree::Listener
+		
 {
 public:
 
@@ -18,6 +21,28 @@ public:
 
 /** Updates the Coordinates of one of the Areas Corners*/
 	void UpdateArea( int Corner, float X, float Y);
+
+	 void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
+
+	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override
+	 {
+
+	 }
+
+	 void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override
+	 {
+
+	 }
+
+	 void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex) override
+	 {
+
+	 }
+
+	 void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override
+	 {
+
+	 }
 	
 	//==============================================================================	
 	/** Getters & Setters*/
@@ -46,11 +71,14 @@ public:
 	void SetAreaColour(Colour colour);
 
 	Colour GetAreaColour();
+
 	//==============================================================================	
 
 	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfAreaCorners};
 
 private:
+
+ScopedPointer<ValueTree> valueTree;
 
 	struct AreaCorner
 	{
@@ -70,6 +98,4 @@ private:
 	Path AreaPath;
 	Colour AreaColour = Colours::floralwhite;
 	
-	bool AreaSelectedState = false;
-
 };

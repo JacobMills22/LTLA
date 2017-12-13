@@ -14,7 +14,8 @@ void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 {
 	const CommandID ids[] = { MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID,
 		MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.EditStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID,
-		MenuBar.GridSize15ID, MenuBar.GridSize20ID, MenuBar.AddStageAreaID, MenuBar.EditStageAreasID, MenuBar.RemoveStageAreaID };
+		MenuBar.GridSize15ID, MenuBar.GridSize20ID, MenuBar.AddStageAreaID, MenuBar.EditStageAreasID, MenuBar.RemoveStageAreaID, MenuBar.AudioParametersID };
+	
 	commands.addArray(ids, numElementsInArray(ids));
 }
 
@@ -67,11 +68,18 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 		break;
 	case LTLAMenuBar::EditStageAreasID:
 		result.setInfo("Edit Stage Areas", "Resize current stage areas", "Stage Areas", 0);
+		GUI.StageAreas.size() > 0 ? result.setActive(true) : result.setActive(false);
+		GUI.GetStageAreaEditState() == true ? result.setTicked(true) : result.setTicked(false);
 		break;
 	case LTLAMenuBar::RemoveStageAreaID:
 		result.setInfo("Remove Selected Area", "Removes the currently selected shape.", "Stage Areas", 0);
+		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
 		break;
-		
+	case LTLAMenuBar::AudioParametersID:
+		result.setInfo("Edit Area Parameters", "Open a panel to edit audio parameters", "Stage Areas", 0);
+		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
+		GUI.getAudioPanelState() == true ? result.setTicked(true) : result.setTicked(false);
+		break;
 	}
 }
 
@@ -108,16 +116,91 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 		break;
 	case LTLAMenuBar::GridSize20ID: GUI.SetGridIncrement(20);
 		break;
-	case LTLAMenuBar::AddStageAreaID: GUI.StageAreas.add(new StageArea); DBG("Adding new Stage Area");
+	case LTLAMenuBar::AddStageAreaID: AddStageAreaIDPressed();
 		break;
-	case LTLAMenuBar::EditStageAreasID: 
-		GUI.GetStageAreaEditState() == true ? GUI.SetStageAreaEditState(false) : GUI.SetStageAreaEditState(true);
-		GUI.SetStageEditState(false);
+	case LTLAMenuBar::EditStageAreasID: EditStageAreasIDPressed();
 		break;
-	case LTLAMenuBar::RemoveStageAreaID: GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+	case LTLAMenuBar::RemoveStageAreaID: RemoveStageAreaIDPressed();
+		break;
+	case LTLAMenuBar::AudioParametersID: editAudioParametersPressed();
 		break;
 	default: return false;
 	}
 	return true;
+}
 
+void MainContentComponent::AddStageAreaIDPressed()
+{
+	GUI.StageAreas.add(new StageArea); // Add a new area.
+	GUI.SetStageEditState(false);
+	GUI.SetStageAreaEditState(true); // Enable menuBars edit area button.
+	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaSelectedState(false); // Deselect currently selected area.
+	GUI.StageAreas.getLast()->SetAreaSelectedState(true); // Select the newly created area.
+	GUI.SetCurrentlySelectedArea(GUI.StageAreas.size() - 1); // Set Selected Area Index to the newly created area.
+
+	stageAreaAudioPanel.add(new LTLAAudioPanel);
+	stageAreaAudioPanel.getLast()->prepareToPlay(samplesPerBlock, samplerate);
+	prepareToPlay(samplesPerBlock, samplerate);
+	addAndMakeVisible(stageAreaAudioPanel.getLast());
+	stageAreaAudioPanel.getLast()->setVisible(false);
+
+}
+
+
+void MainContentComponent::EditStageAreasIDPressed()
+{
+	if (GUI.GetStageAreaEditState() == false)
+	{
+		GUI.SetStageAreaEditState(true);
+		GUI.StageAreas[0]->SetAreaSelectedState(true);
+		GUI.SetCurrentlySelectedArea(0);
+	}
+	else if (GUI.GetStageAreaEditState() == true)
+	{
+		GUI.SetStageAreaEditState(false);
+		for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
+		{
+			GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
+		}
+	}
+	GUI.SetStageEditState(false);
+}
+
+void MainContentComponent::RemoveStageAreaIDPressed()
+{
+	GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+	if (GUI.StageAreas.size() < 1) 
+	{ 
+		GUI.SetStageAreaEditState(false); 
+		AreaColourSelector.setVisible(false);
+	}
+	else
+	{
+		GUI.SetCurrentlySelectedArea(0);
+		GUI.StageAreas[0]->SetAreaSelectedState(true);
+	}
+}
+
+void MainContentComponent::editAudioParametersPressed()
+{
+	GUI.setAudioPanelState(!GUI.getAudioPanelState());
+
+	if (GUI.getAudioPanelState() == true)
+	{
+		AreaColourSelector.setVisible(true);
+		for (int stageAreaAudioID = 0; stageAreaAudioID < stageAreaAudioPanel.size(); stageAreaAudioID++)
+		{
+			stageAreaAudioPanel[stageAreaAudioID]->setVisible(true);
+		}
+	}
+	else
+	{
+		AreaColourSelector.setVisible(false);
+		for (int stageAreaAudioID = 0; stageAreaAudioID < stageAreaAudioPanel.size(); stageAreaAudioID++)
+		{
+			stageAreaAudioPanel[stageAreaAudioID]->setVisible(false);
+		}
+	}
+
+	resized();
 }
