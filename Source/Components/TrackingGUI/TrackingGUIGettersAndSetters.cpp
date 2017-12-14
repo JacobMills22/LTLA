@@ -135,7 +135,7 @@ bool LTLA_GUI::doesAnyAreaContainPerfomer(int performerID)
 		if (StageAreas[AreaID]->GetAreaPath().contains(EllipseCoordinates[performerID].x, EllipseCoordinates[performerID].y) == true)
 		{
 			return true;
-				break;
+			break;
 		}
 	}
 	return false;

@@ -65,6 +65,9 @@ public:
 	bool getPlaybackState();
 
 	void startPlayback(int playBackPosition);
+	
+	void stopPlayback();
+
 
 /** Sets the Sample Rate. */
 	void setSampleRate(int sampleRate);
@@ -80,7 +83,20 @@ public:
 
 	int getPerformerWhichTriggers();
 
+	int getPlaybackOnPerformerExitOption();
+
+	bool getReTriggerState();
+
 private:
+
+	// TRACKING BASED PARAMETERS (VALUETREE PARAMETERS)
+	enum { performerWhichTriggersBoxID, performerExitBoxID, retriggerBoxID, numOfComboBoxes };
+	ComboBox filePlayerComboBox[numOfComboBoxes];
+	float playbackLevel = 0.0;
+	int PerformerWhichTriggers = 0;
+	enum { continuePlaybackID = 1, stopPlaybackID };
+	int playbackOnPerformerExit = stopPlaybackID;
+	bool retriggerState = false;
 
 	// AUDIO VARIABLES/OBJECTS
 	AudioFormatReaderSource* audioFormatReaderSource;
@@ -90,7 +106,6 @@ private:
 	float playBackPosition = 0.0;
 	bool playbackState = false;
 	int SampleRate = 44100;
-	float playbackLevel = 0.0;
 
 	// GUI VARIABLES/OBJECTS
 	enum { playButtonID, stopButtonID, numOfButtons };
@@ -98,12 +113,7 @@ private:
 	enum { levelSliderID, numOfSliderIDs};
 	Slider fileplayerSlider[numOfSliderIDs];
 	ScopedPointer<FilenameComponent> fileChooser;
-	enum {levelLabelID, triggeredByLabelID, numOfLabels};
+	enum {levelLabelID, triggeredByLabelID, performerExitLabelID, retriggerLabelID, numOfLabels};
 	Label filePlayerLabel[numOfLabels];
-
-	// TRACKING BASED PARAMETERS
-	enum { performerWhichTriggersID, numOfComboBoxes};
-	ComboBox filePlayerComboBox[numOfComboBoxes];
-	int PerformerWhichTriggers = 0;
 
 };

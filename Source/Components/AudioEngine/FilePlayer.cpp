@@ -51,6 +51,9 @@ FilePlayer::FilePlayer() : thread("AudioFileStreamThread")
 	}
 	filePlayerLabel[levelLabelID].setText("Level", dontSendNotification);
 	filePlayerLabel[triggeredByLabelID].setText("Triggered by", dontSendNotification);
+	filePlayerLabel[performerExitLabelID].setText("Stop When Perfromer Exits", dontSendNotification);
+	filePlayerLabel[retriggerLabelID].setText("Retrigger", dontSendNotification);
+
 
 	// ComboBox Initialisation
 
@@ -59,11 +62,20 @@ FilePlayer::FilePlayer() : thread("AudioFileStreamThread")
 		addAndMakeVisible(filePlayerComboBox[boxNum]);
 		filePlayerComboBox[boxNum].addListener(this);
 	}
-	filePlayerComboBox[performerWhichTriggersID].addItem("Perfromer 1", 1);
-	filePlayerComboBox[performerWhichTriggersID].addItem("Perfromer 2", 2);
-	filePlayerComboBox[performerWhichTriggersID].addItem("Any Performer", 3);
-	filePlayerComboBox[performerWhichTriggersID].setSelectedId(1, dontSendNotification);
+	filePlayerComboBox[performerWhichTriggersBoxID].addItem("Perfromer 1", 1);
+	filePlayerComboBox[performerWhichTriggersBoxID].addItem("Perfromer 2", 2);
+	filePlayerComboBox[performerWhichTriggersBoxID].addItem("Any Performer", 3);
+	filePlayerComboBox[performerWhichTriggersBoxID].setSelectedId(1, dontSendNotification);
 
+	filePlayerComboBox[performerExitBoxID].addItem("Continue Playback", continuePlaybackID);
+	filePlayerComboBox[performerExitBoxID].addItem("Stop Playback", stopPlaybackID);
+	filePlayerComboBox[performerExitBoxID].setSelectedId(stopPlaybackID, dontSendNotification);
+
+	filePlayerComboBox[retriggerBoxID].addItem("No", 1);
+	filePlayerComboBox[retriggerBoxID].addItem("Yes", 2);
+	filePlayerComboBox[retriggerBoxID].setSelectedId(1, dontSendNotification);
+
+	PerformerWhichTriggers = 0;
 
 	// Start timer
 	startTimer(100);
@@ -86,9 +98,7 @@ void FilePlayer::buttonClicked(Button* button)
 	{											// Start/Pause audio Playback.
 		if (getPlaybackState() == false)
 		{
-			audioTransportSource.setPosition(playBackPosition);
-			setPlayBackState(true);
-			GUIButtons[playButtonID].setButtonText("Pause");
+			startPlayback(playBackPosition);
 		}
 		else
 		{
@@ -98,18 +108,23 @@ void FilePlayer::buttonClicked(Button* button)
 	}
 	else if (button == &GUIButtons[stopButtonID])	// If Stop button was clicked,
 	{												// stop audio playback and reset psoition to zero.
-		setPlayBackState(false);
-		playBackPosition = 0;
-		audioTransportSource.setPosition(playBackPosition);
-		GUIButtons[playButtonID].setButtonText("Play");
+		stopPlayback();
 	}
 }
 
 void FilePlayer::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 {
-	if (comboBoxThatHasChanged == &filePlayerComboBox[performerWhichTriggersID])
+	if (comboBoxThatHasChanged == &filePlayerComboBox[performerWhichTriggersBoxID])
 	{
-		PerformerWhichTriggers = filePlayerComboBox[performerWhichTriggersID].getSelectedId() - 1;
+		PerformerWhichTriggers = filePlayerComboBox[performerWhichTriggersBoxID].getSelectedId() - 1;
+	}
+	else if (comboBoxThatHasChanged == &filePlayerComboBox[performerExitBoxID])
+	{
+		playbackOnPerformerExit = filePlayerComboBox[performerExitBoxID].getSelectedId();
+	}
+	else if (comboBoxThatHasChanged == &filePlayerComboBox[retriggerBoxID])
+	{
+		retriggerState = filePlayerComboBox[retriggerBoxID].getSelectedId() - 1;
 	}
 }
 
@@ -120,6 +135,15 @@ void FilePlayer::startPlayback(int playBackPosition)
 		setPlayBackState(true);
 		GUIButtons[playButtonID].setButtonText("Pause");	
 }
+
+void FilePlayer::stopPlayback()
+{
+	setPlayBackState(false);
+	playBackPosition = 0;
+	audioTransportSource.setPosition(playBackPosition);
+	GUIButtons[playButtonID].setButtonText("Play");
+}
+
 
 
 void FilePlayer::openPanel()
@@ -169,7 +193,14 @@ void FilePlayer::resized()
 	filePlayerLabel[levelLabelID].setBounds(fileplayerSlider[levelSliderID].getX(), fileplayerSlider[levelSliderID].getY() * 0.75, fileplayerSlider[levelSliderID].getWidth(), fileplayerSlider[levelSliderID].getHeight() * 0.25);
 
 	filePlayerLabel[triggeredByLabelID].setBounds(0, fileplayerSlider[levelSliderID].getBottom() + (getHeight() * 0.01), getWidth() * 0.25, getHeight() * 0.1);
-	filePlayerComboBox[performerWhichTriggersID].setBounds(filePlayerLabel[triggeredByLabelID].getX(), filePlayerLabel[triggeredByLabelID].getBottom(), getWidth() * 0.25, getHeight() * 0.1);
+	filePlayerComboBox[performerWhichTriggersBoxID].setBounds(filePlayerLabel[triggeredByLabelID].getX(), filePlayerLabel[triggeredByLabelID].getBottom(), getWidth() * 0.25, getHeight() * 0.1);
+
+	filePlayerLabel[performerExitLabelID].setBounds(filePlayerLabel[triggeredByLabelID].getRight() + (getWidth() * 0.03), filePlayerLabel[triggeredByLabelID].getY(), getWidth() * 0.40, getHeight() * 0.1);
+	filePlayerComboBox[performerExitBoxID].setBounds(filePlayerLabel[performerExitLabelID].getX(), filePlayerLabel[performerExitLabelID].getBottom(), getWidth() * 0.40, getHeight() * 0.1);
+
+	filePlayerLabel[retriggerLabelID].setBounds(filePlayerLabel[performerExitLabelID].getRight() + (getWidth() * 0.03), filePlayerLabel[triggeredByLabelID].getY(), getWidth() * 0.20, getHeight() * 0.1);
+	filePlayerComboBox[retriggerBoxID].setBounds(filePlayerLabel[retriggerLabelID].getX(), filePlayerLabel[performerExitLabelID].getBottom(), getWidth() * 0.20, getHeight() * 0.1);
+
 }
 
 // AUDIO
@@ -280,4 +311,16 @@ int FilePlayer::getPerformerWhichTriggers()
 {
 	return PerformerWhichTriggers;
 }
+
+int FilePlayer::getPlaybackOnPerformerExitOption()
+{
+	return playbackOnPerformerExit;
+}
+
+bool FilePlayer::getReTriggerState()
+{
+	return retriggerState;
+}
+
+
 

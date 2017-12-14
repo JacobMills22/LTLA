@@ -14,12 +14,16 @@ public:
 	{
 		samplesPerBlock = SamplesPerBlock;
 		samplerate = sampleRate;
+
+		performerExitedAreaState[0] = false;
+		performerExitedAreaState[1] = false;
+
 		startTimer(30);
 	}
 
 	void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
 	{
-		mixerAudioSource.addInputSource(stageAreaAudioPanel.getLast(), true);
+		mixerAudioSource.addInputSource(audioPanel.getLast(), true);
 		mixerAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 	}
 
@@ -36,43 +40,43 @@ public:
 
 	void addNewStageAreaAudioPanel()
 	{
-		stageAreaAudioPanel.add(new LTLAAudioPanel);
-		stageAreaAudioPanel.getLast()->prepareToPlay(samplesPerBlock, samplerate);
+		audioPanel.add(new LTLAAudioPanel);
+		audioPanel.getLast()->prepareToPlay(samplesPerBlock, samplerate);
 		prepareToPlay(samplesPerBlock, samplerate);
-		addAndMakeVisible(stageAreaAudioPanel.getLast());
-		stageAreaAudioPanel.getLast()->setVisible(true);
+		addAndMakeVisible(audioPanel.getLast());
+		audioPanel.getLast()->setVisible(true);
 	}
 
 	void reopenAudioPanel(int selectedArea)
 	{
-		for (int stageAreaAudioID = 0; stageAreaAudioID < stageAreaAudioPanel.size(); stageAreaAudioID++)
+		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
 		{
-			stageAreaAudioPanel[stageAreaAudioID]->setVisible(false);
+			audioPanel[stageAreaAudioID]->setVisible(false);
 		}
-		stageAreaAudioPanel[selectedArea]->setVisible(true);
-		stageAreaAudioPanel[selectedArea]->toFront(false);
+		audioPanel[selectedArea]->setVisible(true);
+		audioPanel[selectedArea]->toFront(false);
 		resized();
 	}
 
 	void setStateOfAllPanels(bool state)
 	{
-		for (int stageAreaAudioID = 0; stageAreaAudioID < stageAreaAudioPanel.size(); stageAreaAudioID++)
+		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
 		{
-			stageAreaAudioPanel[stageAreaAudioID]->setVisible(state);
+			audioPanel[stageAreaAudioID]->setVisible(state);
 		}
 	}
 
 	void resized() override
 	{
-		for (int stageAreaAudioID = 0; stageAreaAudioID < stageAreaAudioPanel.size(); stageAreaAudioID++)
+		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
 		{
-			stageAreaAudioPanel[stageAreaAudioID]->setBounds(0, 0, getBounds().getWidth(), getBounds().getHeight());
+			audioPanel[stageAreaAudioID]->setBounds(0, 0, getBounds().getWidth(), getBounds().getHeight());
 		}
 	}
 
 	void setAreaIDWhichContainsPerformer(int perfromerID, int AreaID)
 	{
-		areaIDWhichContainsPerformer[perfromerID] = AreaID;
+		areaIDWithPerformer[perfromerID] = AreaID;
 	}
 
 	void setPerformerEnteredAreaState(int perfromerID, bool state)
@@ -97,34 +101,77 @@ public:
 
 	void timerCallback() override
 	{
-		for (int perfromerNum = 0; perfromerNum < 2; perfromerNum++)
+		for (int performer = 0; performer < 2; performer++)
 		{
-			if (performerEnteredAreaState[perfromerNum] == true)
+			if (performerEnteredAreaState[performer] == true)
 			{
-				if (stageAreaAudioPanel[areaIDWhichContainsPerformer[perfromerNum]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
-				{
-					stageAreaAudioPanel[areaIDWhichContainsPerformer[perfromerNum]]->startFilePlayerPlayback(0);
-				}
-				else if (stageAreaAudioPanel[areaIDWhichContainsPerformer[perfromerNum]]->getPerfromerToTrigger() == perfromerNum)
-				{
-					stageAreaAudioPanel[areaIDWhichContainsPerformer[perfromerNum]]->startFilePlayerPlayback(0);
-				}
+				performerEnteredArea(performer);
+			}
+			else if (performerExitedAreaState[performer] == true)
+			{
+				performerExitedArea(performer);
 			}
 		}
+	}
 
+	void performerEnteredArea(int performer)
+	{
+		if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerRetriggerState() == true)
+		{
+			DBG("TRUE");
+			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
+			{
+				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
+			}
+			else if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == performer)
+			{
+				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
+			}
+		}
+		else if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerPlayBackState() == false)
+		{
+			DBG("FALSE");
+
+			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
+			{
+				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
+			}
+			else if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == performer)
+			{
+				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
+			}
+		}
+	}
+
+	void performerExitedArea(int performer)
+	{
+		if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerPerformerExitOption() == stopPlaybackID)
+		{
+			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
+			{
+				audioPanel[areaIDWithPerformer[performer]]->stopFilePlayerPlayback();
+			}
+			else if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == performer)
+			{
+				audioPanel[areaIDWithPerformer[performer]]->stopFilePlayerPlayback();
+			}
+		}
 	}
 
 
 private:
 
 	MixerAudioSource mixerAudioSource;
-	OwnedArray<LTLAAudioPanel> stageAreaAudioPanel;
+	OwnedArray<LTLAAudioPanel> audioPanel;
 	int samplesPerBlock = 0;
 	double samplerate = 0;
 
 	bool performerEnteredAreaState[2];
 	bool performerExitedAreaState[2];
 
-	int areaIDWhichContainsPerformer[2];
+	int areaIDWithPerformer[2];
+
+	enum { continuePlaybackID = 1, stopPlaybackID };
+
 
 };

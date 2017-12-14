@@ -70,6 +70,8 @@ private:
 	double samplerate = 0;
 	int samplesPerBlock = 0;
 
+	int oldAreaIDContainingPerfromer[2];
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 
 

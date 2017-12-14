@@ -75,9 +75,33 @@ public:
 		filePlayer.startPlayback(playBackPosition);
 	}
 
+	void stopFilePlayerPlayback()
+	{
+		filePlayer.stopPlayback();
+	}
+
 	int getPerfromerToTrigger()
 	{
-		return filePlayer.getPerformerWhichTriggers();
+		if (&filePlayer != nullptr)
+		{
+			return filePlayer.getPerformerWhichTriggers();
+		}
+		else { return 0; }
+	}
+
+	int getFilePlayerPerformerExitOption()
+	{
+		return filePlayer.getPlaybackOnPerformerExitOption();
+	}
+
+	bool getFilePlayerPlayBackState()
+	{
+		return filePlayer.getPlaybackState();
+	}
+
+	bool getFilePlayerRetriggerState()
+	{
+		return filePlayer.getReTriggerState();
 	}
 
 

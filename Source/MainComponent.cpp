@@ -122,6 +122,12 @@
 			{
 				if (GUI.doesAnyAreaContainPerfomer(performerNum) == true)
 				{
+					if (oldAreaIDContainingPerfromer[performerNum] != GUI.getAreaIDContainingPerformer(performerNum))
+					{
+						audioEngine.setPerformerExitedAreaState(performerNum, true);
+						audioEngine.setPerformerEnteredAreaState(performerNum, false);
+					}
+
 					if (audioEngine.getPerformerExitedAreaState(performerNum) == true)
 					{
 						audioEngine.setPerformerEnteredAreaState(performerNum, true);
@@ -130,15 +136,19 @@
 					{
 						audioEngine.setPerformerEnteredAreaState(performerNum, false);
 					}
-					
+
 					audioEngine.setAreaIDWhichContainsPerformer(performerNum, GUI.getAreaIDContainingPerformer(performerNum));
+					oldAreaIDContainingPerfromer[performerNum] = GUI.getAreaIDContainingPerformer(performerNum);
 					audioEngine.setPerformerExitedAreaState(performerNum, false);
 
 				}
 				else
 				{
-					audioEngine.setPerformerExitedAreaState(performerNum, true);
-					audioEngine.setPerformerEnteredAreaState(performerNum, false);
+					if (audioEngine.getPerformerEnteredAreaState(performerNum) == false)
+					{
+						audioEngine.setPerformerExitedAreaState(performerNum, true);
+						audioEngine.setPerformerEnteredAreaState(performerNum, false);
+					}
 				}
 			}
 
