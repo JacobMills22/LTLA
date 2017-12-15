@@ -40,17 +40,10 @@ void LTLA_GUI::mouseDoubleClick(const MouseEvent & event)
 	{
 		for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
 		{
-			StageAreas[AreaIndex]->SetAreaSelectedState(false);
-
 			if (StageAreas[AreaIndex]->GetAreaPath().contains(event.x, event.y) == true)
 			{
 				if (StageAreas[AreaIndex]->GetAreaPath().contains(event.x, event.y) == true)
 				{
-					if (GetCurrentlySelectedArea() != AreaIndex)
-						setStageAreaHasChangedState(true);
-			
-					StageAreas[GetCurrentlySelectedArea()]->SetAreaSelectedState(false);
-					StageAreas[AreaIndex]->SetAreaSelectedState(true);
 					SetCurrentlySelectedArea(AreaIndex);
 				}
 			}

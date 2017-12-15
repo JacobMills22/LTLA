@@ -72,6 +72,10 @@ public:
 
 	Colour GetAreaColour();
 
+	void setAreaName(String name);
+
+	String getAreaName();
+
 	//==============================================================================	
 
 	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfAreaCorners};
@@ -97,5 +101,6 @@ ScopedPointer<ValueTree> valueTree;
 	
 	Path AreaPath;
 	Colour AreaColour = Colours::floralwhite;
+	String areaName;
 	
 };

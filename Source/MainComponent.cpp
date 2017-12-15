@@ -37,7 +37,24 @@
 		Font LabelFont;
 		LabelFont.setSizeAndStyle(20, 1, 1, 0.25);
 		CalibrationCountDownLabel.setFont(LabelFont);
-		
+
+		addAndMakeVisible(areaNameLabel);
+		areaNameLabel.addListener(this);
+		areaNameLabel.setEditable(true, true, false);
+		areaNameLabel.setText("Enter Area Name", dontSendNotification);
+		areaNameLabel.setJustificationType(Justification::centred);
+
+		// Global Parameters Initialisation
+
+		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
+		{
+			addAndMakeVisible(GlobalButton[buttonNum]);
+			GlobalButton[buttonNum].addListener(this);
+		}
+
+		GlobalButton[SelectNextAreaButtonID].setButtonText("Next Area");
+		GlobalButton[SelectPreviousAreaButtonID].setButtonText("Previous Area");
+				
 		auto& commandManager = LTLACommandManager::getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
 
@@ -83,6 +100,7 @@
 		GUI.resized();
 		MenuBar.setBounds(10, 10, 300, 30);
 
+
 		if (GUI.getAudioPanelState() == false)
 			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(50).getHeight());
 		else
@@ -92,6 +110,14 @@
 		AreaColourSelector.setBounds(GUI.getX() + GUI.getWidth() * 0.9, GUI.getHeight() + 55, GUI.getWidth() * 0.1, (getHeight() - GUI.getHeight()) * 0.3);
 
 		audioEngine.setBounds(GUI.getX(), GUI.getHeight() + 50, GUI.getWidth() - AreaColourSelector.getWidth(), getHeight() - GUI.getHeight());
+
+		float MaxGuiHeight = getBounds().reduced(50).getHeight();
+		int GlobalPanelHeight = getHeight() - ((getHeight() - MaxGuiHeight) * 0.4);
+
+		GlobalButton[SelectPreviousAreaButtonID].setBounds(GUI.getX(), GlobalPanelHeight, getWidth() * 0.1, 25);
+		areaNameLabel.setBounds(GlobalButton[SelectPreviousAreaButtonID].getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
+		GlobalButton[SelectNextAreaButtonID].setBounds(areaNameLabel.getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
+
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
@@ -115,6 +141,7 @@
 			if (GUI.hasStageAreaChanged() == true)
 			{
 				GUI.setStageAreaHasChangedState(false);
+				areaNameLabel.setText(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
 				audioEngine.reopenAudioPanel(GUI.GetCurrentlySelectedArea());
 			}
 
@@ -178,6 +205,19 @@
 
 	void MainContentComponent::buttonClicked(Button* button)
 	{
+		if (button == &GlobalButton[SelectPreviousAreaButtonID] && GUI.GetCurrentlySelectedArea() > 0)
+		{
+			GUI.SetCurrentlySelectedArea(GUI.GetCurrentlySelectedArea() - 1);
+		}
+		else if (button == &GlobalButton[SelectNextAreaButtonID] && GUI.GetCurrentlySelectedArea() < GUI.StageAreas.size() - 1)
+		{
+			GUI.SetCurrentlySelectedArea(GUI.GetCurrentlySelectedArea() + 1);
+		}
+	}
+
+	void MainContentComponent::sliderValueChanged(Slider* slider)
+	{
+
 	}
 
 	void MainContentComponent::changeListenerCallback(ChangeBroadcaster* source)
@@ -187,6 +227,15 @@
 			GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaColour(AreaColourSelector.getCurrentColour());
 		}
 	}
+
+	void MainContentComponent::labelTextChanged(Label* labelThatHasChanged) 
+	{
+		if (labelThatHasChanged == &areaNameLabel && GUI.StageAreas.size() >= 1)
+		{
+			GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->setAreaName(areaNameLabel.getText());
+		}
+	}
+
 	
 	// (This function is called by the app startup code to create our main component)
 	Component* createMainContentComponent() { return new MainContentComponent(); }

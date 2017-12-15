@@ -130,8 +130,6 @@ public:
 		}
 		else if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerPlayBackState() == false)
 		{
-			DBG("FALSE");
-
 			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
 			{
 				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);

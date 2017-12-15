@@ -58,7 +58,16 @@ bool LTLA_GUI::GetStageAreaEditState()
 
 void LTLA_GUI::SetCurrentlySelectedArea(int Index)
 {
+	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	{
+		StageAreas[AreaIndex]->SetAreaSelectedState(false);
+	}
+
+	if (GetCurrentlySelectedArea() != Index)
+		setStageAreaHasChangedState(true);
+
 	SelectedAreaIndex = Index;
+	StageAreas[Index]->SetAreaSelectedState(true);
 }
 int LTLA_GUI::GetCurrentlySelectedArea()
 {

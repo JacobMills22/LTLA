@@ -7,10 +7,12 @@
 #include "Components\AudioEngine\AudioEngine.h"
 
 class MainContentComponent : public AudioAppComponent,
-							 private MultiTimer,
-							 public Button::Listener,
-							 public ApplicationCommandTarget,
-							 public ChangeListener
+	private MultiTimer,
+	public Button::Listener,
+	public ApplicationCommandTarget,
+	public ChangeListener,
+	public Slider::Listener,
+	public Label::Listener
 
 {
 public:
@@ -31,7 +33,10 @@ public:
 
 	void timerCallback(int timerID) override;
 	void buttonClicked(Button* button) override;
+	void sliderValueChanged(Slider* slider) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
+	void labelTextChanged(Label* labelThatHasChanged) override;
+
 
 	//==============================================================================
 	/** Command Manager Functions. Implemented in Source/Components/CommandManager.cpp */
@@ -62,15 +67,22 @@ private:
 	LTLAMenuBar MenuBar;
 	LTLAAudioEngine audioEngine;
 
-	Label CalibrationCountDownLabel;
 	ColourSelector AreaColourSelector{(ColourSelector::showColourspace), 4, 7 };
-	
+	Label areaNameLabel;
+	Label CalibrationCountDownLabel;
+
 	enum TimerID { KinectUpdateTimer, GUITimer, CalibrationIntervalTimer, NumOfTimerIDs };
 
 	double samplerate = 0;
 	int samplesPerBlock = 0;
 
 	int oldAreaIDContainingPerfromer[2];
+
+	// Global Parameters
+	enum { SelectNextAreaButtonID, SelectPreviousAreaButtonID, numOfButtons};
+	TextButton GlobalButton[numOfButtons];
+	enum {StagePanningSliderID, numOfSliders};
+	Slider GlobalSliders[numOfSliders];
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 

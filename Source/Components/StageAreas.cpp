@@ -14,6 +14,8 @@ StageArea::StageArea()
 	AreaPosition[BackLeft].x = 50.0;
 	AreaPosition[BackLeft].y = 100.0;
 
+	areaName = "New Area";
+
 	valueTree = new ValueTree("Stage Area Value Tree");
 	valueTree->addListener(this);
 
@@ -114,5 +116,15 @@ void StageArea::SetAreaColour(Colour colour)
 Colour StageArea::GetAreaColour()
 {
 	return AreaColour;
+}
+
+void StageArea::setAreaName(String name)
+{
+	areaName = name;
+}
+
+String StageArea::getAreaName()
+{
+	return areaName;
 }
 
