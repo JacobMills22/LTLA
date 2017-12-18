@@ -111,6 +111,11 @@ public:
 			{
 				performerExitedArea(performer);
 			}
+
+			//if audioPanel[areaIDWithPerformer[performer]] has autopanner enabled
+		//	{
+			//	audioPanel[areaIDWithPerformer[performer]]->setAutoPannerAmount(0);
+		//	}
 		}
 	}
 
@@ -118,7 +123,6 @@ public:
 	{
 		if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerRetriggerState() == true)
 		{
-			DBG("TRUE");
 			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
 			{
 				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
@@ -156,6 +160,10 @@ public:
 		}
 	}
 
+	void setAutoPannerAmount(float value, int areaID)
+	{
+		audioPanel[areaID]->setAutoPannerAmount(value);
+	}
 
 private:
 
@@ -168,6 +176,8 @@ private:
 	bool performerExitedAreaState[2];
 
 	int areaIDWithPerformer[2];
+
+	float autoPannerAmount = 0;
 
 	enum { continuePlaybackID = 1, stopPlaybackID };
 

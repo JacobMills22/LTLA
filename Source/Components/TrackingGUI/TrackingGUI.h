@@ -137,6 +137,16 @@ public:
 
 	int getAreaIDContainingPerformer(int performerID);
 
+	float getPerformerXPosInsideArea(int areaID, int performerID)
+	{
+		float areaLeft = StageAreas[areaID]->GetAreaPath().getBounds().getX();
+		float areaRight = StageAreas[areaID]->GetAreaPath().getBounds().getRight();
+		float performerX = EllipseCoordinates[performerID].x;
+
+	 // return (performerX - AreaMinimum) / (Max - Min)
+		return (performerX - areaLeft) / (areaRight - areaLeft);
+	}
+
 	//==============================================================================	
 
 	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfStagePositions };

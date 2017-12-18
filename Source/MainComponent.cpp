@@ -168,6 +168,8 @@
 					oldAreaIDContainingPerfromer[performerNum] = GUI.getAreaIDContainingPerformer(performerNum);
 					audioEngine.setPerformerExitedAreaState(performerNum, false);
 
+					audioEngine.setAutoPannerAmount(GUI.getPerformerXPosInsideArea(GUI.getAreaIDContainingPerformer(performerNum), performerNum), GUI.getAreaIDContainingPerformer(performerNum));
+					DBG((String)GUI.getPerformerXPosInsideArea(GUI.getAreaIDContainingPerformer(performerNum), performerNum));
 				}
 				else
 				{
