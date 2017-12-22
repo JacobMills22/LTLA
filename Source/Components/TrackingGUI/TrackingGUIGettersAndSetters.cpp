@@ -137,28 +137,15 @@ void LTLA_GUI::SetKinectTrackingState(int PerformerNum, bool State)
 	TrackingState[PerformerNum] = State;
 }
 
-bool LTLA_GUI::doesAnyAreaContainPerfomer(int performerID)
+bool LTLA_GUI::doesAreaIDContainPerfomer(int performerID, int areaID)
 {
-	for (int AreaID = 0; AreaID < StageAreas.size(); AreaID++)
+	if (StageAreas[areaID]->GetAreaPath().contains(EllipseCoordinates[performerID].x, EllipseCoordinates[performerID].y) == true)
 	{
-		if (StageAreas[AreaID]->GetAreaPath().contains(EllipseCoordinates[performerID].x, EllipseCoordinates[performerID].y) == true)
-		{
-			return true;
-			break;
-		}
+		return true;
 	}
-	return false;
-}
+	else
+	{
+		return false;
+	}
 
-int LTLA_GUI::getAreaIDContainingPerformer(int performerID)
-{
-	for (int AreaID = 0; AreaID < StageAreas.size(); AreaID++)
-	{
-		if (StageAreas[AreaID]->GetAreaPath().contains(EllipseCoordinates[performerID].x, EllipseCoordinates[performerID].y) == true)
-		{
-			return AreaID;
-			break;
-		}
-	}
-	return false;
 }

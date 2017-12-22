@@ -15,9 +15,6 @@ public:
 		samplesPerBlock = SamplesPerBlock;
 		samplerate = sampleRate;
 
-		performerExitedAreaState[0] = false;
-		performerExitedAreaState[1] = false;
-
 		startTimer(30);
 	}
 
@@ -41,10 +38,16 @@ public:
 	void addNewStageAreaAudioPanel()
 	{
 		audioPanel.add(new LTLAAudioPanel);
+		areaData.add(new AreaDataStruct);
 		audioPanel.getLast()->prepareToPlay(samplesPerBlock, samplerate);
 		prepareToPlay(samplesPerBlock, samplerate);
 		addAndMakeVisible(audioPanel.getLast());
 		audioPanel.getLast()->setVisible(true);
+		areaData.getLast()->performerExitedAreaState[0] = false;
+		areaData.getLast()->performerExitedAreaState[1] = false;
+		areaData.getLast()->performerEnteredAreaState[0] = false;
+		areaData.getLast()->performerEnteredAreaState[1] = false;
+
 	}
 
 	void reopenAudioPanel(int selectedArea)
@@ -74,88 +77,101 @@ public:
 		}
 	}
 
-	void setAreaIDWhichContainsPerformer(int perfromerID, int AreaID)
+	void setAreaIDContainingPerformerState(int perfromerID, int areaID, bool state)
 	{
-		areaIDWithPerformer[perfromerID] = AreaID;
+		areaData[areaID]->areaContainsPerformer[perfromerID] = state;
 	}
 
-	void setPerformerEnteredAreaState(int perfromerID, bool state)
+	void setPerformerEnteredAreaState(int perfromerID, bool state, int areaID)
 	{
-		performerEnteredAreaState[perfromerID] = state;
+		if (areaData.size() > 0)
+		{
+			areaData[areaID]->performerEnteredAreaState[perfromerID] = state;
+		}
 	}
 
-	bool getPerformerEnteredAreaState(int perfromerID)
+	bool getPerformerEnteredAreaState(int perfromerID, int areaID)
 	{
-		return performerEnteredAreaState[perfromerID];
+		if (areaData.size() > 0)
+		{
+			return areaData[areaID]->performerEnteredAreaState[perfromerID];
+		}
 	}
 
-	void setPerformerExitedAreaState(int perfromerID, bool state)
+	void setPerformerExitedAreaState(int perfromerID, bool state, int areaID)
 	{
-		performerExitedAreaState[perfromerID] = state;
+		if (areaData.size() > 0)
+		{
+			areaData[areaID]->performerExitedAreaState[perfromerID] = state;
+		}
 	}
 
-	bool getPerformerExitedAreaState(int perfromerID)
+	bool getPerformerExitedAreaState(int perfromerID, int areaID)
 	{
-		return performerExitedAreaState[perfromerID];
+		if (areaData.size() > 0)
+		{
+			return areaData[areaID]->performerExitedAreaState[perfromerID];
+		}
 	}
 
 	void timerCallback() override
 	{
-		for (int performer = 0; performer < 2; performer++)
+		if (areaData.size() > 0)
 		{
-			if (performerEnteredAreaState[performer] == true)
+			for (int performer = 0; performer < 2; performer++)
 			{
-				performerEnteredArea(performer);
-			}
-			else if (performerExitedAreaState[performer] == true)
-			{
-				performerExitedArea(performer);
-			}
-
-			//if audioPanel[areaIDWithPerformer[performer]] has autopanner enabled
-		//	{
-			//	audioPanel[areaIDWithPerformer[performer]]->setAutoPannerAmount(0);
-		//	}
-		}
-	}
-
-	void performerEnteredArea(int performer)
-	{
-		if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerRetriggerState() == true)
-		{
-			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
-			{
-				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
-			}
-			else if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == performer)
-			{
-				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
-			}
-		}
-		else if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerPlayBackState() == false)
-		{
-			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
-			{
-				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
-			}
-			else if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == performer)
-			{
-				audioPanel[areaIDWithPerformer[performer]]->startFilePlayerPlayback(0);
+				for (int area = 0; area < areaData.size(); area++)
+				{
+					if (areaData[area]->performerEnteredAreaState[performer] == true && areaData[area]->areaContainsPerformer[performer] == true)
+					{
+						performerEnteredArea(performer, area);
+					}
+					else if (areaData[area]->performerExitedAreaState[performer] == true && areaData[area]->areaContainsPerformer[performer] == false)
+					{
+						performerExitedArea(performer, area);
+					}
+				}
 			}
 		}
 	}
 
-	void performerExitedArea(int performer)
+	void performerEnteredArea(int performer, int areaID)
 	{
-		if (audioPanel[areaIDWithPerformer[performer]]->getFilePlayerPerformerExitOption() == stopPlaybackID)
+		if (audioPanel[areaID]->getFilePlayerRetriggerState() == true)
 		{
-			if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
+			if (audioPanel[areaID]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
 			{
-				audioPanel[areaIDWithPerformer[performer]]->stopFilePlayerPlayback();
+				audioPanel[areaID]->startFilePlayerPlayback(0);
 			}
-			else if (audioPanel[areaIDWithPerformer[performer]]->getPerfromerToTrigger() == performer)
+			else if (audioPanel[areaID]->getPerfromerToTrigger() == performer)
 			{
-				audioPanel[areaIDWithPerformer[performer]]->stopFilePlayerPlayback();
+				audioPanel[areaID]->startFilePlayerPlayback(0);
+			}
+		}
+		else if (audioPanel[areaID]->getFilePlayerPlayBackState() == false)
+		{
+			if (audioPanel[areaID]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
+			{
+				audioPanel[areaID]->startFilePlayerPlayback(0);
+			}
+			else if (audioPanel[areaID]->getPerfromerToTrigger() == performer)
+			{
+				audioPanel[areaID]->startFilePlayerPlayback(0);
+			}
+		}
+	}
+
+	void performerExitedArea(int performer, int areaID)
+	{
+		if (audioPanel[areaID]->getFilePlayerPerformerExitOption() == stopPlaybackID)
+		{
+			if (audioPanel[areaID]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
+			{
+				audioPanel[areaID]->stopFilePlayerPlayback();
+			}
+			else if (audioPanel[areaID]->getPerfromerToTrigger() == performer)
+			{
+				audioPanel[areaID]->stopFilePlayerPlayback();
 			}
 		}
 	}
@@ -167,15 +183,19 @@ public:
 
 private:
 
+	struct AreaDataStruct
+	{
+		int areaID = 0;
+		bool performerEnteredAreaState[2];
+		bool performerExitedAreaState[2];
+		bool areaContainsPerformer[2];
+	};
+
 	MixerAudioSource mixerAudioSource;
 	OwnedArray<LTLAAudioPanel> audioPanel;
+	OwnedArray<AreaDataStruct> areaData;
 	int samplesPerBlock = 0;
 	double samplerate = 0;
-
-	bool performerEnteredAreaState[2];
-	bool performerExitedAreaState[2];
-
-	int areaIDWithPerformer[2];
 
 	float autoPannerAmount = 0;
 

@@ -133,9 +133,7 @@ public:
 /** Sets the tracking state of each performer. */
 	void SetKinectTrackingState(int PerformerNum, bool State);
 
-	bool doesAnyAreaContainPerfomer(int performerID);
-
-	int getAreaIDContainingPerformer(int performerID);
+	bool doesAreaIDContainPerfomer(int performerID, int areaID);
 
 	float getPerformerXPosInsideArea(int areaID, int performerID)
 	{

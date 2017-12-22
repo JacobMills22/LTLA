@@ -145,44 +145,10 @@
 				audioEngine.reopenAudioPanel(GUI.GetCurrentlySelectedArea());
 			}
 
-			for (int performerNum = 0; performerNum < 2; performerNum++)
-			{
-				if (GUI.doesAnyAreaContainPerfomer(performerNum) == true)
-				{
-					if (oldAreaIDContainingPerfromer[performerNum] != GUI.getAreaIDContainingPerformer(performerNum))
-					{
-						audioEngine.setPerformerExitedAreaState(performerNum, true);
-						audioEngine.setPerformerEnteredAreaState(performerNum, false);
-					}
-
-					if (audioEngine.getPerformerExitedAreaState(performerNum) == true)
-					{
-						audioEngine.setPerformerEnteredAreaState(performerNum, true);
-					}
-					else
-					{
-						audioEngine.setPerformerEnteredAreaState(performerNum, false);
-					}
-
-					audioEngine.setAreaIDWhichContainsPerformer(performerNum, GUI.getAreaIDContainingPerformer(performerNum));
-					oldAreaIDContainingPerfromer[performerNum] = GUI.getAreaIDContainingPerformer(performerNum);
-					audioEngine.setPerformerExitedAreaState(performerNum, false);
-
-					audioEngine.setAutoPannerAmount(GUI.getPerformerXPosInsideArea(GUI.getAreaIDContainingPerformer(performerNum), performerNum), GUI.getAreaIDContainingPerformer(performerNum));
-					DBG((String)GUI.getPerformerXPosInsideArea(GUI.getAreaIDContainingPerformer(performerNum), performerNum));
-				}
-				else
-				{
-					if (audioEngine.getPerformerEnteredAreaState(performerNum) == false)
-					{
-						audioEngine.setPerformerExitedAreaState(performerNum, true);
-						audioEngine.setPerformerEnteredAreaState(performerNum, false);
-					}
-				}
-			}
-
+			setAudioEngineData();
 			repaint();
 		}
+
 		if (timerID == CalibrationIntervalTimer)
 		{
 			switch (GUI.StageCalibrationCounter)
@@ -202,6 +168,48 @@
 					break;
 			}
 			GUI.StageCalibrationCounter++;
+		}
+	}
+
+	void MainContentComponent::setAudioEngineData()
+	{
+		for (int performerNum = 0; performerNum < 2; performerNum++)
+		{
+			for (int areaID = 0; areaID < GUI.StageAreas.size(); areaID++)
+			{
+				if (GUI.doesAreaIDContainPerfomer(performerNum, areaID))
+				{
+					if (audioEngine.getPerformerExitedAreaState(performerNum, areaID) == true)
+					{
+						audioEngine.setPerformerEnteredAreaState(performerNum, true, areaID);
+					}
+					else
+					{
+						audioEngine.setPerformerEnteredAreaState(performerNum, false, areaID);
+					}
+
+					if (GUI.doesAreaIDContainPerfomer(performerNum, areaID) == true)
+					{
+						audioEngine.setAreaIDContainingPerformerState(performerNum, areaID, true);
+					}
+					else
+					{
+						audioEngine.setAreaIDContainingPerformerState(performerNum, areaID, false);
+					}
+
+					audioEngine.setPerformerExitedAreaState(performerNum, false, areaID);
+					audioEngine.setAutoPannerAmount(GUI.getPerformerXPosInsideArea(areaID, performerNum), areaID);
+				}
+				else
+				{
+					if (audioEngine.getPerformerEnteredAreaState(performerNum, areaID) == false)
+					{
+						audioEngine.setPerformerExitedAreaState(performerNum, true, areaID);
+						audioEngine.setPerformerEnteredAreaState(performerNum, false, areaID);
+						audioEngine.setAreaIDContainingPerformerState(performerNum, areaID, false);
+					}
+				}
+			}
 		}
 	}
 

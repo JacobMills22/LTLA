@@ -59,6 +59,8 @@ public:
 	void RemoveStageAreaIDPressed();
 	void editAudioParametersPressed();
 
+	void setAudioEngineData();
+
 private:
 	//==============================================================================
 
