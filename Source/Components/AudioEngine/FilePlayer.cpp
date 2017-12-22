@@ -54,7 +54,6 @@ FilePlayer::FilePlayer() : thread("AudioFileStreamThread")
 	filePlayerLabel[performerExitLabelID].setText("Stop When Perfromer Exits", dontSendNotification);
 	filePlayerLabel[retriggerLabelID].setText("Retrigger", dontSendNotification);
 
-
 	// ComboBox Initialisation
 
 	for (int boxNum = 0; boxNum < numOfComboBoxes; boxNum++)
@@ -143,19 +142,6 @@ void FilePlayer::stopPlayback()
 	audioTransportSource.setPosition(playBackPosition);
 	GUIButtons[playButtonID].setButtonText("Play");
 }
-
-
-
-void FilePlayer::openPanel()
-{
-	setVisible(true);
-}
-
-void FilePlayer::closePanel()
-{
-	setVisible(false);
-}
-
 
 
 void FilePlayer::sliderValueChanged(Slider* slider)
@@ -321,6 +307,4 @@ bool FilePlayer::getReTriggerState()
 {
 	return retriggerState;
 }
-
-
 

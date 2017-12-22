@@ -10,176 +10,59 @@ class LTLAAudioEngine : public AudioSource,
 
 public:
 
-	void initialiseEngine( int SamplesPerBlock, double sampleRate)
-	{
-		samplesPerBlock = SamplesPerBlock;
-		samplerate = sampleRate;
+/** Initialises Audio Engine */
+	void initialiseEngine(int SamplesPerBlock, double sampleRate);
 
-		startTimer(30);
-	}
+/** Adds inputs from each AudioPanel to the AudioMixerSource and prepares for playback */
+	void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
 
-	void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
-	{
-		mixerAudioSource.addInputSource(audioPanel.getLast(), true);
-		mixerAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-	}
+/** Processes the AudioMixerSource */
+	void getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) override;
 
-	void getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) override
-	{
-		mixerAudioSource.getNextAudioBlock(bufferToFill);
-	}
+/** Released the resources of the AudioMixerSource */
+	void releaseResources() override;
 
-	void releaseResources() override
-	{
-		mixerAudioSource.releaseResources();
-		stopTimer();
-	}
+/** Called whenever the user adds a new stage area. 
+	Adds and initialises a new AudioPanel containing all audio processes.
+	Adds and initialises a new set of Areadata which contains tracking data provided by TrackingGUI/MainComponent */
+	void addNewStageAreaAudioPanel();
 
-	void addNewStageAreaAudioPanel()
-	{
-		audioPanel.add(new LTLAAudioPanel);
-		areaData.add(new AreaDataStruct);
-		audioPanel.getLast()->prepareToPlay(samplesPerBlock, samplerate);
-		prepareToPlay(samplesPerBlock, samplerate);
-		addAndMakeVisible(audioPanel.getLast());
-		audioPanel.getLast()->setVisible(true);
-		areaData.getLast()->performerExitedAreaState[0] = false;
-		areaData.getLast()->performerExitedAreaState[1] = false;
-		areaData.getLast()->performerEnteredAreaState[0] = false;
-		areaData.getLast()->performerEnteredAreaState[1] = false;
+/** Makes all AudioPanels invisible and then makes the currently selected AudioPanel visible */
+	void reopenAudioPanel(int selectedArea);
 
-	}
+/** Sets the visibillity (true/false) of all AudioPanels, typically called when the EditAreaParameters menu is closed*/
+	void setStateOfAllPanels(bool state);
 
-	void reopenAudioPanel(int selectedArea)
-	{
-		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
-		{
-			audioPanel[stageAreaAudioID]->setVisible(false);
-		}
-		audioPanel[selectedArea]->setVisible(true);
-		audioPanel[selectedArea]->toFront(false);
-		resized();
-	}
+/** Standard JUCE resized function, used to set the bounds of all objects */
+	void resized() override;
 
-	void setStateOfAllPanels(bool state)
-	{
-		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
-		{
-			audioPanel[stageAreaAudioID]->setVisible(state);
-		}
-	}
+/** AreaData: Sets whether a performer is stood inside a specific area */
+	void setAreaIDContainingPerformerState(int perfromerID, int areaID, bool state);
 
-	void resized() override
-	{
-		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
-		{
-			audioPanel[stageAreaAudioID]->setBounds(0, 0, getBounds().getWidth(), getBounds().getHeight());
-		}
-	}
+/** AreaData: Updates the entered area state of a specific performer and area */
+	void setPerformerEnteredAreaState(int perfromerID, bool state, int areaID);
 
-	void setAreaIDContainingPerformerState(int perfromerID, int areaID, bool state)
-	{
-		areaData[areaID]->areaContainsPerformer[perfromerID] = state;
-	}
+/** AreaData: Gets the entered area state of a specific performer and area */
+	bool getPerformerEnteredAreaState(int perfromerID, int areaID);
 
-	void setPerformerEnteredAreaState(int perfromerID, bool state, int areaID)
-	{
-		if (areaData.size() > 0)
-		{
-			areaData[areaID]->performerEnteredAreaState[perfromerID] = state;
-		}
-	}
+/** AreaData: Updates the exited area state of a specific performer and area */
+	void setPerformerExitedAreaState(int perfromerID, bool state, int areaID);
 
-	bool getPerformerEnteredAreaState(int perfromerID, int areaID)
-	{
-		if (areaData.size() > 0)
-		{
-			return areaData[areaID]->performerEnteredAreaState[perfromerID];
-		}
-	}
+/** AreaData: Gets the exited area state of a specific performer and area */
+	bool getPerformerExitedAreaState(int perfromerID, int areaID);
 
-	void setPerformerExitedAreaState(int perfromerID, bool state, int areaID)
-	{
-		if (areaData.size() > 0)
-		{
-			areaData[areaID]->performerExitedAreaState[perfromerID] = state;
-		}
-	}
+/** Standard JUCE Timer callback.
+	Loops through each performer and area and updates various states to control audio playback*/
+	void timerCallback() override;
 
-	bool getPerformerExitedAreaState(int perfromerID, int areaID)
-	{
-		if (areaData.size() > 0)
-		{
-			return areaData[areaID]->performerExitedAreaState[perfromerID];
-		}
-	}
+/** Called in timercallback when a performer enters an area, starts audio playback if required*/
+	void performerEnteredArea(int performer, int areaID);
 
-	void timerCallback() override
-	{
-		if (areaData.size() > 0)
-		{
-			for (int performer = 0; performer < 2; performer++)
-			{
-				for (int area = 0; area < areaData.size(); area++)
-				{
-					if (areaData[area]->performerEnteredAreaState[performer] == true && areaData[area]->areaContainsPerformer[performer] == true)
-					{
-						performerEnteredArea(performer, area);
-					}
-					else if (areaData[area]->performerExitedAreaState[performer] == true && areaData[area]->areaContainsPerformer[performer] == false)
-					{
-						performerExitedArea(performer, area);
-					}
-				}
-			}
-		}
-	}
+/** Called in timercallback when a performer exits an area, stops audio playback if required*/
+	void performerExitedArea(int performer, int areaID);
 
-	void performerEnteredArea(int performer, int areaID)
-	{
-		if (audioPanel[areaID]->getFilePlayerRetriggerState() == true)
-		{
-			if (audioPanel[areaID]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
-			{
-				audioPanel[areaID]->startFilePlayerPlayback(0);
-			}
-			else if (audioPanel[areaID]->getPerfromerToTrigger() == performer)
-			{
-				audioPanel[areaID]->startFilePlayerPlayback(0);
-			}
-		}
-		else if (audioPanel[areaID]->getFilePlayerPlayBackState() == false)
-		{
-			if (audioPanel[areaID]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
-			{
-				audioPanel[areaID]->startFilePlayerPlayback(0);
-			}
-			else if (audioPanel[areaID]->getPerfromerToTrigger() == performer)
-			{
-				audioPanel[areaID]->startFilePlayerPlayback(0);
-			}
-		}
-	}
-
-	void performerExitedArea(int performer, int areaID)
-	{
-		if (audioPanel[areaID]->getFilePlayerPerformerExitOption() == stopPlaybackID)
-		{
-			if (audioPanel[areaID]->getPerfromerToTrigger() == 2) // 2 = Both performer 1 and 2
-			{
-				audioPanel[areaID]->stopFilePlayerPlayback();
-			}
-			else if (audioPanel[areaID]->getPerfromerToTrigger() == performer)
-			{
-				audioPanel[areaID]->stopFilePlayerPlayback();
-			}
-		}
-	}
-
-	void setAutoPannerAmount(float value, int areaID)
-	{
-		audioPanel[areaID]->setAutoPannerAmount(value);
-	}
+/** Updates the AutoPanning amount of an area */
+	void setAutoPannerAmount(float value, int areaID);
 
 private:
 
@@ -199,7 +82,7 @@ private:
 
 	float autoPannerAmount = 0;
 
-	enum { continuePlaybackID = 1, stopPlaybackID };
+	enum { continuePlaybackID = 1, stopPlaybackID, triggeredByBothPerformers = 2 };
 
 
 };

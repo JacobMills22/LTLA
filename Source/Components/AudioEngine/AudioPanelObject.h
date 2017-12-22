@@ -2,6 +2,9 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+// Class for all Audio Panel DSP Modules which will share simple functions
+// such as becoming visible.
+
 class AudioPanelObject : public Component
 {
 

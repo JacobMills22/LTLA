@@ -11,125 +11,50 @@ class LTLAAudioPanel : public AudioSource,
 
 public:
 
-	LTLAAudioPanel()
-	{
-		addAndMakeVisible(filePlayer);
-		addAndMakeVisible(autoPanner);
+/** Constructor, Initialises GUI elements*/
+	LTLAAudioPanel();
 
-		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
-		{
-			addAndMakeVisible(audioPanelButton[buttonNum]);
-			audioPanelButton[buttonNum].addListener(this);
-			audioPanelButton[buttonNum].setToggleState(false, dontSendNotification);
-		}
-		audioPanelButton[buttonFilePlayerID].setButtonText("File Player");
-		audioPanelButton[buttonAutoPannerID].setButtonText("AutoPanner");
+/** Standard JUCE Function: Prepares all DSP modules for audio playback */
+	void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
 
-		filePlayer.closePanel();
-		autoPanner.closePanel();
-	}
+/** Standard JUCE Function: Releases resources for all DSP modules*/
+	void releaseResources() override;
 
-	~LTLAAudioPanel()
-	{
-		
-	}
+/**	Standard JUCE Function: Processes each DSP module*/
+	void getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) override;
 
-	void prepareToPlay(int samplesPerBlockExpected, double sampleRate)  override
-	{
-	    filePlayer.prepareToPlay(samplesPerBlockExpected, sampleRate);
-		autoPanner.prepareToPlay(samplesPerBlockExpected, sampleRate);
-	}
+/**	Standard JUCE Function: sets the bounds of DSP modules */
+	void resized() override;
 
-	void releaseResources() override
-	{
-		filePlayer.releaseResources();
-		autoPanner.releaseResources();
-	}
+/**	Button callback, opens and closes the audio panels various DSP modules*/
+	void buttonClicked(Button* button) override;
 
-	void getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) override
-	{
-		filePlayer.getNextAudioBlock(bufferToFill);
-		autoPanner.getNextAudioBlock(bufferToFill);
-	}
-
-	void resized() override
-	{
-		audioPanelButton[buttonFilePlayerID].setBounds(5, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
-		audioPanelButton[buttonAutoPannerID].setBounds(audioPanelButton[buttonFilePlayerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
-		filePlayer.setBounds(getBounds().getCentreX() * 0.55, audioPanelButton[buttonFilePlayerID].getBottom(), getWidth() * 0.5, getHeight() * 0.8);
-		autoPanner.setBounds(filePlayer.getBounds());
-	}
-
-	void buttonClicked(Button* button) override
-	{
-		closeAllPanels();
-
-		if (button == &audioPanelButton[buttonFilePlayerID])
-		{
-			audioPanelButton[buttonFilePlayerID].setToggleState(!audioPanelButton[buttonFilePlayerID].getToggleState(), dontSendNotification);
-			audioPanelButton[buttonFilePlayerID].getToggleState() == false ? filePlayer.closePanel() : filePlayer.openPanel();
-
-		}
-		else if (button == &audioPanelButton[buttonAutoPannerID])
-		{
-			audioPanelButton[buttonAutoPannerID].setToggleState(!audioPanelButton[buttonAutoPannerID].getToggleState(), dontSendNotification);
-			audioPanelButton[buttonAutoPannerID].getToggleState() == false ? autoPanner.closePanel() : autoPanner.openPanel();
-		}
-	}
+/** Closes all of the panels of all the DSP modules (Not the audioPanel itself) */
+	void closeAllPanels();
 
 	// FILEPLAYER FUNCTIONS
 
-	void startFilePlayerPlayback(int playBackPosition)
-	{
-		filePlayer.startPlayback(playBackPosition);
-	}
+/** Starts file player playback at the specified position in ms */
+	void startFilePlayerPlayback(int playBackPosition);
 
-	void stopFilePlayerPlayback()
-	{
-		filePlayer.stopPlayback();
-	}
+/** Stops file player playback */
+	void stopFilePlayerPlayback();
 
-	int getPerfromerToTrigger()
-	{
-		if (&filePlayer != nullptr)
-		{
-			return filePlayer.getPerformerWhichTriggers();
-		}
-		else { return 0; }
-	}
+/** Returns the performer option ID which will cause the fileplayer to trigger playback (Can be both performers) */
+	int getPerfromerToTrigger();
 
-	int getFilePlayerPerformerExitOption()
-	{
-		return filePlayer.getPlaybackOnPerformerExitOption();
-	}
+	bool getFilePlayerRetriggerState();
 
-	bool getFilePlayerPlayBackState()
-	{
-		return filePlayer.getPlaybackState();
-	}
+/** Returns the option ID which determines whether audio playback will stop or continue when a performer exits the area*/
+	int getFilePlayerPerformerExitOption();
 
-	bool getFilePlayerRetriggerState()
-	{
-		return filePlayer.getReTriggerState();
-	}
+/** Returns the current playback state of the file player*/
+	bool getFilePlayerPlayBackState();
 
 	// AUTOPANNER FUNCTIONS
 
-	void setAutoPannerAmount(float value)
-	{
-		autoPanner.setPanAmount(value);
-	}
-
-	void closeAllPanels()
-	{
-		for (int buttomNum = 0; buttomNum < numOfButtons; buttomNum++)
-		{
-			audioPanelButton[buttomNum].setToggleState(false, dontSendNotification);
-		}
-
-		filePlayer.closePanel();
-		autoPanner.closePanel();
-	}
+/** Sets the Auto-Panner Amount */
+	void setAutoPannerAmount(float value);
 
 private:
 

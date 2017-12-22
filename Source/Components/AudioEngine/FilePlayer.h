@@ -1,14 +1,15 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "AudioPanelObject.h"
 
 class FilePlayer : public AudioSource,
-	public Component,
 	public Button::Listener,
 	public FilenameComponentListener,
 	public Slider::Listener,
 	public Timer,
-	public ComboBox::Listener
+	public ComboBox::Listener,
+	public AudioPanelObject
 {
 
 public:
@@ -29,15 +30,11 @@ public:
 /** Responds to periodic calls, used to update the playback positon slider */
 	void timerCallback() override;
 
+/** Called when a combobox option gets changed. */
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-
 
 /** Called when the component is resized. */
 	void resized() override;
-
-	void openPanel();
-
-	void closePanel();
 
 	/** Audio Functions*/
 
@@ -64,10 +61,11 @@ public:
 /** Gets the playback state. */
 	bool getPlaybackState();
 
+/** Starts the audio playback */
 	void startPlayback(int playBackPosition);
-	
-	void stopPlayback();
 
+/** Stops the audio playback */
+	void stopPlayback();
 
 /** Sets the Sample Rate. */
 	void setSampleRate(int sampleRate);
@@ -81,10 +79,13 @@ public:
 /** Get the playback level modifier */
 	float getLevel();
 
+/** Returns the performer option ID which will cause the fileplayer to trigger playback (Can be both performers) */
 	int getPerformerWhichTriggers();
 
+/** Returns the option ID which determines whether audio playback will stop or continue when a performer exits the area*/
 	int getPlaybackOnPerformerExitOption();
 
+/** Returns the Retrigger option state */
 	bool getReTriggerState();
 
 private:
