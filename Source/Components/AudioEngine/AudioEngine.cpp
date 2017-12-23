@@ -5,6 +5,10 @@
 	{
 		samplesPerBlock = SamplesPerBlock;
 		samplerate = sampleRate;
+
+		setMeterData(0, 0.0);
+		setMeterData(1, 0.0);
+
 		startTimer(30);
 	}
 
@@ -17,6 +21,20 @@
 	void LTLAAudioEngine::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) 
 	{
 		mixerAudioSource.getNextAudioBlock(bufferToFill);
+
+		float* OutputL = bufferToFill.buffer->getWritePointer(0);
+		float* OutputR = bufferToFill.buffer->getWritePointer(1);
+
+
+		for (int sample = 0; sample < bufferToFill.numSamples; sample++)
+		{
+			if (OutputL[sample] <= 1.0 && OutputL[sample] >= 0.0)
+				setMeterData(0, OutputL[sample]);
+
+			if (OutputR[sample] <= 1.0 && OutputR[sample] >= 0.0)
+				setMeterData(1, OutputR[sample]);
+			
+		}
 	}
 
 	void LTLAAudioEngine::releaseResources() 
@@ -172,4 +190,14 @@
 	void LTLAAudioEngine::setAutoPannerAmount(float value, int areaID)
 	{
 		audioPanel[areaID]->setAutoPannerAmount(value);
+	}
+
+	void LTLAAudioEngine::setMeterData(int channel, float value)
+	{
+		meterData[channel] = value;
+	}
+
+	float LTLAAudioEngine::getMeterData(int channel)
+	{
+		return meterData[channel];
 	}

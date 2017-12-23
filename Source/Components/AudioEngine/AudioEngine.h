@@ -64,6 +64,11 @@ public:
 /** Updates the AutoPanning amount of an area */
 	void setAutoPannerAmount(float value, int areaID);
 
+	void setMeterData(int channel, float value);
+
+	float getMeterData(int channel);
+
+
 private:
 
 	struct AreaDataStruct
@@ -81,6 +86,7 @@ private:
 	double samplerate = 0;
 
 	float autoPannerAmount = 0;
+	float meterData[2];
 
 	enum { continuePlaybackID = 1, stopPlaybackID, triggeredByBothPerformers = 2 };
 

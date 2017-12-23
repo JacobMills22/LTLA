@@ -37,8 +37,8 @@
 		for (int sample = 0; sample < bufferToFill.numSamples; sample++)
 		{
 			// 6dB Pan Law
-			OutputL[sample] *= pow(sin((1 - panAmount) * (float_Pi * 0.5)), 2);
-			OutputR[sample] *= pow(sin(panAmount * (float_Pi * 0.5)), 2);
+			OutputL[sample] *= pow(sin((1 - panAmount) * (float_Pi * 0.5)), 2) * 0.5;
+			OutputR[sample] *= pow(sin(panAmount * (float_Pi * 0.5)), 2) * 0.5;
 		}
 	}
 

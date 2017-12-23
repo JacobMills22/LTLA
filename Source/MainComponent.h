@@ -5,6 +5,7 @@
 #include "Components\LTLAMenuBar.h"
 #include "Components\AudioEngine\AudioPanel.h"
 #include "Components\AudioEngine\AudioEngine.h"
+#include "Components\AudioEngine\Meter.h"
 
 class MainContentComponent : public AudioAppComponent,
 	private MultiTimer,
@@ -85,6 +86,8 @@ private:
 	TextButton GlobalButton[numOfButtons];
 	enum {StagePanningSliderID, numOfSliders};
 	Slider GlobalSliders[numOfSliders];
+
+	AudioMeter stereoAudioMeter;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 

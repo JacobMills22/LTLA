@@ -44,6 +44,8 @@
 		areaNameLabel.setText("Enter Area Name", dontSendNotification);
 		areaNameLabel.setJustificationType(Justification::centred);
 
+		addAndMakeVisible(stereoAudioMeter);
+
 		// Global Parameters Initialisation
 
 		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
@@ -118,6 +120,8 @@
 		areaNameLabel.setBounds(GlobalButton[SelectPreviousAreaButtonID].getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
 		GlobalButton[SelectNextAreaButtonID].setBounds(areaNameLabel.getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
 
+		stereoAudioMeter.setBounds(getBounds().reduced(50).getX() + GUI.getWidth() + 5, GUI.getBottom() - getHeight() * 0.2, 40, getHeight() * 0.2);
+
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
@@ -144,6 +148,9 @@
 				areaNameLabel.setText(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
 				audioEngine.reopenAudioPanel(GUI.GetCurrentlySelectedArea());
 			}
+
+			stereoAudioMeter.setMeterData(0, audioEngine.getMeterData(0));
+			stereoAudioMeter.setMeterData(1, audioEngine.getMeterData(1));
 
 			setAudioEngineData();
 			repaint();
