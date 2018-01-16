@@ -53,6 +53,15 @@ public:
 /** Gets the Y Coordinate of one of the Areas Corners */
 	float GetY(int CornerID);
 
+	float getDifferenceX(int CornerID);
+
+	float getDifferenceY(int CornerID);
+
+	void setDifferenceX(int cornerID, int value);
+
+	void setDifferenceY(int cornerID, int value);
+
+	
 /** Gets the Path Used to Draw the Area*/
 	Path GetAreaPath();
 
@@ -78,17 +87,19 @@ public:
 
 	//==============================================================================	
 
-	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfAreaCorners};
+	enum { FrontLeft, FrontRight, BackRight, BackLeft, Centre, NumOfAreaCorners};
 
 private:
 
-ScopedPointer<ValueTree> valueTree;
+	ScopedPointer<ValueTree> valueTree;
 
 	struct AreaCorner
 	{
 		float x = 0.00;
 		float y = 0.00;
 		bool Selected = false;
+		float differenceX = 0.00;
+		float differenceY = 0.00;
 	};
 	AreaCorner AreaPosition[NumOfAreaCorners];
 
@@ -98,7 +109,7 @@ ScopedPointer<ValueTree> valueTree;
 		float y = 0.00;
 	};
 	Coordinates PerformerCoordinates;
-	
+
 	Path AreaPath;
 	Colour AreaColour = Colours::floralwhite;
 	String areaName;

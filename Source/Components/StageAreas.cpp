@@ -13,6 +13,8 @@ StageArea::StageArea()
 	AreaPosition[BackRight].y = 100.0;
 	AreaPosition[BackLeft].x = 50.0;
 	AreaPosition[BackLeft].y = 100.0;
+	AreaPosition[Centre].x = 75.0;
+	AreaPosition[Centre].y = 75.0;
 
 	areaName = "New Area";
 
@@ -55,6 +57,11 @@ void StageArea::DrawArea(Graphics &g, bool Editmode)
 		g.setColour(Colours::white);
 		if (AreaPosition[BackRight].Selected == true) { g.setColour(Colours::cyan); }
 		g.drawRect((int)AreaPosition[BackRight].x - 5, (int)AreaPosition[BackRight].y - 5, 10, 10, 1.0);
+
+		g.setColour(Colours::white);
+		if (AreaPosition[Centre].Selected == true) { g.setColour(Colours::cyan); }
+		g.drawRect((int)AreaPosition[Centre].x - 5, (int)AreaPosition[Centre].y - 5, 10, 10, 1.0);
+
 	}
 
 	if (valueTree->getPropertyAsValue("AreaSelectedState", nullptr) == true)
@@ -66,8 +73,25 @@ void StageArea::DrawArea(Graphics &g, bool Editmode)
 
 void StageArea::UpdateArea(int Corner, float X, float Y)
 {
-	AreaPosition[Corner].x = X;
-	AreaPosition[Corner].y = Y;
+	if (Corner == Centre)
+	{
+		AreaPosition[Centre].x = X;
+		AreaPosition[Centre].y = Y;
+
+		for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+		{
+			AreaPosition[corner].x = X - AreaPosition[corner].differenceX;
+			AreaPosition[corner].y = Y - AreaPosition[corner].differenceY;
+		}
+	}
+	else
+	{
+		AreaPosition[Corner].x = X;
+		AreaPosition[Corner].y = Y;
+
+		AreaPosition[Centre].x = AreaPath.getBounds().getCentreX();
+		AreaPosition[Centre].y = AreaPath.getBounds().getCentreY();
+	}
 }
 
 void StageArea::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
@@ -81,6 +105,26 @@ float StageArea::GetX(int CornerID)
 float StageArea::GetY(int CornerID)
 {
 	return AreaPosition[CornerID].y;
+}
+
+float StageArea::getDifferenceX(int CornerID)
+{
+	return AreaPosition[CornerID].differenceX;
+}
+
+float StageArea::getDifferenceY(int CornerID)
+{
+	return AreaPosition[CornerID].differenceY;
+}
+
+void StageArea::setDifferenceX(int cornerID, int value)
+{
+	AreaPosition[cornerID].differenceX = value;
+}
+
+void StageArea::setDifferenceY(int cornerID, int value)
+{
+	AreaPosition[cornerID].differenceY = value;
 }
 
 Path StageArea::GetAreaPath()

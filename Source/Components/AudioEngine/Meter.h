@@ -34,8 +34,6 @@ public:
 
 		leftMeter.setBounds(      0,      meterHeight * peakMeterData[0], meterWidth, meterHeight * 2);
 		rightMeter.setBounds(meterRightX, meterHeight * peakMeterData[1], meterWidth, meterHeight * 2);
-		DBG(peakMeterData[0]);
-
 	}
 
 	void timerCallback() override

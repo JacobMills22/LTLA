@@ -27,6 +27,12 @@ void LTLA_GUI::mouseDown(const MouseEvent &event)
 				event.getMouseDownY() <= StageAreas[SelectedAreaIndex]->GetY(Corner) + 10 && event.getMouseDownY() >= StageAreas[SelectedAreaIndex]->GetY(Corner) - 10)
 			{
 				StageAreas[SelectedAreaIndex]->SetCornerSelectedState(Corner, true);
+
+				for (int corner = 0; corner < NumOfStagePositions - 1; corner++)
+				{
+					StageAreas[SelectedAreaIndex]->setDifferenceX(corner, StageAreas[SelectedAreaIndex]->GetX(Centre) - StageAreas[SelectedAreaIndex]->GetX(corner));
+					StageAreas[SelectedAreaIndex]->setDifferenceY(corner, StageAreas[SelectedAreaIndex]->GetY(Centre) - StageAreas[SelectedAreaIndex]->GetY(corner));
+				}
 				break;
 			}
 		}

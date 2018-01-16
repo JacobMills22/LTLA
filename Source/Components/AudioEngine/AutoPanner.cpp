@@ -54,8 +54,8 @@
 		float centreY = getHeight() * 0.5;
 		float sliderWidth = getWidth() * 0.3;
 
-		panningSlider.setBounds(centreX - (sliderWidth * 0.5), centreY - (sliderWidth * 0.8), sliderWidth, sliderWidth);
-		enablePanButton.setBounds(centreX - (sliderWidth * 0.7), centreY - (sliderWidth * 1.0), sliderWidth * 1.5, sliderWidth * 0.25);
+		panningSlider.setBounds(centreX - (sliderWidth * 0.5), centreY - (sliderWidth * 0.7), sliderWidth, sliderWidth);
+		enablePanButton.setBounds(centreX - sliderWidth * 0.4, centreY - (sliderWidth * 0.85), sliderWidth * 1.5, sliderWidth * 0.25);
 		resetPanButton.setBounds(centreX - (sliderWidth * 0.25), centreY * 1.1, sliderWidth * 0.5, sliderWidth * 0.15);
 	}
 

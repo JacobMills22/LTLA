@@ -147,7 +147,7 @@ public:
 
 	//==============================================================================	
 
-	enum { FrontLeft, FrontRight, BackRight, BackLeft, NumOfStagePositions };
+	enum { FrontLeft, FrontRight, BackRight, BackLeft, Centre, NumOfStagePositions };
 	int StageCalibrationCounter = 0;
 	int StageCalibrationInterval = 5;
 
