@@ -57,9 +57,11 @@ public:
 
 	float getDifferenceY(int CornerID);
 
-	void setDifferenceX(int cornerID, int value);
+	void setDifferenceX(int cornerID, float value);
 
-	void setDifferenceY(int cornerID, int value);
+	void setDifferenceY(int cornerID, float value);
+
+	void updateTrackingGUIWidthAndHeight(float width, float height);
 
 	
 /** Gets the Path Used to Draw the Area*/
@@ -113,5 +115,8 @@ private:
 	Path AreaPath;
 	Colour AreaColour = Colours::floralwhite;
 	String areaName;
-	
-};
+
+	float trackingGUIWidth = 900.0;
+	float trackingGUIHeight = 500.0;
+
+}; 

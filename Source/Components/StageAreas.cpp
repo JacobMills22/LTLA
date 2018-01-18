@@ -75,22 +75,53 @@ void StageArea::UpdateArea(int Corner, float X, float Y)
 {
 	if (Corner == Centre)
 	{
-		AreaPosition[Centre].x = X;
-		AreaPosition[Centre].y = Y;
-
-		for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+		if (X >= 0 && X <= trackingGUIWidth)
 		{
-			AreaPosition[corner].x = X - AreaPosition[corner].differenceX;
-			AreaPosition[corner].y = Y - AreaPosition[corner].differenceY;
+			AreaPosition[Centre].x = X;
+			for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+			{
+				AreaPosition[corner].x = X - AreaPosition[corner].differenceX;
+			}
+		}
+		else
+		{
+			X <= 0 ? AreaPosition[Centre].x = 0.0 : AreaPosition[Centre].x = trackingGUIWidth;
+		}
+
+		if (Y >= 0 && Y <= trackingGUIHeight)
+		{
+			AreaPosition[Centre].y = Y;
+			for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+			{
+				AreaPosition[corner].y = Y - AreaPosition[corner].differenceY;
+			}
+		}
+		else
+		{
+			Y <= 0 ? AreaPosition[Centre].y = 0.0 : AreaPosition[Centre].y = trackingGUIHeight;
 		}
 	}
 	else
 	{
-		AreaPosition[Corner].x = X;
-		AreaPosition[Corner].y = Y;
+		if (X >= 0 && X <= trackingGUIWidth)
+		{
+			AreaPosition[Corner].x = X;
+			AreaPosition[Centre].x = AreaPath.getBounds().getCentreX();
+		}
+		else
+		{
+			X <= 0 ? AreaPosition[Corner].x = 0.0 : AreaPosition[Corner].x = trackingGUIWidth;
+		}
 
-		AreaPosition[Centre].x = AreaPath.getBounds().getCentreX();
-		AreaPosition[Centre].y = AreaPath.getBounds().getCentreY();
+		if (Y >= 0 && Y <= trackingGUIHeight)
+		{
+			AreaPosition[Corner].y = Y;
+			AreaPosition[Centre].y = AreaPath.getBounds().getCentreY();
+		}
+		else
+		{
+			Y <= 0 ? AreaPosition[Corner].y = 0.0 : AreaPosition[Corner].y = trackingGUIHeight;
+		}
 	}
 }
 
@@ -117,14 +148,20 @@ float StageArea::getDifferenceY(int CornerID)
 	return AreaPosition[CornerID].differenceY;
 }
 
-void StageArea::setDifferenceX(int cornerID, int value)
+void StageArea::setDifferenceX(int cornerID, float value)
 {
 	AreaPosition[cornerID].differenceX = value;
 }
 
-void StageArea::setDifferenceY(int cornerID, int value)
+void StageArea::setDifferenceY(int cornerID, float value)
 {
 	AreaPosition[cornerID].differenceY = value;
+}
+
+void StageArea::updateTrackingGUIWidthAndHeight(float width, float height)
+{
+	trackingGUIWidth = width;
+	trackingGUIHeight = height;
 }
 
 Path StageArea::GetAreaPath()

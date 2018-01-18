@@ -91,7 +91,7 @@ void LTLA_GUI::PaintGrid(Graphics& g)
 
 void LTLA_GUI::SnapStageToGrid()
 {
-	for (int Corner = 0; Corner < MainStageArea.NumOfAreaCorners; Corner++)
+	for (int Corner = 0; Corner < MainStageArea.NumOfAreaCorners - 1; Corner++)
 	{
 		float SnappedStageCornerX = round(MainStageArea.GetX(Corner) / GridIncrement) * GridIncrement;
 		float SnappedStageCornerY = round(MainStageArea.GetY(Corner) / GridIncrement) * GridIncrement;
@@ -100,7 +100,7 @@ void LTLA_GUI::SnapStageToGrid()
 	
 	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
 	{
-		for (int Corner = 0; Corner < StageAreas[AreaIndex]->NumOfAreaCorners; Corner++)
+		for (int Corner = 0; Corner < StageAreas[AreaIndex]->NumOfAreaCorners - 1; Corner++)
 		{
 			float SnappedAreaCornerX = round(StageAreas[AreaIndex]->GetX(Corner) / GridIncrement) * GridIncrement;
 			float SnappedAreaCornerY = round(StageAreas[AreaIndex]->GetY(Corner) / GridIncrement) * GridIncrement;
@@ -112,5 +112,8 @@ void LTLA_GUI::SnapStageToGrid()
 
 void LTLA_GUI::resized()
 {
-
+	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	{
+		StageAreas[AreaIndex]->updateTrackingGUIWidthAndHeight(getWidth(), getHeight());
+	}
 }	

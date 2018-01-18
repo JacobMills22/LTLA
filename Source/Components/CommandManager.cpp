@@ -105,6 +105,10 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 	case LTLAMenuBar::EditStageID: 
 		GUI.GetStageEditState() == true ? GUI.SetStageEditState(false) : GUI.SetStageEditState(true);
 		GUI.SetStageAreaEditState(false);
+		if (GUI.getAudioPanelState() == true)
+		{
+			editAudioParametersPressed();
+		}
 		break;
 	case LTLAMenuBar::DrawGridID: GUI.GetGridDrawingState() == true ? GUI.SetGridDrawingState(false) : GUI.SetGridDrawingState(true);
 		break;
@@ -189,7 +193,11 @@ void MainContentComponent::editAudioParametersPressed()
 	{
 		AreaColourSelector.setVisible(false);
 		audioEngine.setVisible(false);
-	}
 
+		for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
+		{
+			GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
+		}
+	}
 	resized();
 }
