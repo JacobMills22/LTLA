@@ -59,7 +59,7 @@ public:
 
 private:
 
-	INuiSensor* m_pNuiSensor;
+	INuiSensor* m_pNuiSensor = NULL;
 	HANDLE m_hNextSkeletonEvent;
 	int FirstSkeleton = -1;
 	int SecondSkeleton = -1;
