@@ -12,6 +12,8 @@ public:
 /** Creates an Area on the Stage at Default Position */
 	StageArea();
 
+	~StageArea();
+
 	//==============================================================================	
 	/** Main Functions*/
 
@@ -22,7 +24,10 @@ public:
 /** Updates the Coordinates of one of the Areas Corners*/
 	void UpdateArea( int Corner, float X, float Y);
 
-	 void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
+    void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override
+  	 {
+
+	 }
 
 	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override
 	 {

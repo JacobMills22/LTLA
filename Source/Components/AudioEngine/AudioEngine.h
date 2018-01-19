@@ -10,6 +10,8 @@ class LTLAAudioEngine : public AudioSource,
 
 public:
 
+	~LTLAAudioEngine();
+
 /** Initialises Audio Engine */
 	void initialiseEngine(int SamplesPerBlock, double sampleRate);
 

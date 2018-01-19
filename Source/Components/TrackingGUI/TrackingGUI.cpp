@@ -10,6 +10,13 @@ LTLA_GUI::LTLA_GUI()
 	TrackingState[1] = false;
 }
 
+LTLA_GUI::~LTLA_GUI()
+{
+
+	StageAreas.clear(true);
+}
+
+
 // Main GUI Functions
 
 void LTLA_GUI::paint(Graphics& g) 

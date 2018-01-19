@@ -16,8 +16,8 @@ public:
 /** Destroys MenuBar Component.*/
 	~LTLAMenuBar()
 	{
-		PopupMenu::dismissAllActiveMenus();
-		delete menuBar;
+		PopupMenu::dismissAllActiveMenus();	
+		menuBar.release();
 	}
 
 /** Called when component is resized, used to set bounds of component.*/

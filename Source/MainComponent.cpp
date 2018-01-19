@@ -65,6 +65,7 @@
 	MainContentComponent::~MainContentComponent()
 	{
 		shutdownAudio();
+		
 	}
 
 	// MAIN AUDIO FUNCTIONS

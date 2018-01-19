@@ -1,6 +1,14 @@
 
 #include "AudioEngine.h"
 
+
+	LTLAAudioEngine::~LTLAAudioEngine()
+	{
+
+		audioPanel.clear(true);
+		areaData.clear(true);	
+	}
+
 	void LTLAAudioEngine::initialiseEngine(int SamplesPerBlock, double sampleRate)
 	{
 		samplesPerBlock = SamplesPerBlock;

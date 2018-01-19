@@ -22,6 +22,12 @@ StageArea::StageArea()
 	valueTree->addListener(this);
 
 	valueTree->setProperty("AreaSelectedState", false, nullptr);	
+	
+}
+
+StageArea::~StageArea()
+{
+	valueTree.release();
 }
 
 void StageArea::DrawArea(Graphics &g, bool Editmode)
@@ -58,7 +64,7 @@ void StageArea::DrawArea(Graphics &g, bool Editmode)
 		if (AreaPosition[BackRight].Selected == true) { g.setColour(Colours::cyan); }
 		g.drawRect((int)AreaPosition[BackRight].x - 5, (int)AreaPosition[BackRight].y - 5, 10, 10, 1.0);
 
-		g.setColour(Colours::white);
+		g.setColour(Colours::blue);
 		if (AreaPosition[Centre].Selected == true) { g.setColour(Colours::cyan); }
 		g.drawRect((int)AreaPosition[Centre].x - 5, (int)AreaPosition[Centre].y - 5, 10, 10, 1.0);
 
