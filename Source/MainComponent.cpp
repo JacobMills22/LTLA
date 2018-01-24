@@ -16,10 +16,14 @@
 		your controls and content.
 	*/
 	//==============================================================================
-	MainContentComponent::MainContentComponent()
+MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager, 0, 256, 0, 256, false, false, true, true),
+	audioSettingsWindow("Audio Device Settings", false)
+								             //  audioSettingsWindow("Audio Settings", Colours::black, 4, false)
 	{
+		
 		setSize(1000, 600);
-		setAudioChannels(0, 2);
+	//	deviceManager.initialise(2, 2, nullptr, true, String(), nullptr);
+		setAudioChannels(2, 2);
 		KinectSensor.StartKinectST();
 		startTimer(KinectUpdateTimer, 40);
 		startTimer(GUITimer, 30);
@@ -45,7 +49,7 @@
 		areaNameLabel.setJustificationType(Justification::centred);
 
 		addAndMakeVisible(stereoAudioMeter);
-
+						
 		// Global Parameters Initialisation
 
 		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
@@ -57,6 +61,11 @@
 		GlobalButton[SelectNextAreaButtonID].setButtonText("Next Area");
 		GlobalButton[SelectPreviousAreaButtonID].setButtonText("Previous Area");
 				
+		addAndMakeVisible(audioDeviceSelector);
+		addAndMakeVisible(audioSettingsWindow);
+		audioSettingsWindow.setVisible(false);
+		audioSettingsWindow.setContentOwned(&audioDeviceSelector, true);
+
 		auto& commandManager = LTLACommandManager::getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
 
@@ -65,7 +74,6 @@
 	MainContentComponent::~MainContentComponent()
 	{
 		shutdownAudio();
-		
 	}
 
 	// MAIN AUDIO FUNCTIONS
@@ -79,8 +87,8 @@
 	}
 
 	void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
-	{
-		bufferToFill.clearActiveBufferRegion();	
+	{			
+		audioEngine.setDeviceManagerToUse(&deviceManager);
 		audioEngine.getNextAudioBlock(bufferToFill);
 	}
 
@@ -101,13 +109,16 @@
 	void MainContentComponent::resized()
 	{
 		GUI.resized();
-		MenuBar.setBounds(10, 10, 300, 30);
-
+		MenuBar.setBounds(10, 10, 500, 30);
+	
 
 		if (GUI.getAudioPanelState() == false)
 			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(50).getHeight());
 		else
 			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getHeight() * 0.5);
+
+		audioSettingsWindow.setBounds(GUI.getX() + 1, GUI.getY() + 1, 500, 600);
+		audioDeviceSelector.setBounds(GUI.getX() + 1, GUI.getY() + 1, 500, 600);
 
 		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
 		AreaColourSelector.setBounds(GUI.getX() + GUI.getWidth() * 0.9, GUI.getHeight() + 55, GUI.getWidth() * 0.1, (getHeight() - GUI.getHeight()) * 0.3);

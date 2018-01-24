@@ -30,15 +30,24 @@
 	/** Processes the audio data (Resampling Audio Source)*/
 	void AutoPanner::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
 	{
-		float* OutputL = bufferToFill.buffer->getWritePointer(0);
-		float* OutputR = bufferToFill.buffer->getWritePointer(1);
+		// Using process function instead.
+	}
 
+	void AutoPanner::process(AudioSampleBuffer &buffer)
+	{
+		float* OutputL = buffer.getWritePointer(0);
+		float* OutputR = buffer.getWritePointer(1);
 
-		for (int sample = 0; sample < bufferToFill.numSamples; sample++)
+		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 		{
 			// 6dB Pan Law
-			OutputL[sample] *= pow(sin((1 - panAmount) * (float_Pi * 0.5)), 2) * 0.5;
-			OutputR[sample] *= pow(sin(panAmount * (float_Pi * 0.5)), 2) * 0.5;
+			//	OutputL[sample] *= pow(sin((1 - panAmount) * (float_Pi * 0.5)), 2) * 1.98;
+			//	OutputR[sample] *= pow(sin(panAmount * (float_Pi * 0.5)), 2) * 1.98;
+
+			// 3dB Pan Law
+			OutputL[sample] *= sin((1 - panAmount) * (float_Pi * 0.5));
+			OutputR[sample] *= sin((panAmount) * (float_Pi * 0.5));
+
 		}
 	}
 

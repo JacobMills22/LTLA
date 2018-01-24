@@ -44,7 +44,7 @@ public:
 	void setMeterData(int channel, float value)
 	{
 		
-		value *= 5;
+		value *= 10;
 
 		if (value > peak[channel])
 		{

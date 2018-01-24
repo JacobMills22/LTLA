@@ -40,6 +40,8 @@ public:
 
 /** Sets the pan amount. */
 	void setPanAmount(float value);
+	
+	void process(AudioSampleBuffer &buffer);
 
 private:
 

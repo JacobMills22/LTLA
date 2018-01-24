@@ -3,10 +3,13 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../AudioEngine/FilePlayer.h"
 #include "AutoPanner.h"
+#include "PerformerInput.h"
+
 
 class LTLAAudioPanel : public AudioSource,
 					   public Component,
-					   public Button::Listener
+					   public Button::Listener,
+					   public ComboBox::Listener
 {
 
 public:
@@ -29,8 +32,19 @@ public:
 /**	Button callback, opens and closes the audio panels various DSP modules*/
 	void buttonClicked(Button* button) override;
 
+	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
+
+
 /** Closes all of the panels of all the DSP modules (Not the audioPanel itself) */
 	void closeAllPanels();
+
+	void setPerformerInsideAreaState(int performerNum, bool state);
+
+	bool getPerformerInsideAreaState(int performerNum);
+
+	void setAudioInputID(int ID);
+
+	int getAudioInputID();
 
 	// FILEPLAYER FUNCTIONS
 
@@ -56,13 +70,22 @@ public:
 /** Sets the Auto-Panner Amount */
 	void setAutoPannerAmount(float value);
 
+	enum { FilePlayerInput = 1, Performer1, Performer2 };
+
 private:
 
 	FilePlayer filePlayer;
 	AutoPanner autoPanner;
 
+	ComboBox inputComboBox;
+
 	enum {buttonFilePlayerID, buttonAutoPannerID, numOfButtons};
 	TextButton audioPanelButton[numOfButtons];
 
 	int currentlySelectedAreaID = 0;
+	int audioInputID = FilePlayerInput;
+
+	bool performerInsideArea[2];
+
+
 };

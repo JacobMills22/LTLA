@@ -2,6 +2,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "AudioPanel.h"
+#include "PerformerInput.h"
 
 class LTLAAudioEngine : public AudioSource,
 					    public Component,
@@ -70,6 +71,10 @@ public:
 
 	float getMeterData(int channel);
 
+	void setPerformerParameters(int ActualInputChannel, int MaxOutputChannels);
+
+	void setDeviceManagerToUse(AudioDeviceManager *deviceManager);
+	
 
 private:
 
@@ -90,7 +95,9 @@ private:
 	float autoPannerAmount = 0;
 	float meterData[2];
 
-	enum { continuePlaybackID = 1, stopPlaybackID, triggeredByBothPerformers = 2 };
+	PerformerInput performerInput;
+	AudioSampleBuffer rawInputBuffer, processedPerformerBuffer, filePlayerBuffer;
 
+	enum { continuePlaybackID = 1, stopPlaybackID, triggeredByBothPerformers = 2 };
 
 };

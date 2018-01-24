@@ -71,6 +71,9 @@ private:
 	LTLAAudioEngine audioEngine;
 
 	ColourSelector AreaColourSelector{(ColourSelector::showColourspace), 4, 7 };
+//	ScopedPointer<AudioDeviceSelectorComponent> audioDeviceSelector;
+//	AudioDeviceManager audioDeviceManager;
+	AudioDeviceSelectorComponent audioDeviceSelector;
 	Label areaNameLabel;
 	Label CalibrationCountDownLabel;
 
@@ -88,6 +91,10 @@ private:
 	Slider GlobalSliders[numOfSliders];
 
 	AudioMeter stereoAudioMeter;
+
+	PerformerInput performerInput;
+
+	ResizableWindow audioSettingsWindow;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };

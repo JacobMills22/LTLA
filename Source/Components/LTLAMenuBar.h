@@ -29,7 +29,7 @@ public:
 /** Gets the main menu bar heading names. */
 	StringArray getMenuBarNames() override
 	{
-		const char* const names[] = { "Stage Calibration", "Grid", "Stage Areas", nullptr };
+		const char* const names[] = { "Stage Calibration", "Grid", "Stage Areas", "Preferences", nullptr };
 		return StringArray(names);
 	}
 
@@ -71,6 +71,10 @@ public:
 			menu.addCommandItem(commandManager, RemoveStageAreaID);
 			menu.addCommandItem(commandManager, AudioParametersID);
 		}
+		else if (menuIndex == PreferencesID)
+		{
+			menu.addCommandItem(commandManager, AudioDeviceSettingsID);
+		}
 		return menu;
 	}
 	
@@ -85,12 +89,12 @@ public:
 	enum MainCommandManagerIDs {CalibrationStartID = 1, Interval5SecondsID, Interval10SecondsID, 
 		Interval20SecondsID, DrawStageID, EditStageID, DrawGridID, SnaptoGridID, GridSize10ID, 
 		GridSize15ID, GridSize20ID, AddStageAreaID, EditStageAreasID, RemoveStageAreaID, 
-		AudioParametersID, NumOfCommandIDs};
+		AudioParametersID, AudioDeviceSettingsID, NumOfCommandIDs};
 
 private:
 
 	ScopedPointer<MenuBarComponent> menuBar;
-	enum { CalibrationIndexID, GridIndexID, StageAreasID };
+	enum { CalibrationIndexID, GridIndexID, StageAreasID, PreferencesID };
 
 };
 

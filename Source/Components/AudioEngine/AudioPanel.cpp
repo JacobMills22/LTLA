@@ -3,6 +3,9 @@
 
 	LTLAAudioPanel::LTLAAudioPanel()
 	{
+		performerInsideArea[0] = false;
+		performerInsideArea[1] = false;
+		
 		addAndMakeVisible(filePlayer);
 		addAndMakeVisible(autoPanner);
 
@@ -15,6 +18,12 @@
 		audioPanelButton[buttonFilePlayerID].setButtonText("File Player");
 		audioPanelButton[buttonAutoPannerID].setButtonText("AutoPanner");
 
+		addAndMakeVisible(inputComboBox);
+		inputComboBox.addItem("File Player", 1);
+		inputComboBox.addItem("Performer 1", 2);
+		inputComboBox.addItem("Performer 2", 3);
+		inputComboBox.addListener(this);
+		
 		filePlayer.closePanel();
 		autoPanner.closePanel();
 	}
@@ -29,18 +38,29 @@
 	{
 		filePlayer.releaseResources();
 		autoPanner.releaseResources();
+
 	}
 
 	void LTLAAudioPanel::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
-	{
-		filePlayer.getNextAudioBlock(bufferToFill);
-		autoPanner.getNextAudioBlock(bufferToFill);
+	{	
+		if (getAudioInputID() == Performer1)
+		{
+		//	if (performerInsideArea[0] == true)
+			{
+				autoPanner.process(*bufferToFill.buffer);
+			}
+		}
+		else if (getAudioInputID() == FilePlayerInput)
+		{
+			filePlayer.getNextAudioBlock(bufferToFill);
+		}
 	}
 
 	void LTLAAudioPanel::resized()
 	{
 		audioPanelButton[buttonFilePlayerID].setBounds(5, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoPannerID].setBounds(audioPanelButton[buttonFilePlayerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
+		inputComboBox.setBounds(5, getHeight() * 0.08, getWidth() * 0.15, getHeight() * 0.1);
 		filePlayer.setBounds(getBounds().getCentreX() * 0.55, audioPanelButton[buttonFilePlayerID].getBottom(), getWidth() * 0.5, getHeight() * 0.8);
 		autoPanner.setBounds(filePlayer.getBounds());
 	}
@@ -62,6 +82,14 @@
 		}
 	}
 
+	void LTLAAudioPanel::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
+	{
+		if (comboBoxThatHasChanged == &inputComboBox)
+		{
+			setAudioInputID(inputComboBox.getSelectedId());
+		}
+	}
+
 	void LTLAAudioPanel::closeAllPanels()
 	{
 		for (int buttomNum = 0; buttomNum < numOfButtons; buttomNum++)
@@ -71,6 +99,26 @@
 
 		filePlayer.closePanel();
 		autoPanner.closePanel();
+	}
+
+	void LTLAAudioPanel::setPerformerInsideAreaState(int performerNum, bool state)
+	{
+		performerInsideArea[performerNum] = state;
+	}
+
+	bool LTLAAudioPanel::getPerformerInsideAreaState(int performerNum)
+	{
+		return performerInsideArea[performerNum];
+	}
+
+	void LTLAAudioPanel::setAudioInputID(int ID)
+	{
+		audioInputID = ID;
+	}
+
+	int LTLAAudioPanel::getAudioInputID()
+	{
+		return audioInputID;
 	}
 
 	// FILEPLAYER FUNCTIONS
@@ -93,7 +141,6 @@
 		}
 	//	else { return 0; }
 	}
-
 
 	bool LTLAAudioPanel::getFilePlayerRetriggerState()
 	{

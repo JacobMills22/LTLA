@@ -14,7 +14,8 @@ void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 {
 	const CommandID ids[] = { MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID,
 		MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.EditStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID,
-		MenuBar.GridSize15ID, MenuBar.GridSize20ID, MenuBar.AddStageAreaID, MenuBar.EditStageAreasID, MenuBar.RemoveStageAreaID, MenuBar.AudioParametersID };
+		MenuBar.GridSize15ID, MenuBar.GridSize20ID, MenuBar.AddStageAreaID, MenuBar.EditStageAreasID, MenuBar.RemoveStageAreaID, MenuBar.AudioParametersID,
+		MenuBar.AudioDeviceSettingsID };
 	
 	commands.addArray(ids, numElementsInArray(ids));
 }
@@ -80,6 +81,9 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
 		GUI.getAudioPanelState() == true ? result.setTicked(true) : result.setTicked(false);
 		break;
+	case LTLAMenuBar::AudioDeviceSettingsID:
+		result.setInfo("Audio Device Settings", "Open a panel to edit audio device settings", "Preferences", 0);
+		audioSettingsWindow.isVisible() == true ? result.setTicked(true) : result.setTicked(false);
 	}
 }
 
@@ -128,7 +132,9 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 		break;
 	case LTLAMenuBar::AudioParametersID: editAudioParametersPressed();
 		break;
-	default: return false;
+	case LTLAMenuBar::AudioDeviceSettingsID: audioSettingsWindow.isVisible() == true ? audioSettingsWindow.setVisible(false) : audioSettingsWindow.setVisible(true);
+		break;
+	default: return false; 
 	}
 	return true;
 }

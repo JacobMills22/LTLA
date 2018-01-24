@@ -24,10 +24,7 @@ public:
 /** Updates the Coordinates of one of the Areas Corners*/
 	void UpdateArea( int Corner, float X, float Y);
 
-    void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override
-  	 {
-
-	 }
+	void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
 
 	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override
 	 {
@@ -108,6 +105,7 @@ private:
 		float differenceX = 0.00;
 		float differenceY = 0.00;
 	};
+
 	AreaCorner AreaPosition[NumOfAreaCorners];
 
 	struct Coordinates

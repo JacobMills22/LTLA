@@ -4,16 +4,15 @@
 
 	LTLAAudioEngine::~LTLAAudioEngine()
 	{
-
 		audioPanel.clear(true);
-		areaData.clear(true);	
+		areaData.clear(true);
 	}
 
 	void LTLAAudioEngine::initialiseEngine(int SamplesPerBlock, double sampleRate)
 	{
 		samplesPerBlock = SamplesPerBlock;
 		samplerate = sampleRate;
-
+		
 		setMeterData(0, 0.0);
 		setMeterData(1, 0.0);
 
@@ -22,32 +21,96 @@
 
 	void LTLAAudioEngine::prepareToPlay(int samplesPerBlockExpected, double sampleRate) 
 	{
-		mixerAudioSource.addInputSource(audioPanel.getLast(), true);
-		mixerAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+		rawInputBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
+		processedPerformerBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
+		filePlayerBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
+
+		if (audioPanel.size() > 0)
+		{
+			audioPanel.getLast()->prepareToPlay(samplesPerBlockExpected, sampleRate);
+			mixerAudioSource.addInputSource(audioPanel.getLast(), false);
+			DBG("ADDING MIXER SOURCE, SIZE IS " + (String)audioPanel.size());
+		}
+		else
+		{
+			mixerAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+		}
+
+		performerInput.prepareToPlay(samplesPerBlockExpected, sampleRate);
 	}
 
 	void LTLAAudioEngine::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) 
 	{
-		mixerAudioSource.getNextAudioBlock(bufferToFill);
+		// Store a raw copy of the input buffer
+		rawInputBuffer.makeCopyOf(*bufferToFill.buffer, true);
 
+		// Set the Input to the copy of the input buffer and process
+		performerInput.setInputBuffer(rawInputBuffer);
+		performerInput.getNextAudioBlock(bufferToFill);
+	
+		// Since fileplayers use a resamplingaudiosource and doesn't just "process data"
+		// all fileplayers need to be added to a mixeraudiosource and removed if 
+		// the audiopanel doesn't have its input set to fileplayer.
+
+		// For each audiopanel which has its input set to performer 1
+		for (int panel = 0; panel < audioPanel.size(); panel++)
+		{
+			if (audioPanel[panel]->getAudioInputID() == 2)
+			{
+				// Remove the fileplayer audiosource from the mixer and then process
+				mixerAudioSource.removeInputSource(audioPanel[panel]);
+				audioPanel[panel]->getNextAudioBlock(bufferToFill);
+			}
+		}
+		// Copy the processed audio into a buffer.
+		processedPerformerBuffer.makeCopyOf(*bufferToFill.buffer, false);
+
+		// For each audiopanel which has its input set to Fileplayer
+		for (int panel = 0; panel < audioPanel.size(); panel++)
+		{
+			if (audioPanel[panel]->getAudioInputID() == 1)
+			{
+				// add the audio panel with the fileplayer to the mixer.
+				mixerAudioSource.addInputSource(audioPanel[panel], false);
+			}
+		}
+		// process all fileplayers and make a copy of the buffer.
+		mixerAudioSource.getNextAudioBlock(bufferToFill);
+		filePlayerBuffer.makeCopyOf(*bufferToFill.buffer, false);
+		
 		float* OutputL = bufferToFill.buffer->getWritePointer(0);
 		float* OutputR = bufferToFill.buffer->getWritePointer(1);
 
+		float* ProcessedPerformerL = processedPerformerBuffer.getWritePointer(0);
+		float* ProcessedPerformerR = processedPerformerBuffer.getWritePointer(1);
 
+		float* filePlayerBufferL = filePlayerBuffer.getWritePointer(0);
+		float* filePlayerBufferR = filePlayerBuffer.getWritePointer(1);
+		
 		for (int sample = 0; sample < bufferToFill.numSamples; sample++)
 		{
+			// Set the output to be the processed performer audio and the fileplayer audio.
+			OutputL[sample] = ProcessedPerformerL[sample] + filePlayerBufferL[sample] * 0.5;
+			OutputR[sample] = ProcessedPerformerR[sample] + filePlayerBufferR[sample] * 0.5;
+		}
+		
+		for (int sample = 0; sample < bufferToFill.numSamples; sample++)
+		{
+			// Set meter data.
 			if (OutputL[sample] <= 1.0 && OutputL[sample] >= 0.0)
-				setMeterData(0, OutputL[sample]);
+			setMeterData(0, OutputL[sample]);
 
 			if (OutputR[sample] <= 1.0 && OutputR[sample] >= 0.0)
-				setMeterData(1, OutputR[sample]);
-			
+			setMeterData(1, OutputR[sample]);
 		}
 	}
 
 	void LTLAAudioEngine::releaseResources() 
 	{
-		mixerAudioSource.releaseResources();
+		for (int panel = 0; panel < audioPanel.size(); panel++)
+		{
+			audioPanel[panel]->releaseResources();
+		}
 		stopTimer();
 	}
 
@@ -80,11 +143,11 @@
 	{
 		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
 		{
-			audioPanel[stageAreaAudioID]->setVisible(state); 
+			audioPanel[stageAreaAudioID]->setVisible(state);
 		}
 	}
 
-	void LTLAAudioEngine::resized() 
+	void LTLAAudioEngine::resized()
 	{
 		for (int stageAreaAudioID = 0; stageAreaAudioID < audioPanel.size(); stageAreaAudioID++)
 		{
@@ -95,6 +158,7 @@
 	void LTLAAudioEngine::setAreaIDContainingPerformerState(int perfromerID, int areaID, bool state)
 	{
 		areaData[areaID]->areaContainsPerformer[perfromerID] = state;
+		audioPanel[areaID]->setPerformerInsideAreaState(perfromerID, state);
 	}
 
 	void LTLAAudioEngine::setPerformerEnteredAreaState(int perfromerID, bool state, int areaID)
@@ -140,15 +204,20 @@
 					// call performerEnteredArea if the enter state is true and they are still in the area
 					// and if either retrigger mode is turned on or the fileplayer has finished previous playback.
 					if (areaData[area]->performerEnteredAreaState[performer] == true && areaData[area]->areaContainsPerformer[performer] == true)
-					{	
+					{
 						if (audioPanel[area]->getFilePlayerRetriggerState() == true || audioPanel[area]->getFilePlayerPlayBackState() == false)
 						{
-							performerEnteredArea(performer, area); 
+							performerEnteredArea(performer, area);
 						}
 					}
 					else if (areaData[area]->performerExitedAreaState[performer] == true && areaData[area]->areaContainsPerformer[performer] == false)
 					{
 						performerExitedArea(performer, area); // call performerExitedArea if the exit state is true and they aren't in the area
+					}
+
+					if (areaData[area]->areaContainsPerformer[performer] == true)
+					{
+						audioPanel[area]->setPerformerInsideAreaState(performer, true);
 					}
 				}
 			}
@@ -208,4 +277,14 @@
 	float LTLAAudioEngine::getMeterData(int channel)
 	{
 		return meterData[channel];
+	}
+
+	void LTLAAudioEngine::setPerformerParameters(int ActualInputChannel, int MaxOutputChannels)
+	{
+		performerInput.initialise(ActualInputChannel, MaxOutputChannels);
+	}
+
+	void LTLAAudioEngine::setDeviceManagerToUse(AudioDeviceManager *deviceManager)
+	{
+		performerInput.setDeviceManagerToUse(deviceManager);
 	}
