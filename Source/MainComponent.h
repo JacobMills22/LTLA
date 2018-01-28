@@ -6,6 +6,8 @@
 #include "Components\AudioEngine\AudioPanel.h"
 #include "Components\AudioEngine\AudioEngine.h"
 #include "Components\AudioEngine\Meter.h"
+#include "SnapshotManager.h"
+
 
 class MainContentComponent : public AudioAppComponent,
 	private MultiTimer,
@@ -13,7 +15,8 @@ class MainContentComponent : public AudioAppComponent,
 	public ApplicationCommandTarget,
 	public ChangeListener,
 	public Slider::Listener,
-	public Label::Listener
+	public Label::Listener,
+	public ValueTree::Listener
 
 {
 public:
@@ -62,6 +65,20 @@ public:
 
 	void setAudioEngineData();
 
+
+
+
+	void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
+
+	void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
+
+	void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override;
+
+	void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex) override;
+
+	void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override;
+
+
 private:
 	//==============================================================================
 
@@ -71,8 +88,6 @@ private:
 	LTLAAudioEngine audioEngine;
 
 	ColourSelector AreaColourSelector{(ColourSelector::showColourspace), 4, 7 };
-//	ScopedPointer<AudioDeviceSelectorComponent> audioDeviceSelector;
-//	AudioDeviceManager audioDeviceManager;
 	AudioDeviceSelectorComponent audioDeviceSelector;
 	Label areaNameLabel;
 	Label CalibrationCountDownLabel;
@@ -96,5 +111,9 @@ private:
 
 	ResizableWindow audioSettingsWindow;
 
+	ValueTree valueTree;
+	SnapshotManager snapshotManager;
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };
+

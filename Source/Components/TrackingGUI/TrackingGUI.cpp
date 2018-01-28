@@ -12,7 +12,6 @@ LTLA_GUI::LTLA_GUI()
 
 LTLA_GUI::~LTLA_GUI()
 {
-
 	StageAreas.clear(true);
 }
 
@@ -50,11 +49,12 @@ void LTLA_GUI::PaintStage(Graphics& g)
 	if (GetGridSnappingState()) 
 		SnapStageToGrid();
 
-	if (StageDrawingState == true)
-	{
-		MainStageArea.SetAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));
-		MainStageArea.DrawArea(g, GetStageEditState());
-	}
+	//if (StageDrawingState == true)
+		if (valueTree.getPropertyAsValue("StageDrawingState", nullptr) == true)
+		{
+			MainStageArea.SetAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));
+			MainStageArea.DrawArea(g, GetStageEditState());
+		}
 }
 
 void LTLA_GUI::PaintStageAreas(Graphics &g)

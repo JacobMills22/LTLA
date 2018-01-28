@@ -147,6 +147,11 @@ public:
 		return (performerX - areaLeft) / (areaRight - areaLeft);
 	}
 
+	void setValueTree(ValueTree ValueTree)
+	{
+		valueTree = ValueTree;
+	}
+
 	//==============================================================================	
 
 	enum { FrontLeft, FrontRight, BackRight, BackLeft, Centre, NumOfStagePositions };
@@ -181,4 +186,9 @@ private:
 	 LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
 
 	 enum { StageFront, StageRight, StageBack, StageLeft, NumOfStageSides };
+
+	// ScopedPointer<ValueTree> valueTree;
+	ValueTree valueTree;
+
+
 };

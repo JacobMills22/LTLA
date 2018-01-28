@@ -17,7 +17,7 @@
 	*/
 	//==============================================================================
 MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager, 0, 256, 0, 256, false, false, true, true),
-	audioSettingsWindow("Audio Device Settings", false)
+	audioSettingsWindow("Audio Device Settings", false), valueTree("LTLAValueTree")
 								             //  audioSettingsWindow("Audio Settings", Colours::black, 4, false)
 	{
 		
@@ -69,6 +69,14 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		auto& commandManager = LTLACommandManager::getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
 
+		addAndMakeVisible(snapshotManager);
+
+		valueTree.addListener(this);
+
+		valueTree.setProperty("StageDrawingState", false, nullptr);
+
+		GUI.setValueTree(valueTree);
+		snapshotManager.setValueTree(valueTree);
 	}
 
 	MainContentComponent::~MainContentComponent()
@@ -133,6 +141,8 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		GlobalButton[SelectNextAreaButtonID].setBounds(areaNameLabel.getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
 
 		stereoAudioMeter.setBounds(getBounds().reduced(50).getX() + GUI.getWidth() + 5, GUI.getBottom() - getHeight() * 0.2, 40, getHeight() * 0.2);
+
+		snapshotManager.setBounds(GlobalButton[SelectNextAreaButtonID].getRight() + getWidth() * 0.1, GlobalPanelHeight, getWidth() * 0.3, 25);
 
 	}
 

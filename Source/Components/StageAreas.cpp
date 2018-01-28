@@ -22,7 +22,6 @@ StageArea::StageArea()
 	valueTree->addListener(this);
 
 	valueTree->setProperty("AreaSelectedState", false, nullptr);	
-	
 }
 
 StageArea::~StageArea()
