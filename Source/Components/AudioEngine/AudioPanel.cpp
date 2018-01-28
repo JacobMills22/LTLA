@@ -8,6 +8,7 @@
 		
 		addAndMakeVisible(filePlayer);
 		addAndMakeVisible(autoPanner);
+		addAndMakeVisible(autoFilter);
 
 		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
 		{
@@ -17,6 +18,7 @@
 		}
 		audioPanelButton[buttonFilePlayerID].setButtonText("File Player");
 		audioPanelButton[buttonAutoPannerID].setButtonText("AutoPanner");
+		audioPanelButton[buttonAutoFilterID].setButtonText("Filters");
 
 		addAndMakeVisible(inputComboBox);
 		inputComboBox.addItem("File Player", 1);
@@ -26,12 +28,15 @@
 		
 		filePlayer.closePanel();
 		autoPanner.closePanel();
+		filePlayer.closePanel();
 	}
 
 	void LTLAAudioPanel::prepareToPlay(int samplesPerBlockExpected, double sampleRate)  
 	{
 		filePlayer.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoPanner.prepareToPlay(samplesPerBlockExpected, sampleRate);
+
+		autoFilter.initialise(sampleRate);
 	}
 
 	void LTLAAudioPanel::releaseResources()
@@ -45,9 +50,10 @@
 	{	
 		if (getAudioInputID() == Performer1)
 		{
-		//	if (performerInsideArea[0] == true)
+			if (performerInsideArea[0] == true)
 			{
 				autoPanner.process(*bufferToFill.buffer);
+				autoFilter.process(*bufferToFill.buffer);
 			}
 		}
 		else if (getAudioInputID() == FilePlayerInput)
@@ -60,9 +66,13 @@
 	{
 		audioPanelButton[buttonFilePlayerID].setBounds(5, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoPannerID].setBounds(audioPanelButton[buttonFilePlayerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
+		audioPanelButton[buttonAutoFilterID].setBounds(audioPanelButton[buttonAutoPannerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
+
+		
 		inputComboBox.setBounds(5, getHeight() * 0.08, getWidth() * 0.15, getHeight() * 0.1);
-		filePlayer.setBounds(getBounds().getCentreX() * 0.55, audioPanelButton[buttonFilePlayerID].getBottom(), getWidth() * 0.5, getHeight() * 0.8);
+		filePlayer.setBounds(getWidth() * 0.25, audioPanelButton[buttonFilePlayerID].getBottom() + (getHeight() * 0.1), getWidth() * 0.6, getHeight() * 0.8);
 		autoPanner.setBounds(filePlayer.getBounds());
+		autoFilter.setBounds(filePlayer.getBounds());
 	}
 
 	void LTLAAudioPanel::buttonClicked(Button* button)
@@ -79,6 +89,11 @@
 		{
 			audioPanelButton[buttonAutoPannerID].setToggleState(!audioPanelButton[buttonAutoPannerID].getToggleState(), dontSendNotification);
 			audioPanelButton[buttonAutoPannerID].getToggleState() == false ? autoPanner.closePanel() : autoPanner.openPanel();
+		}
+		else if (button == &audioPanelButton[buttonAutoFilterID]) // Open Auto-Filter panel if selected.
+		{
+			audioPanelButton[buttonAutoFilterID].setToggleState(!audioPanelButton[buttonAutoFilterID].getToggleState(), dontSendNotification);
+			audioPanelButton[buttonAutoFilterID].getToggleState() == false ? autoFilter.closePanel() : autoFilter.openPanel();
 		}
 	}
 
@@ -99,6 +114,7 @@
 
 		filePlayer.closePanel();
 		autoPanner.closePanel();
+		autoFilter.closePanel();
 	}
 
 	void LTLAAudioPanel::setPerformerInsideAreaState(int performerNum, bool state)

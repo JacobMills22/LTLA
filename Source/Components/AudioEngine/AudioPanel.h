@@ -4,6 +4,7 @@
 #include "../AudioEngine/FilePlayer.h"
 #include "AutoPanner.h"
 #include "PerformerInput.h"
+#include "AutoFilter.h"
 
 
 class LTLAAudioPanel : public AudioSource,
@@ -76,10 +77,11 @@ private:
 
 	FilePlayer filePlayer;
 	AutoPanner autoPanner;
+	AutoFilter autoFilter;
 
 	ComboBox inputComboBox;
 
-	enum {buttonFilePlayerID, buttonAutoPannerID, numOfButtons};
+	enum {buttonFilePlayerID, buttonAutoPannerID, buttonAutoFilterID, numOfButtons};
 	TextButton audioPanelButton[numOfButtons];
 
 	int currentlySelectedAreaID = 0;
