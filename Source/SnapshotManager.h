@@ -9,7 +9,22 @@ public:
 
 	void recallSnapshot(ValueTree valueTree)
 	{
+		// Main Tree
 		valueTree.copyPropertiesFrom(snapshotValueTree, nullptr);
+
+		for (int childTree = 0; childTree < valueTree.getNumChildren(); childTree++)
+		{
+			// Childtree such as StageAreas and Audio Panels
+			DBG("Number of trees at Level 2 is " + (String)valueTree.getNumChildren());
+			valueTree.getChild(childTree).copyPropertiesFrom(snapshotValueTree.getChild(childTree), nullptr);
+
+			for (int subChildTree = 0; subChildTree < valueTree.getChild(childTree).getNumChildren(); subChildTree++)
+			{
+				// Child Tree such as Fileplayer
+				DBG("Number of trees at Level 3 is " + (String)valueTree.getChild(childTree).getNumChildren());
+				valueTree.getChild(childTree).getChild(subChildTree).copyPropertiesFrom(snapshotValueTree.getChild(childTree).getChild(subChildTree), nullptr);
+			}
+		}
 	}
 
 	void updateSnapshot(ValueTree valueTree)
@@ -50,20 +65,22 @@ public:
 		snapshotButtons[firePreviousID].setButtonText("<");
 		snapshotButtons[fireNextID].setButtonText(">");
 		snapshotButtons[updateSnapshotID].setButtonText("Update");
-		snapshotButtons[addNewSnapshotID].setButtonText("Add New");
+		snapshotButtons[addNewSnapshotID].setButtonText("Add");
 
 		addAndMakeVisible(currentSnapshotLabel);
 		currentSnapshotLabel.setText("No Snapshot", dontSendNotification);
 		currentSnapshotLabel.setJustificationType(Justification::centred);
 		currentSnapshotLabel.addListener(this);
 		currentSnapshotLabel.setEditable(false, true, false);
+
+		createNewSnapshot();
 	}
 
 	void createNewSnapshot()
 	{
 		snapshots.add(new Snapshot);
 		snapshots.getLast()->updateSnapshot(valueTree);
-		snapshots.getLast()->setSnapshotName("New Snappy");
+		snapshots.getLast()->setSnapshotName("Snapshot " + (String)(snapshots.size()));
 		setCurrentSnapshot(snapshots.size() - 1, false);
 	}
 
@@ -83,6 +100,7 @@ public:
 		if (alsoFireSnapshot == true)
 		{
 			snapshots[currentSnapshotID]->recallSnapshot(valueTree);
+			snapshotHasbeenFired = true;
 		}
 	}
 
@@ -126,11 +144,20 @@ public:
 	void resized() override
 	{
 		snapshotButtons[firePreviousID].setBounds(0, 0, getWidth() * 0.1, getHeight());
-		currentSnapshotLabel.setBounds(getWidth() * 0.11, 0, getWidth() * 0.4, getHeight());
-		snapshotButtons[updateSnapshotID].setBounds(getWidth() * 0.51, 0, getWidth() * 0.15, getHeight());
-		snapshotButtons[addNewSnapshotID].setBounds(getWidth() * 0.66, 0, getWidth() * 0.15, getHeight());
-		snapshotButtons[fireNextID].setBounds(getWidth() * 0.91, 0, getWidth() * 0.1, getHeight());
+		currentSnapshotLabel.setBounds(getWidth() * 0.11, 0, getWidth() * 0.35, getHeight());
+		snapshotButtons[updateSnapshotID].setBounds(getWidth() * 0.48, 0, getWidth() * 0.18, getHeight());
+		snapshotButtons[addNewSnapshotID].setBounds(getWidth() * 0.68, 0, getWidth() * 0.15, getHeight());
+		snapshotButtons[fireNextID].setBounds(getWidth() * 0.85, 0, getWidth() * 0.1, getHeight());
+	}
 
+	bool hasSnapshotBeenFired()
+	{
+		return snapshotHasbeenFired;
+	}
+
+	void setHasbeenFiredState(bool state)
+	{
+		snapshotHasbeenFired = state;
 	}
 
 private:
@@ -143,6 +170,7 @@ private:
 	Label currentSnapshotLabel;
 
 	int currentSnapshotID = 0;
+	bool snapshotHasbeenFired = false;
 
 };
 

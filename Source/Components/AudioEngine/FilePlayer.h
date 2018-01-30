@@ -88,16 +88,36 @@ public:
 /** Returns the Retrigger option state */
 	bool getReTriggerState();
 
+	void snapshotFired()
+	{
+		setLevel(getLevel());
+		filePlayerComboBox[performerExitBoxID].setSelectedId(filePlayerValueTree.getPropertyAsValue("playbackOnPerformerExit", nullptr).getValue());
+
+		int selectedID = filePlayerValueTree.getPropertyAsValue("PerformerWhichTriggers", nullptr).getValue();
+		selectedID += 1;
+		filePlayerComboBox[performerWhichTriggersBoxID].setSelectedId(selectedID);
+
+		int retriggerID = filePlayerValueTree.getPropertyAsValue("Retrigger", nullptr).getValue();
+		retriggerID += 1;
+		filePlayerComboBox[retriggerBoxID].setSelectedId(retriggerID);
+
+	}
+
+	ValueTree getValueTree()
+	{
+		return filePlayerValueTree;
+	}
+
 private:
 
 	// TRACKING BASED PARAMETERS (VALUETREE PARAMETERS)
 	enum { performerWhichTriggersBoxID, performerExitBoxID, retriggerBoxID, numOfComboBoxes };
 	ComboBox filePlayerComboBox[numOfComboBoxes];
 	float playbackLevel = 0.0;
-	int PerformerWhichTriggers = 0;
+	//int PerformerWhichTriggers = 0;
 	enum { continuePlaybackID = 1, stopPlaybackID };
-	int playbackOnPerformerExit = stopPlaybackID;
-	bool retriggerState = false;
+	//int playbackOnPerformerExit = stopPlaybackID;
+	//bool retriggerState = false;
 
 	// AUDIO VARIABLES/OBJECTS
 	AudioFormatReaderSource* audioFormatReaderSource;
@@ -116,5 +136,8 @@ private:
 	ScopedPointer<FilenameComponent> fileChooser;
 	enum {levelLabelID, triggeredByLabelID, performerExitLabelID, retriggerLabelID, numOfLabels};
 	Label filePlayerLabel[numOfLabels];
+
+	// VALUE TREE
+	ValueTree filePlayerValueTree;
 
 };

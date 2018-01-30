@@ -49,7 +49,6 @@ void LTLA_GUI::PaintStage(Graphics& g)
 	if (GetGridSnappingState()) 
 		SnapStageToGrid();
 
-	//if (StageDrawingState == true)
 		if (valueTree.getPropertyAsValue("StageDrawingState", nullptr) == true)
 		{
 			MainStageArea.SetAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));

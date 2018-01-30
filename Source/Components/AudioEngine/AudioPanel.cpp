@@ -1,7 +1,7 @@
 
 #include "AudioPanel.h"
 
-	LTLAAudioPanel::LTLAAudioPanel()
+	LTLAAudioPanel::LTLAAudioPanel() : audioPanelValueTree("audioPanelValueTree")
 	{
 		performerInsideArea[0] = false;
 		performerInsideArea[1] = false;
@@ -28,7 +28,9 @@
 		
 		filePlayer.closePanel();
 		autoPanner.closePanel();
-		filePlayer.closePanel();
+		autoFilter.closePanel();
+
+		audioPanelValueTree.addChild(filePlayer.getValueTree(), 0, nullptr);
 	}
 
 	void LTLAAudioPanel::prepareToPlay(int samplesPerBlockExpected, double sampleRate)  

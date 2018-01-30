@@ -74,7 +74,16 @@ public:
 	void setPerformerParameters(int ActualInputChannel, int MaxOutputChannels);
 
 	void setDeviceManagerToUse(AudioDeviceManager *deviceManager);
+
+	void snapshotFired()
+	{
+		for (int panel = 0; panel < audioPanel.size(); panel++)
+		{
+			audioPanel[panel]->snapshotFired();
+		}
+	}
 	
+	OwnedArray<LTLAAudioPanel> audioPanel;
 
 private:
 
@@ -87,7 +96,6 @@ private:
 	};
 
 	MixerAudioSource mixerAudioSource;
-	OwnedArray<LTLAAudioPanel> audioPanel;
 	OwnedArray<AreaDataStruct> areaData;
 	int samplesPerBlock = 0;
 	double samplerate = 0;

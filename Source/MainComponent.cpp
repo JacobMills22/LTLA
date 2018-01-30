@@ -32,6 +32,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		addAndMakeVisible(MenuBar);
 
 		addAndMakeVisible(audioEngine);
+		audioEngine.setVisible(false);
 
 		addAndMakeVisible(AreaColourSelector);
 		AreaColourSelector.addChangeListener(this);
@@ -169,6 +170,13 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 				GUI.setStageAreaHasChangedState(false);
 				areaNameLabel.setText(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
 				audioEngine.reopenAudioPanel(GUI.GetCurrentlySelectedArea());
+			}
+
+			if (snapshotManager.hasSnapshotBeenFired() == true)
+			{
+				areaNameLabel.setText(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
+				audioEngine.snapshotFired();
+				snapshotManager.setHasbeenFiredState(false);
 			}
 
 			stereoAudioMeter.setMeterData(0, audioEngine.getMeterData(0));

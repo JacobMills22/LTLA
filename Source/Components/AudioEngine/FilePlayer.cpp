@@ -1,7 +1,7 @@
 #include "FilePlayer.h"
 
 
-FilePlayer::FilePlayer() : thread("AudioFileStreamThread")
+FilePlayer::FilePlayer() : thread("AudioFileStreamThread"), filePlayerValueTree("FilePlayerValueTree")
 {
 	//Audio Initialisation
 	thread.startThread();
@@ -74,7 +74,12 @@ FilePlayer::FilePlayer() : thread("AudioFileStreamThread")
 	filePlayerComboBox[retriggerBoxID].addItem("Yes", 2);
 	filePlayerComboBox[retriggerBoxID].setSelectedId(1, dontSendNotification);
 
-	PerformerWhichTriggers = 0;
+	//PerformerWhichTriggers = 0;
+
+	filePlayerValueTree.setProperty("Level", 0.0, nullptr);
+	filePlayerValueTree.setProperty("PerformerWhichTriggers", 0.0, nullptr);
+	filePlayerValueTree.setProperty("playbackOnPerformerExit", stopPlaybackID, nullptr);
+	filePlayerValueTree.setProperty("Retrigger", false, nullptr);
 
 	// Start timer
 	startTimer(100);
@@ -115,15 +120,19 @@ void FilePlayer::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 {
 	if (comboBoxThatHasChanged == &filePlayerComboBox[performerWhichTriggersBoxID])
 	{
-		PerformerWhichTriggers = filePlayerComboBox[performerWhichTriggersBoxID].getSelectedId() - 1;
+		//PerformerWhichTriggers = filePlayerComboBox[performerWhichTriggersBoxID].getSelectedId() - 1;
+		filePlayerValueTree.setProperty("PerformerWhichTriggers", filePlayerComboBox[performerWhichTriggersBoxID].getSelectedId() - 1, nullptr);
 	}
 	else if (comboBoxThatHasChanged == &filePlayerComboBox[performerExitBoxID])
 	{
-		playbackOnPerformerExit = filePlayerComboBox[performerExitBoxID].getSelectedId();
+		//playbackOnPerformerExit = filePlayerComboBox[performerExitBoxID].getSelectedId();
+		filePlayerValueTree.setProperty("playbackOnPerformerExit", filePlayerComboBox[performerExitBoxID].getSelectedId(), nullptr);
 	}
 	else if (comboBoxThatHasChanged == &filePlayerComboBox[retriggerBoxID])
 	{
-		retriggerState = filePlayerComboBox[retriggerBoxID].getSelectedId() - 1;
+		//retriggerState = filePlayerComboBox[retriggerBoxID].getSelectedId() - 1;
+		filePlayerValueTree.setProperty("Retrigger", filePlayerComboBox[retriggerBoxID].getSelectedId() - 1, nullptr);
+
 	}
 }
 
@@ -210,8 +219,8 @@ void FilePlayer::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
 
 	for (int sample = 0; sample < bufferToFill.numSamples; sample++) // For each sample.
 	{
-		outputL[sample] *= getLevel() * 0.5;	// Scale audio down.
-		outputR[sample] *= getLevel() * 0.5;	// Scale audio down.
+		outputL[sample] *= playbackLevel * 0.5;	// Scale audio down.
+		outputR[sample] *= playbackLevel * 0.5;	// Scale audio down.
 	}
 }
 
@@ -285,26 +294,32 @@ int FilePlayer::getSampleRate()
 
 void FilePlayer::setLevel(float level)
 {
+	filePlayerValueTree.setProperty("Level", level, nullptr);
 	playbackLevel = level;
+	fileplayerSlider[levelSliderID].setValue(level, dontSendNotification);
 }
 
 float FilePlayer::getLevel()
 {
-	return playbackLevel;
+	return filePlayerValueTree.getPropertyAsValue("Level", nullptr).getValue();	
 }
 
 int FilePlayer::getPerformerWhichTriggers()
 {
-	return PerformerWhichTriggers;
+	//return PerformerWhichTriggers;
+	return filePlayerValueTree.getPropertyAsValue("PerformerWhichTriggers", nullptr).getValue();
 }
 
 int FilePlayer::getPlaybackOnPerformerExitOption()
 {
-	return playbackOnPerformerExit;
+	//return playbackOnPerformerExit;
+	return filePlayerValueTree.getPropertyAsValue("playbackOnPerformerExit", nullptr).getValue();
 }
 
 bool FilePlayer::getReTriggerState()
 {
-	return retriggerState;
+	//return retriggerState;
+	return filePlayerValueTree.getPropertyAsValue("Retrigger", nullptr).getValue();
+
 }
 

@@ -47,6 +47,13 @@ public:
 
 	int getAudioInputID();
 
+	// VALUE TREE
+
+	ValueTree getValueTree()
+	{
+		return audioPanelValueTree;
+	}
+
 	// FILEPLAYER FUNCTIONS
 
 /** Starts file player playback at the specified position in ms */
@@ -71,6 +78,11 @@ public:
 /** Sets the Auto-Panner Amount */
 	void setAutoPannerAmount(float value);
 
+	void snapshotFired()
+	{
+		filePlayer.snapshotFired();
+	}
+
 	enum { FilePlayerInput = 1, Performer1, Performer2 };
 
 private:
@@ -78,6 +90,8 @@ private:
 	FilePlayer filePlayer;
 	AutoPanner autoPanner;
 	AutoFilter autoFilter;
+
+	ValueTree audioPanelValueTree;
 
 	ComboBox inputComboBox;
 

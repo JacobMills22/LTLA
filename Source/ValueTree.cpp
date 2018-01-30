@@ -1,6 +1,14 @@
 
 #include "MainComponent.h"
 
+/*
+PARAMETERS CURENTLY ADDED TO VALUETREE FOR SNAPSHOTS.
+
+- Draw Stage State
+- Stage Areas Positions
+- Stage Areas Names
+- 
+*/
 
 void MainContentComponent::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) 
 {

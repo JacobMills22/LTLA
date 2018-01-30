@@ -3,8 +3,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "AudioEngine\AudioPanel.h"
 
-class StageArea : public Component,
-				  public ValueTree::Listener
+class StageArea : public Component
 		
 {
 public:
@@ -23,28 +22,6 @@ public:
 
 /** Updates the Coordinates of one of the Areas Corners*/
 	void UpdateArea( int Corner, float X, float Y);
-
-	void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
-
-	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override
-	 {
-
-	 }
-
-	 void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override
-	 {
-
-	 }
-
-	 void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex) override
-	 {
-
-	 }
-
-	 void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override
-	 {
-
-	 }
 	
 	//==============================================================================	
 	/** Getters & Setters*/
@@ -54,6 +31,10 @@ public:
 
 /** Gets the Y Coordinate of one of the Areas Corners */
 	float GetY(int CornerID);
+
+	void setX(int CornerID, float value);
+
+	void setY(int CornerID, float value);
 
 	float getDifferenceX(int CornerID);
 
@@ -89,18 +70,21 @@ public:
 
 	String getAreaName();
 
+	ValueTree getValueTree()
+	{
+		return stageAreaValueTree;
+	}
+
 	//==============================================================================	
 
 	enum { FrontLeft, FrontRight, BackRight, BackLeft, Centre, NumOfAreaCorners};
 
 private:
 
-	ScopedPointer<ValueTree> valueTree;
+    ValueTree stageAreaValueTree;
 
 	struct AreaCorner
 	{
-		float x = 0.00;
-		float y = 0.00;
 		bool Selected = false;
 		float differenceX = 0.00;
 		float differenceY = 0.00;
@@ -117,9 +101,10 @@ private:
 
 	Path AreaPath;
 	Colour AreaColour = Colours::floralwhite;
-	String areaName;
+	//String areaName;
 
 	float trackingGUIWidth = 900.0;
 	float trackingGUIHeight = 500.0;
+	bool areaSelectedState = false;
 
 }; 

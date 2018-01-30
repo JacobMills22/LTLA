@@ -147,8 +147,15 @@ void MainContentComponent::AddStageAreaIDPressed()
 	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaSelectedState(false); // Deselect currently selected area.
 	GUI.StageAreas.getLast()->SetAreaSelectedState(true); // Select the newly created area.
 	GUI.SetCurrentlySelectedArea(GUI.StageAreas.size() - 1); // Set Selected Area Index to the newly created area.
+	GUI.StageAreas.getLast()->updateTrackingGUIWidthAndHeight(GUI.getWidth(), GUI.getHeight());
+
+	valueTree.addChild(GUI.StageAreas.getLast()->getValueTree(), GUI.StageAreas.size() - 1, nullptr);
 
 	audioEngine.addNewStageAreaAudioPanel();
+
+	//valueTree.addChild(audioEngine.getAudioPanel()->getLast()->getValueTree(), 0, nullptr);
+	valueTree.addChild(audioEngine.audioPanel.getLast()->getValueTree(), 0, nullptr);
+
 }
 
 
