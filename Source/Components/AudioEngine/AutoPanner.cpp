@@ -1,7 +1,7 @@
 
 #include "AutoPanner.h"
 
-	AutoPanner::AutoPanner()
+	AutoPanner::AutoPanner() : autoPannerValueTree("autoPannerValueTree")
 	{
 		addAndMakeVisible(panningSlider);
 		panningSlider.setRange(0.0, 1.0, 0.01);
@@ -17,6 +17,8 @@
 		addAndMakeVisible(resetPanButton);
 		resetPanButton.addListener(this);
 		resetPanButton.setButtonText("Reset");
+
+		autoPannerValueTree.setProperty("EnableAutoPan", false, nullptr);
 
 		startTimer(50);
 	}
@@ -84,12 +86,14 @@
 			if (enablePanButton.getToggleState() == true)
 			{
 				enablePanButton.setButtonText("Auto Panning Enabled");
-				enablePanState = true;
+				//enablePanState = true;
+				autoPannerValueTree.setProperty("EnableAutoPan", true, nullptr);
 			}
 			else
 			{
 				enablePanButton.setButtonText("Auto Panning Disabled");
-				enablePanState = false;
+				//enablePanState = false;
+				autoPannerValueTree.setProperty("EnableAutoPan", false, nullptr);
 			}
 		}
 		else if (button == &resetPanButton)
@@ -108,7 +112,7 @@
 
 	void AutoPanner::setPanAmount(float value)
 	{
-		if (enablePanState == true)
+		if (autoPannerValueTree.getPropertyAsValue("EnableAutoPan", nullptr) == true)
 		{
 			panAmount = value;
 		}

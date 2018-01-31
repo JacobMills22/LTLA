@@ -7,7 +7,15 @@ PARAMETERS CURENTLY ADDED TO VALUETREE FOR SNAPSHOTS.
 - Draw Stage State
 - Stage Areas Positions
 - Stage Areas Names
-- 
+- FilePlayer: Level
+- FilePlayer: Triggered By
+- FilePlayer: Continue/Stop Playback When Performer Exits
+- FilePlayer: Retrigger
+- AutoPan: Enabled/Disabled (Resets pan to 0.5 if auto pan is disabled in the snapshot that is being recalled.)
+- Filters: Low/High Pass Enable/Disable
+- Filters: Low/High Pass Cutoff 
+
+
 */
 
 void MainContentComponent::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) 

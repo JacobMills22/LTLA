@@ -43,6 +43,23 @@ public:
 	
 	void process(AudioSampleBuffer &buffer);
 
+	ValueTree getValueTree()
+	{
+		return autoPannerValueTree;
+	}
+
+	void snapshotFired()
+	{
+		bool enableAutoPanState = autoPannerValueTree.getPropertyAsValue("EnableAutoPan", nullptr).getValue();
+
+		enablePanButton.setToggleState(enableAutoPanState, dontSendNotification);
+		if (enableAutoPanState == false)
+		{
+			setPanAmount(0.5);
+			panningSlider.setValue(0.5);
+		}
+	}
+
 private:
 
 	Slider panningSlider;
@@ -51,6 +68,8 @@ private:
 	TextButton resetPanButton;
 
 	float panAmount = 0.5;
-	bool enablePanState = false;
+	//bool enablePanState = false;
+
+	ValueTree autoPannerValueTree;
 
 };

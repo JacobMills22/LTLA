@@ -81,6 +81,8 @@ public:
 	void snapshotFired()
 	{
 		filePlayer.snapshotFired();
+		autoPanner.snapshotFired();
+		autoFilter.snapshotFired();
 	}
 
 	enum { FilePlayerInput = 1, Performer1, Performer2 };

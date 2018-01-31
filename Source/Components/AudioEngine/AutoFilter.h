@@ -10,7 +10,7 @@ class AutoFilter : public AudioPanelObject,
 {
 public:
 
-	AutoFilter()
+	AutoFilter() : autoFilterValueTree("autoFilterValueTree")
 	{
 		for (int filterNum = 0; filterNum < NumOfFilters; filterNum++)
 		{
@@ -36,8 +36,14 @@ public:
 		enableButton[lowPassID].setToggleState(false, dontSendNotification);
 		enableButton[highPassID].setToggleState(false, dontSendNotification);
 
-		enableState[lowPassID] = false;
-		enableState[highPassID] = false;
+		//enableState[lowPassID] = false;
+		//enableState[highPassID] = false;
+
+		autoFilterValueTree.setProperty("LowPassEnabled", false, nullptr);
+		autoFilterValueTree.setProperty("HighPassEnabled", false, nullptr);
+
+		autoFilterValueTree.setProperty("LowPassCutoff", 20000.0, nullptr);
+		autoFilterValueTree.setProperty("HighPassCutoff", 20.0, nullptr);
 	}
 
 	void initialise(double SampleRate)
@@ -45,11 +51,17 @@ public:
 		cutoffFrequency[lowPassID] = 20000.0;
 		cutoffFrequency[highPassID] = 20.0;
 
+		autoFilterValueTree.setProperty("LowPassCutoff", 20000.0, nullptr);
+		autoFilterValueTree.setProperty("HighPassCutoff", 20.0, nullptr);
+
+		autoFilterValueTree.setProperty("LowPassEnabled", false, nullptr);
+		autoFilterValueTree.setProperty("HighPassEnabled", false, nullptr);
+
 		filter[lowPassID].reset();
 		filter[highPassID].reset();
 		
-		filterCoefficients[lowPassID].makeLowPass(sampleRate, cutoffFrequency[lowPassID]);
-		filterCoefficients[highPassID].makeHighPass(sampleRate, cutoffFrequency[highPassID]);
+		filterCoefficients[lowPassID].makeLowPass(sampleRate, autoFilterValueTree.getPropertyAsValue("LowPassCutoff", nullptr).getValue());
+		filterCoefficients[highPassID].makeHighPass(sampleRate, autoFilterValueTree.getPropertyAsValue("HighPassCutoff", nullptr).getValue());
 
 		filter[lowPassID].setCoefficients(filterCoefficients[lowPassID]);
 		filter[highPassID].setCoefficients(filterCoefficients[highPassID]);
@@ -76,13 +88,17 @@ public:
 
 		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 		{
-			if (enableState[lowPassID] == true)
+			bool lowPassEnabled = autoFilterValueTree.getPropertyAsValue("LowPassEnabled", nullptr).getValue();
+
+			if (lowPassEnabled == true)
 			{
 				OutputL[sample] = filter[lowPassID].processSingleSampleRaw(OutputL[sample]);
 				OutputR[sample] = filter[lowPassID].processSingleSampleRaw(OutputR[sample]);
 			}
 
-			if (enableState[highPassID] == true)
+			bool highPassEnabled = autoFilterValueTree.getPropertyAsValue("HighPassEnabled", nullptr).getValue();
+
+			if (highPassEnabled == true)
 			{
 				OutputL[sample] = filter[highPassID].processSingleSampleRaw(OutputL[sample]);
 				OutputR[sample] = filter[highPassID].processSingleSampleRaw(OutputR[sample]);
@@ -117,10 +133,12 @@ public:
 		if (slider == &cutoffSlider[lowPassID])
 		{
 			updateCutoff(cutoffSlider[lowPassID].getValue(), cutoffFrequency[highPassID]);
+			autoFilterValueTree.setProperty("LowPassCutoff", cutoffSlider[lowPassID].getValue(), nullptr);
 		}
 		else if (slider == &cutoffSlider[highPassID])
 		{
 			updateCutoff(cutoffFrequency[lowPassID], cutoffSlider[highPassID].getValue());
+			autoFilterValueTree.setProperty("HighPassCutoff", cutoffSlider[highPassID].getValue(), nullptr);
 		}
 	}
 
@@ -128,11 +146,14 @@ public:
 	{
 		if (button == &enableButton[lowPassID])
 		{
-			enableState[lowPassID] = enableButton[lowPassID].getToggleState();
+			//enableState[lowPassID] = enableButton[lowPassID].getToggleState();
+			autoFilterValueTree.setProperty("LowPassEnabled", enableButton[lowPassID].getToggleState(), nullptr);
 		}
 		else if (button == &enableButton[highPassID])
 		{
-			enableState[highPassID] = enableButton[highPassID].getToggleState();
+			//enableState[highPassID] = enableButton[highPassID].getToggleState();
+			autoFilterValueTree.setProperty("HighPassEnabled", enableButton[highPassID].getToggleState(), nullptr);
+
 		}
 	}
 
@@ -151,6 +172,21 @@ public:
 
 	}
 
+	ValueTree getValueTree()
+	{
+		return autoFilterValueTree;
+	}
+
+	void snapshotFired()
+	{
+		cutoffSlider[lowPassID].setValue(autoFilterValueTree.getPropertyAsValue("LowPassCutoff", nullptr).getValue());
+		cutoffSlider[highPassID].setValue(autoFilterValueTree.getPropertyAsValue("HighPassCutoff", nullptr).getValue());
+
+		enableButton[lowPassID].setToggleState(autoFilterValueTree.getPropertyAsValue("LowPassEnabled", nullptr).getValue(), dontSendNotification);
+		enableButton[highPassID].setToggleState(autoFilterValueTree.getPropertyAsValue("HighPassEnabled", nullptr).getValue(), dontSendNotification);
+		
+	}
+
 	enum { lowPassID, highPassID, NumOfFilters };
 
 private:
@@ -160,7 +196,9 @@ private:
 	Slider cutoffSlider[2];
 	ToggleButton enableButton[2];
 
+	ValueTree autoFilterValueTree;
+
 	double cutoffFrequency[2];
 	double sampleRate = 48000;
-	bool enableState[2];
+	//bool enableState[2];
 };

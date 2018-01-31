@@ -31,6 +31,9 @@
 		autoFilter.closePanel();
 
 		audioPanelValueTree.addChild(filePlayer.getValueTree(), 0, nullptr);
+		audioPanelValueTree.addChild(autoPanner.getValueTree(), 0, nullptr);
+		audioPanelValueTree.addChild(autoFilter.getValueTree(), 0, nullptr);
+
 	}
 
 	void LTLAAudioPanel::prepareToPlay(int samplesPerBlockExpected, double sampleRate)  
