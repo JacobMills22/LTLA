@@ -97,7 +97,7 @@ private:
 	double samplerate = 0;
 	int samplesPerBlock = 0;
 
-	int oldAreaIDContainingPerfromer[2];
+	int oldAreaIDContainingPerfromer[2]; 
 
 	// Global Parameters
 	enum { SelectNextAreaButtonID, SelectPreviousAreaButtonID, numOfButtons};

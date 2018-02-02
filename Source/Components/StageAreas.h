@@ -75,6 +75,31 @@ public:
 		return stageAreaValueTree;
 	}
 
+	void setValueTreeChildIndex(int index)
+	{
+		valueTreeChildIndex = index;
+	}
+
+	int getValueTreeChildIndex()
+	{
+		return valueTreeChildIndex;
+	}
+
+	void setActive(bool state)
+	{
+		stageAreaValueTree.setProperty("Active", state, nullptr);
+
+		if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
+		{
+			setVisible(false);
+		}
+	}
+
+	bool getActiveState()
+	{
+		return stageAreaValueTree.getPropertyAsValue("Active", nullptr).getValue();
+	}
+
 	//==============================================================================	
 
 	enum { FrontLeft, FrontRight, BackRight, BackLeft, Centre, NumOfAreaCorners};
@@ -106,5 +131,7 @@ private:
 	float trackingGUIWidth = 900.0;
 	float trackingGUIHeight = 500.0;
 	bool areaSelectedState = false;
+	int valueTreeChildIndex = 0;
+	//bool activeState = true;
 
 }; 

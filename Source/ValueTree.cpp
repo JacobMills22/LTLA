@@ -15,7 +15,6 @@ PARAMETERS CURENTLY ADDED TO VALUETREE FOR SNAPSHOTS.
 - Filters: Low/High Pass Enable/Disable
 - Filters: Low/High Pass Cutoff 
 
-
 */
 
 void MainContentComponent::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) 

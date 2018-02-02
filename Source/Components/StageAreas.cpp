@@ -38,6 +38,8 @@ StageArea::StageArea() : stageAreaValueTree("LTLAValueTree")
 
 	stageAreaValueTree.setProperty("AreaName", "New Area", nullptr);
 
+	stageAreaValueTree.setProperty("Active", true, nullptr);
+
 }
 
 StageArea::~StageArea()
@@ -48,99 +50,107 @@ void StageArea::DrawArea(Graphics &g, bool Editmode)
 {
 	AreaPath.clear();
 
-	AreaPath.addQuadrilateral(FrontLeftXValue, FrontLeftYValue, FrontRightXValue, FrontRightYValue, 
-							  BackRightXValue, BackRightYValue, BackleftXValue, BackLeftYValue);
-
-	g.setColour(GetAreaColour());
-	g.fillPath(AreaPath);
-
-	g.setColour(Colours::black);
-	g.setOpacity(1.0);
-	g.strokePath(AreaPath, PathStrokeType(1.0));
-
-	if (Editmode == true)
+	if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
 	{
-		g.setColour(Colours::white);
-		if (AreaPosition[FrontLeft].Selected == true) { g.setColour(Colours::cyan); }
-		g.drawRect((int)FrontLeftXValue - 5, (int)FrontLeftYValue - 5, 10, 10, 1.0);
 
-		g.setColour(Colours::white);
-		if (AreaPosition[FrontRight].Selected == true) { g.setColour(Colours::cyan); }
-		g.drawRect((int)FrontRightXValue - 5, (int)FrontRightYValue - 5, 10, 10, 1.0);
+		AreaPath.addQuadrilateral(FrontLeftXValue, FrontLeftYValue, FrontRightXValue, FrontRightYValue,
+			BackRightXValue, BackRightYValue, BackleftXValue, BackLeftYValue);
 
-		g.setColour(Colours::white);
-		if (AreaPosition[BackLeft].Selected == true) { g.setColour(Colours::cyan); }
-		g.drawRect((int)BackleftXValue - 5, (int)BackLeftYValue - 5, 10, 10, 1.0);
+		g.setColour(GetAreaColour());
+		g.fillPath(AreaPath);
 
-		g.setColour(Colours::white);
-		if (AreaPosition[BackRight].Selected == true) { g.setColour(Colours::cyan); }
-		g.drawRect((int)BackRightXValue - 5, (int)BackRightYValue - 5, 10, 10, 1.0);
-
-		g.setColour(Colours::blue);
-		if (AreaPosition[Centre].Selected == true) { g.setColour(Colours::cyan); }
-		g.drawRect((int)CentreXValue - 5, (int)CentreYValue - 5, 10, 10, 1.0);
-
-	}
-
-	if (areaSelectedState == true)
-	{
-		g.setColour(Colours::white);
+		g.setColour(Colours::black);
+		g.setOpacity(1.0);
 		g.strokePath(AreaPath, PathStrokeType(1.0));
+
+
+		if (Editmode == true)
+		{
+			g.setColour(Colours::white);
+			if (AreaPosition[FrontLeft].Selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)FrontLeftXValue - 5, (int)FrontLeftYValue - 5, 10, 10, 1.0);
+
+			g.setColour(Colours::white);
+			if (AreaPosition[FrontRight].Selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)FrontRightXValue - 5, (int)FrontRightYValue - 5, 10, 10, 1.0);
+
+			g.setColour(Colours::white);
+			if (AreaPosition[BackLeft].Selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)BackleftXValue - 5, (int)BackLeftYValue - 5, 10, 10, 1.0);
+
+			g.setColour(Colours::white);
+			if (AreaPosition[BackRight].Selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)BackRightXValue - 5, (int)BackRightYValue - 5, 10, 10, 1.0);
+
+			g.setColour(Colours::blue);
+			if (AreaPosition[Centre].Selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)CentreXValue - 5, (int)CentreYValue - 5, 10, 10, 1.0);
+
+		}
+
+		if (areaSelectedState == true)
+		{
+			g.setColour(Colours::white);
+			g.strokePath(AreaPath, PathStrokeType(1.0));
+		}
 	}
 }
 
 void StageArea::UpdateArea(int Corner, float X, float Y)
 {
-	if (Corner == Centre)
+	if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
 	{
-		if (X >= 0 && X <= trackingGUIWidth)
+		if (Corner == Centre)
 		{
-			stageAreaValueTree.setProperty("CentreX", X, nullptr);
-
-			for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+			if (X >= 0 && X <= trackingGUIWidth)
 			{
-				setX(corner, (X - AreaPosition[corner].differenceX));
+				stageAreaValueTree.setProperty("CentreX", X, nullptr);
+
+				for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+				{
+					setX(corner, (X - AreaPosition[corner].differenceX));
+				}
+			}
+			else
+			{
+				X <= 0 ? stageAreaValueTree.setProperty("CentreX", 0.0, nullptr) : stageAreaValueTree.setProperty("CentreX", trackingGUIWidth, nullptr);
+			}
+
+			if (Y >= 0 && Y <= trackingGUIHeight)
+			{
+				stageAreaValueTree.setProperty("CentreY", Y, nullptr);
+
+				for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+				{
+					setY(corner, (Y - AreaPosition[corner].differenceY));
+				}
+			}
+			else
+			{
+				Y <= 0 ? stageAreaValueTree.setProperty("CentreY", 0.0, nullptr) : stageAreaValueTree.setProperty("CentreY", trackingGUIHeight, nullptr);
 			}
 		}
 		else
 		{
-			X <= 0 ? stageAreaValueTree.setProperty("CentreX", 0.0, nullptr) : stageAreaValueTree.setProperty("CentreX", trackingGUIWidth, nullptr);
-		}
-
-		if (Y >= 0 && Y <= trackingGUIHeight)
-		{
-			stageAreaValueTree.setProperty("CentreY", Y, nullptr);
-
-			for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+			if (X >= 0 && X <= trackingGUIWidth)
 			{
-				setY(corner, (Y - AreaPosition[corner].differenceY));
+				setX(Corner, X);
+				stageAreaValueTree.setProperty("CentreX", AreaPath.getBounds().getCentreX(), nullptr);
 			}
-		}
-		else
-		{
-			Y <= 0 ? stageAreaValueTree.setProperty("CentreY", 0.0, nullptr) : stageAreaValueTree.setProperty("CentreY", trackingGUIHeight, nullptr);
-		}
-	}
-	else
-	{
-		if (X >= 0 && X <= trackingGUIWidth)
-		{
-			setX(Corner, X);
-			stageAreaValueTree.setProperty("CentreX", AreaPath.getBounds().getCentreX(), nullptr);
-		}
-		else
-		{
-			X <= 0 ? setX(Corner, 0.0) : setX(Corner, trackingGUIWidth);
-		}
+			else
+			{
+				X <= 0 ? setX(Corner, 0.0) : setX(Corner, trackingGUIWidth);
+			}
 
-		if (Y >= 0 && Y <= trackingGUIHeight)
-		{
-			setY(Corner, Y);
-			stageAreaValueTree.setProperty("CentreY", AreaPath.getBounds().getCentreY(), nullptr);
-		}
-		else
-		{
-			Y <= 0 ? setY(Corner, 0.0) : setY(Corner, trackingGUIHeight);
+			if (Y >= 0 && Y <= trackingGUIHeight)
+			{
+				setY(Corner, Y);
+				stageAreaValueTree.setProperty("CentreY", AreaPath.getBounds().getCentreY(), nullptr);
+			}
+			else
+			{
+				Y <= 0 ? setY(Corner, 0.0) : setY(Corner, trackingGUIHeight);
+			}
 		}
 	}
 }

@@ -149,13 +149,14 @@ void MainContentComponent::AddStageAreaIDPressed()
 	GUI.SetCurrentlySelectedArea(GUI.StageAreas.size() - 1); // Set Selected Area Index to the newly created area.
 	GUI.StageAreas.getLast()->updateTrackingGUIWidthAndHeight(GUI.getWidth(), GUI.getHeight());
 
-	valueTree.addChild(GUI.StageAreas.getLast()->getValueTree(), GUI.StageAreas.size() - 1, nullptr);
+	valueTree.addChild(GUI.StageAreas.getLast()->getValueTree(), 0, nullptr);
+
+	GUI.StageAreas.getLast()->setValueTreeChildIndex(valueTree.getNumChildren());
 
 	audioEngine.addNewStageAreaAudioPanel();
 
-	//valueTree.addChild(audioEngine.getAudioPanel()->getLast()->getValueTree(), 0, nullptr);
 	valueTree.addChild(audioEngine.audioPanel.getLast()->getValueTree(), 0, nullptr);
-
+	//DBG((String)valueTree.getNumChildren());
 }
 
 
@@ -180,7 +181,12 @@ void MainContentComponent::EditStageAreasIDPressed()
 
 void MainContentComponent::RemoveStageAreaIDPressed()
 {
-	GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+	//valueTree.removeChild(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getValueTreeChildIndex(), nullptr);
+	//DBG( "Index beign removed is  " + (String)GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getValueTreeChildIndex());
+	//GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+
+	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->setActive(false);
+
 	if (GUI.StageAreas.size() < 1) 
 	{ 
 		GUI.SetStageAreaEditState(false); 

@@ -15,13 +15,13 @@ public:
 		for (int childTree = 0; childTree < valueTree.getNumChildren(); childTree++)
 		{
 			// Childtree such as StageAreas and Audio Panels
-			DBG("Number of trees at Level 2 is " + (String)valueTree.getNumChildren());
+			//DBG("Number of trees at Level 2 is " + (String)valueTree.getNumChildren());
 			valueTree.getChild(childTree).copyPropertiesFrom(snapshotValueTree.getChild(childTree), nullptr);
 
 			for (int subChildTree = 0; subChildTree < valueTree.getChild(childTree).getNumChildren(); subChildTree++)
 			{
 				// Child Tree such as Fileplayer
-				DBG("Number of trees at Level 3 is " + (String)valueTree.getChild(childTree).getNumChildren());
+				//DBG("Number of trees at Level 3 is " + (String)valueTree.getChild(childTree).getNumChildren());
 				valueTree.getChild(childTree).getChild(subChildTree).copyPropertiesFrom(snapshotValueTree.getChild(childTree).getChild(subChildTree), nullptr);
 			}
 		}
