@@ -80,6 +80,7 @@ FilePlayer::FilePlayer() : thread("AudioFileStreamThread"), filePlayerValueTree(
 	filePlayerValueTree.setProperty("PerformerWhichTriggers", 0.0, nullptr);
 	filePlayerValueTree.setProperty("playbackOnPerformerExit", stopPlaybackID, nullptr);
 	filePlayerValueTree.setProperty("Retrigger", false, nullptr);
+	filePlayerValueTree.setProperty("AudioFilePath", "NULL", nullptr);
 
 	// Start timer
 	startTimer(100);
@@ -229,7 +230,7 @@ void FilePlayer::loadAudioFile(File& file)
 	setPlayBackState(false);			// Stop audio playback
 	GUIButtons[playButtonID].setButtonText("Play");
 	playBackPosition = 0;
-	fileplayerSlider->setValue(0.0, dontSendNotification);
+	//fileplayerSlider->setValue(0.0, dontSendNotification);
 	audioTransportSource.setSource(0);  // Remove the source from the audio transport source.
 	deleteAndZero(audioFormatReaderSource); // Remove audioformatreadersource
 
@@ -244,6 +245,9 @@ void FilePlayer::loadAudioFile(File& file)
 
 		// Set the audioTransportSource to be ready to play the audio file on the audio thread.
 		audioTransportSource.setSource(audioFormatReaderSource, getSampleRate(), &thread, reader->sampleRate);
+		filePlayerValueTree.setProperty("AudioFilePath", file.getFullPathName(), nullptr);
+
+
 	}
 }
 

@@ -25,10 +25,13 @@
 		inputComboBox.addItem("Performer 1", 2);
 		inputComboBox.addItem("Performer 2", 3);
 		inputComboBox.addListener(this);
+		inputComboBox.setSelectedId(1, dontSendNotification);
 		
 		filePlayer.closePanel();
 		autoPanner.closePanel();
 		autoFilter.closePanel();
+
+		audioPanelValueTree.setProperty("InputSource", FilePlayerInput, nullptr);
 
 		audioPanelValueTree.addChild(filePlayer.getValueTree(), 0, nullptr);
 		audioPanelValueTree.addChild(autoPanner.getValueTree(), 0, nullptr);
@@ -134,12 +137,12 @@
 
 	void LTLAAudioPanel::setAudioInputID(int ID)
 	{
-		audioInputID = ID;
+		audioPanelValueTree.setProperty("InputSource", ID, nullptr);
 	}
 
 	int LTLAAudioPanel::getAudioInputID()
 	{
-		return audioInputID;
+		return audioPanelValueTree.getPropertyAsValue("InputSource", nullptr).getValue();
 	}
 
 	// FILEPLAYER FUNCTIONS

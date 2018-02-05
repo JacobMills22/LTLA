@@ -101,11 +101,22 @@ public:
 		retriggerID += 1;
 		filePlayerComboBox[retriggerBoxID].setSelectedId(retriggerID);
 
+		if (filePlayerValueTree.getPropertyAsValue("AudioFilePath", nullptr).toString() != "NULL")
+		{
+			reloadAudioFile();
+		}
 	}
 
 	ValueTree getValueTree()
 	{
 		return filePlayerValueTree;
+	}
+
+	void reloadAudioFile()
+	{
+		File file(filePlayerValueTree.getPropertyAsValue("AudioFilePath", nullptr).toString());
+		loadAudioFile(file);
+		fileChooser->setCurrentFile(file, true, dontSendNotification);
 	}
 
 private:

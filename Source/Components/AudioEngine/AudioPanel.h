@@ -80,6 +80,7 @@ public:
 
 	void snapshotFired()
 	{
+		inputComboBox.setSelectedId(audioPanelValueTree.getPropertyAsValue("InputSource", nullptr).getValue(), dontSendNotification);
 		filePlayer.snapshotFired();
 		autoPanner.snapshotFired();
 		autoFilter.snapshotFired();
@@ -101,7 +102,7 @@ private:
 	TextButton audioPanelButton[numOfButtons];
 
 	int currentlySelectedAreaID = 0;
-	int audioInputID = FilePlayerInput;
+	//int audioInputID = FilePlayerInput;
 
 	bool performerInsideArea[2];
 
