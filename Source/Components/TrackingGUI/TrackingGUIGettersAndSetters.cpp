@@ -24,14 +24,12 @@ void LTLA_GUI::SetStageCoordinates(int StagePosition, float x, float y)
 
 void LTLA_GUI::SetStageDrawingState(bool State)
 {
-	//StageDrawingState = State;
-		valueTree.setProperty("StageDrawingState", State, nullptr);
+	valueTree.setProperty("StageDrawingState", State, nullptr);
 }
 
 bool LTLA_GUI::GetStageDrawingState()
 {
-	//return StageDrawingState;
-		return valueTree.getPropertyAsValue("StageDrawingState", nullptr).getValue();
+	return valueTree.getPropertyAsValue("StageDrawingState", nullptr).getValue();
 }
 
 void LTLA_GUI::SetStageEditState(bool State)

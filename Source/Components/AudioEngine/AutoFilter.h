@@ -86,17 +86,16 @@ public:
 		float* OutputL = buffer.getWritePointer(0);
 		float* OutputR = buffer.getWritePointer(1);
 
+		bool lowPassEnabled = autoFilterValueTree.getPropertyAsValue("LowPassEnabled", nullptr).getValue();
+		bool highPassEnabled = autoFilterValueTree.getPropertyAsValue("HighPassEnabled", nullptr).getValue();
+
 		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 		{
-			bool lowPassEnabled = autoFilterValueTree.getPropertyAsValue("LowPassEnabled", nullptr).getValue();
-
 			if (lowPassEnabled == true)
 			{
 				OutputL[sample] = filter[lowPassID].processSingleSampleRaw(OutputL[sample]);
 				OutputR[sample] = filter[lowPassID].processSingleSampleRaw(OutputR[sample]);
 			}
-
-			bool highPassEnabled = autoFilterValueTree.getPropertyAsValue("HighPassEnabled", nullptr).getValue();
 
 			if (highPassEnabled == true)
 			{
