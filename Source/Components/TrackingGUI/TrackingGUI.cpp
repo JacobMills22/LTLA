@@ -4,38 +4,38 @@
 // GUI Class, Handles GUI Related functions called from MainComponent.
 
 // Constructor
-LTLA_GUI::LTLA_GUI()
+TrackingGUI::TrackingGUI()
 {	
-	TrackingState[0] = false;
-	TrackingState[1] = false;
+	trackingState[0] = false;
+	trackingState[1] = false;
 }
 
-LTLA_GUI::~LTLA_GUI()
+TrackingGUI::~TrackingGUI()
 {
-	StageAreas.clear(true);
+	stageAreas.clear(true);
 }
 
 
 // Main GUI Functions
 
-void LTLA_GUI::paint(Graphics& g) 
+void TrackingGUI::paint(Graphics& g)
 {
 	// Colour Background. 
 	g.fillAll(Colours::darkgrey); // Colour background.
 	g.drawRect(getLocalBounds().expanded(1), 2);
 
-	if(GetGridDrawingState()) 
-		PaintGrid(g);
+	if(getGridDrawingState()) 
+		paintGrid(g);
 
-	PaintStage(g); // Draw stage if calibrated.
+	paintStage(g); // Draw stage if calibrated.
 
-	PaintStageAreas(g);
+	paintStageAreas(g);
 
-	if (TrackingState[0] == true) { PaintTrackedEllipse(g, EllipseCoordinates[0].x, EllipseCoordinates[0].y, Colours::blue); }
-	if (TrackingState[1] == true) { PaintTrackedEllipse(g, EllipseCoordinates[1].x, EllipseCoordinates[1].y, Colours::red); }
+	if (trackingState[0] == true) { paintTrackedEllipse(g, ellipseCoordinates[0].x, ellipseCoordinates[0].y, Colours::blue); }
+	if (trackingState[1] == true) { paintTrackedEllipse(g, ellipseCoordinates[1].x, ellipseCoordinates[1].y, Colours::red); }
 }
 
-void LTLA_GUI::PaintTrackedEllipse(Graphics& g, float PositionX, float PositionY, Colour colour)
+void TrackingGUI::paintTrackedEllipse(Graphics& g, float PositionX, float PositionY, Colour colour)
 {	
 	// Draw Circle to represent tracked position.
 	float Diameter = 20.f;
@@ -44,82 +44,97 @@ void LTLA_GUI::PaintTrackedEllipse(Graphics& g, float PositionX, float PositionY
 	g.drawEllipse(PositionX - Radius, PositionY - Radius, Diameter, Diameter, 2);
 }
 
-void LTLA_GUI::PaintStage(Graphics& g)
+void TrackingGUI::paintStage(Graphics& g)
 {
-	if (GetGridSnappingState()) 
-		SnapStageToGrid();
+	if (getGridSnappingState()) 
+		snapStageToGrid();
 
 		if (valueTree.getPropertyAsValue("StageDrawingState", nullptr) == true)
 		{
-			MainStageArea.SetAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));
-			MainStageArea.DrawArea(g, GetStageEditState());
+			mainStageArea.setAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));
+			mainStageArea.drawArea(g, getStageEditState());
 		}
 }
 
-void LTLA_GUI::PaintStageAreas(Graphics &g)
+void TrackingGUI::paintStageAreas(Graphics &g)
 {
-	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)
 	{
-		if (StageAreas[AreaIndex]->GetAreaPath().contains(EllipseCoordinates[0].x, EllipseCoordinates[0].y) == true)
-			StageAreas[AreaIndex]->SetAreaColour(StageAreas[AreaIndex]->GetAreaColour().withAlpha(0.5f));
+		if (stageAreas[areaIndex]->getAreaPath().contains(ellipseCoordinates[0].x, ellipseCoordinates[0].y) == true)
+			stageAreas[areaIndex]->setAreaColour(stageAreas[areaIndex]->getAreaColour().withAlpha(0.5f));
 		else
-			StageAreas[AreaIndex]->SetAreaColour(StageAreas[AreaIndex]->GetAreaColour().withAlpha(0.3f));
+			stageAreas[areaIndex]->setAreaColour(stageAreas[areaIndex]->getAreaColour().withAlpha(0.3f));
 
-		if (StageAreas[AreaIndex]->GetAreaPath().contains(EllipseCoordinates[1].x, EllipseCoordinates[1].y) == true)
+		if (stageAreas[areaIndex]->getAreaPath().contains(ellipseCoordinates[1].x, ellipseCoordinates[1].y) == true)
 		g.setColour(Colours::salmon);
 
-		StageAreas[AreaIndex]->DrawArea(g, StageAreas[AreaIndex]->GetAreaSelectedState());
+		stageAreas[areaIndex]->drawArea(g, stageAreas[areaIndex]->getAreaSelectedState());
 	}
 }
 
-void LTLA_GUI::PaintGrid(Graphics& g)
+void TrackingGUI::paintGrid(Graphics& g)
 {
 	g.setColour(Colours::grey);
 
-	int LocalWidth = getLocalBounds().getWidth();
-	int LocalHeight = getLocalBounds().getHeight();
+	int localWidth = getLocalBounds().getWidth();
+	int localHeight = getLocalBounds().getHeight();
 	
-	int IncrementedX = 0;
-	int IncremnetedY = 0;
+	int incrementedX = 0;
+	int incremnetedY = 0;
 
-	for (int LineNum = 0; LineNum < LocalWidth / GridIncrement; LineNum++)
+	for (int lineNum = 0; lineNum < localWidth / gridIncrement; lineNum++)
 	{
-		g.drawLine(IncrementedX, 0, IncrementedX, LocalHeight, 0.2);
-		IncrementedX += GridIncrement;
+		g.drawLine(incrementedX, 0, incrementedX, localHeight, 0.2);
+		incrementedX += gridIncrement;
 	}
 
-	for (int LineNum = 0; LineNum < LocalHeight / GridIncrement; LineNum++)
+	for (int lineNum = 0; lineNum < localHeight / gridIncrement; lineNum++)
 	{
-		g.drawLine(0, IncremnetedY, LocalWidth, IncremnetedY, 0.2);
-		IncremnetedY += GridIncrement;
+		g.drawLine(0, incremnetedY, localWidth, incremnetedY, 0.2);
+		incremnetedY += gridIncrement;
 	}
 }
 
-void LTLA_GUI::SnapStageToGrid()
+void TrackingGUI::snapStageToGrid()
 {
-	for (int Corner = 0; Corner < MainStageArea.NumOfAreaCorners - 1; Corner++)
+	for (int corner = 0; corner < mainStageArea.numOfAreaCorners - 1; corner++)
 	{
-		float SnappedStageCornerX = round(MainStageArea.GetX(Corner) / GridIncrement) * GridIncrement;
-		float SnappedStageCornerY = round(MainStageArea.GetY(Corner) / GridIncrement) * GridIncrement;
-		MainStageArea.UpdateArea(Corner, SnappedStageCornerX, SnappedStageCornerY);
+		float snappedStageCornerX = round(mainStageArea.getX(corner) / gridIncrement) * gridIncrement;
+		float snappedStageCornerY = round(mainStageArea.getY(corner) / gridIncrement) * gridIncrement;
+		mainStageArea.updateArea(corner, snappedStageCornerX, snappedStageCornerY);
 	}
 	
-	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)
 	{
-		for (int Corner = 0; Corner < StageAreas[AreaIndex]->NumOfAreaCorners - 1; Corner++)
+		for (int corner = 0; corner < stageAreas[areaIndex]->numOfAreaCorners - 1; corner++)
 		{
-			float SnappedAreaCornerX = round(StageAreas[AreaIndex]->GetX(Corner) / GridIncrement) * GridIncrement;
-			float SnappedAreaCornerY = round(StageAreas[AreaIndex]->GetY(Corner) / GridIncrement) * GridIncrement;
+			float snappedAreaCornerX = round(stageAreas[areaIndex]->getX(corner) / gridIncrement) * gridIncrement;
+			float snappedAreaCornerY = round(stageAreas[areaIndex]->getY(corner) / gridIncrement) * gridIncrement;
 			
-			StageAreas[AreaIndex]->UpdateArea(Corner, SnappedAreaCornerX, SnappedAreaCornerY);
+			stageAreas[areaIndex]->updateArea(corner, snappedAreaCornerX, snappedAreaCornerY);
 		}
 	}
 }
 
-void LTLA_GUI::resized()
+void TrackingGUI::resized()
 {
-	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)
 	{
-		StageAreas[AreaIndex]->updateTrackingGUIWidthAndHeight(getWidth(), getHeight());
+		stageAreas[areaIndex]->updateTrackingGUIWidthAndHeight(getWidth(), getHeight());
 	}
 }	
+
+float TrackingGUI::getPerformerXPosInsideArea(int areaID, int performerID)
+{
+	float areaLeft = stageAreas[areaID]->getAreaPath().getBounds().getX();
+	float areaRight = stageAreas[areaID]->getAreaPath().getBounds().getRight();
+	float performerX = ellipseCoordinates[performerID].x;
+
+	// return (performerX - AreaMinimum) / (Max - Min)
+	return (performerX - areaLeft) / (areaRight - areaLeft);
+}
+
+void TrackingGUI::setValueTree(ValueTree valueTree)
+{
+	valueTree = valueTree;
+}

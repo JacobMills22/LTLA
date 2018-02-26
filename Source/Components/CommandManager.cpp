@@ -12,10 +12,10 @@ ApplicationCommandTarget* MainContentComponent::getNextCommandTarget()
 
 void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 {
-	const CommandID ids[] = { MenuBar.Interval5SecondsID, MenuBar.Interval10SecondsID, MenuBar.Interval20SecondsID,
-		MenuBar.CalibrationStartID, MenuBar.DrawStageID, MenuBar.EditStageID, MenuBar.DrawGridID, MenuBar.SnaptoGridID, MenuBar.GridSize10ID,
-		MenuBar.GridSize15ID, MenuBar.GridSize20ID, MenuBar.AddStageAreaID, MenuBar.EditStageAreasID, MenuBar.RemoveStageAreaID, MenuBar.AudioParametersID,
-		MenuBar.AudioDeviceSettingsID };
+	const CommandID ids[] = { menuBar.interval5SecondsID, menuBar.interval10SecondsID, menuBar.interval20SecondsID,
+		menuBar.calibrationStartID, menuBar.drawStageID, menuBar.editStageID, menuBar.drawGridID, menuBar.snaptoGridID, menuBar.gridSize10ID,
+		menuBar.gridSize15ID, menuBar.gridSize20ID, menuBar.addStageAreaID, menuBar.editStageAreasID, menuBar.removeStageAreaID, menuBar.audioParametersID,
+		menuBar.audioDeviceSettingsID };
 	
 	commands.addArray(ids, numElementsInArray(ids));
 }
@@ -24,64 +24,64 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 {
 	switch (commandID)
 	{
-	case LTLAMenuBar::Interval5SecondsID:
+	case LTLAMenuBar::interval5SecondsID:
 		result.setInfo("5 Seconds", "Set the Interval to 5 seconds", "Calibration", 0);
-		if (GUI.StageCalibrationInterval == 5) result.setTicked(true);
+		if (trackingGUI.stageCalibrationInterval == 5) result.setTicked(true);
 		break;
-	case LTLAMenuBar::Interval10SecondsID:
+	case LTLAMenuBar::interval10SecondsID:
 		result.setInfo("10 Seconds", "Set the Interval to 10 seconds", "Calibration", 0);
-		if (GUI.StageCalibrationInterval == 10) result.setTicked(true);
+		if (trackingGUI.stageCalibrationInterval == 10) result.setTicked(true);
 		break;
-	case LTLAMenuBar::Interval20SecondsID:
+	case LTLAMenuBar::interval20SecondsID:
 		result.setInfo("20 Seconds", "Set the Interval to 20 seconds", "Calibration", 0);
-		if (GUI.StageCalibrationInterval == 20) result.setTicked(true);
+		if (trackingGUI.stageCalibrationInterval == 20) result.setTicked(true);
 		break;
-	case LTLAMenuBar::CalibrationStartID:
+	case LTLAMenuBar::calibrationStartID:
 		result.setInfo("Start Calibration", "Starts the calibration sequence.", "Calibration", 0);
 		break;
-	case LTLAMenuBar::DrawStageID:
+	case LTLAMenuBar::drawStageID:
 		result.setInfo("Draw Stage", "Draws the stage once calibrated.", "Calibration", 0);
-		result.setTicked(GUI.GetStageDrawingState());
+		result.setTicked(trackingGUI.getStageDrawingState());
 		break;
-	case LTLAMenuBar::EditStageID:
+	case LTLAMenuBar::editStageID:
 		result.setInfo("Edit Stage", "Edits the stage shape.", "Calibration", 0);
-		result.setTicked(GUI.GetStageEditState());
+		result.setTicked(trackingGUI.getStageEditState());
 		break;
-	case LTLAMenuBar::DrawGridID:
+	case LTLAMenuBar::drawGridID:
 		result.setInfo("Draw Grid", "Draws a Grid.", "Grid", 0);
-		result.setTicked(GUI.GetGridDrawingState());
+		result.setTicked(trackingGUI.getGridDrawingState());
 		break;
-	case LTLAMenuBar::SnaptoGridID:
+	case LTLAMenuBar::snaptoGridID:
 		result.setInfo("Enable Grid Snapping", "", "Grid", 0);
-		result.setTicked(GUI.GetGridSnappingState());
+		result.setTicked(trackingGUI.getGridSnappingState());
 		break;
-	case LTLAMenuBar::GridSize10ID:
+	case LTLAMenuBar::gridSize10ID:
 		result.setInfo("Grid Size 10", "", "Grid", 0);
 		break;
-	case LTLAMenuBar::GridSize15ID:
+	case LTLAMenuBar::gridSize15ID:
 		result.setInfo("Grid Size 15", "", "Grid", 0);
 		break;
-	case LTLAMenuBar::GridSize20ID:
+	case LTLAMenuBar::gridSize20ID:
 		result.setInfo("Grid Size 20", "", "Grid", 0);
 		break;
-	case LTLAMenuBar::AddStageAreaID:
+	case LTLAMenuBar::addStageAreaID:
 		result.setInfo("Add Area", "Adds a resizeable area to the stage which can be assigned for different audio processing", "Stage Areas", 0);
 		break;
-	case LTLAMenuBar::EditStageAreasID:
+	case LTLAMenuBar::editStageAreasID:
 		result.setInfo("Edit Stage Areas", "Resize current stage areas", "Stage Areas", 0);
-		GUI.StageAreas.size() > 0 ? result.setActive(true) : result.setActive(false);
-		GUI.GetStageAreaEditState() == true ? result.setTicked(true) : result.setTicked(false);
+		trackingGUI.stageAreas.size() > 0 ? result.setActive(true) : result.setActive(false);
+		trackingGUI.getStageAreaEditState() == true ? result.setTicked(true) : result.setTicked(false);
 		break;
-	case LTLAMenuBar::RemoveStageAreaID:
+	case LTLAMenuBar::removeStageAreaID:
 		result.setInfo("Remove Selected Area", "Removes the currently selected shape.", "Stage Areas", 0);
-		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
+		trackingGUI.getStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
 		break;
-	case LTLAMenuBar::AudioParametersID:
+	case LTLAMenuBar::audioParametersID:
 		result.setInfo("Edit Area Parameters", "Open a panel to edit audio parameters", "Stage Areas", 0);
-		GUI.GetStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
-		GUI.getAudioPanelState() == true ? result.setTicked(true) : result.setTicked(false);
+		trackingGUI.getStageAreaEditState() == true ? result.setActive(true) : result.setActive(false);
+		trackingGUI.getAudioPanelState() == true ? result.setTicked(true) : result.setTicked(false);
 		break;
-	case LTLAMenuBar::AudioDeviceSettingsID:
+	case LTLAMenuBar::audioDeviceSettingsID:
 		result.setInfo("Audio Device Settings", "Open a panel to edit audio device settings", "Preferences", 0);
 		audioSettingsWindow.isVisible() == true ? result.setTicked(true) : result.setTicked(false);
 	}
@@ -91,67 +91,67 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 {
 	switch (info.commandID)
 	{
-	case LTLAMenuBar::Interval5SecondsID: GUI.StageCalibrationInterval = 5;
+	case LTLAMenuBar::interval5SecondsID: trackingGUI.stageCalibrationInterval = 5;
 		break;
-	case LTLAMenuBar::Interval10SecondsID: GUI.StageCalibrationInterval = 10;
+	case LTLAMenuBar::interval10SecondsID: trackingGUI.stageCalibrationInterval = 10;
 		break;
-	case LTLAMenuBar::Interval20SecondsID: GUI.StageCalibrationInterval = 20;
+	case LTLAMenuBar::interval20SecondsID: trackingGUI.stageCalibrationInterval = 20;
 		break;
-	case LTLAMenuBar::CalibrationStartID:
+	case LTLAMenuBar::calibrationStartID:
 	{
-		GUI.StageCalibrationCounter = 0;
-		startTimer(CalibrationIntervalTimer, GUI.StageCalibrationInterval * 1000);
-		CalibrationCountDownLabel.setText("Calibrating Front Left", dontSendNotification);
+		trackingGUI.stageCalibrationCounter = 0;
+		startTimer(calibrationIntervalTimer, trackingGUI.stageCalibrationInterval * 1000);
+		calibrationCountDownLabel.setText("Calibrating Front Left", dontSendNotification);
 	}
 	break;
-	case LTLAMenuBar::DrawStageID: GUI.GetStageDrawingState() == true ? GUI.SetStageDrawingState(false) : GUI.SetStageDrawingState(true);
+	case LTLAMenuBar::drawStageID: trackingGUI.getStageDrawingState() == true ? trackingGUI.setStageDrawingState(false) : trackingGUI.setStageDrawingState(true);
 		break;
-	case LTLAMenuBar::EditStageID: 
-		GUI.GetStageEditState() == true ? GUI.SetStageEditState(false) : GUI.SetStageEditState(true);
-		GUI.SetStageAreaEditState(false);
-		if (GUI.getAudioPanelState() == true)
+	case LTLAMenuBar::editStageID: 
+		trackingGUI.getStageEditState() == true ? trackingGUI.setStageEditState(false) : trackingGUI.setStageEditState(true);
+		trackingGUI.setStageAreaEditState(false);
+		if (trackingGUI.getAudioPanelState() == true)
 		{
 			editAudioParametersPressed();
 		}
 		break;
-	case LTLAMenuBar::DrawGridID: GUI.GetGridDrawingState() == true ? GUI.SetGridDrawingState(false) : GUI.SetGridDrawingState(true);
+	case LTLAMenuBar::drawGridID: trackingGUI.getGridDrawingState() == true ? trackingGUI.setGridDrawingState(false) : trackingGUI.setGridDrawingState(true);
 		break;
-	case LTLAMenuBar::SnaptoGridID: GUI.GetGridSnappingState() == true ? GUI.SetGridSnappingState(false) : GUI.SetGridSnappingState(true);
+	case LTLAMenuBar::snaptoGridID: trackingGUI.getGridSnappingState() == true ? trackingGUI.setGridSnappingState(false) : trackingGUI.setGridSnappingState(true);
 		break;
-	case LTLAMenuBar::GridSize10ID: GUI.SetGridIncrement(10);
+	case LTLAMenuBar::gridSize10ID: trackingGUI.setGridIncrement(10);
 		break;
-	case LTLAMenuBar::GridSize15ID: GUI.SetGridIncrement(15);
+	case LTLAMenuBar::gridSize15ID: trackingGUI.setGridIncrement(15);
 		break;
-	case LTLAMenuBar::GridSize20ID: GUI.SetGridIncrement(20);
+	case LTLAMenuBar::gridSize20ID: trackingGUI.setGridIncrement(20);
 		break;
-	case LTLAMenuBar::AddStageAreaID: AddStageAreaIDPressed();
+	case LTLAMenuBar::addStageAreaID: addStageAreaIDPressed();
 		break;
-	case LTLAMenuBar::EditStageAreasID: EditStageAreasIDPressed();
+	case LTLAMenuBar::editStageAreasID: editStageAreasIDPressed();
 		break;
-	case LTLAMenuBar::RemoveStageAreaID: RemoveStageAreaIDPressed();
+	case LTLAMenuBar::removeStageAreaID: removeStageAreaIDPressed();
 		break;
-	case LTLAMenuBar::AudioParametersID: editAudioParametersPressed();
+	case LTLAMenuBar::audioParametersID: editAudioParametersPressed();
 		break;
-	case LTLAMenuBar::AudioDeviceSettingsID: audioSettingsWindow.isVisible() == true ? audioSettingsWindow.setVisible(false) : audioSettingsWindow.setVisible(true);
+	case LTLAMenuBar::audioDeviceSettingsID: audioSettingsWindow.isVisible() == true ? audioSettingsWindow.setVisible(false) : audioSettingsWindow.setVisible(true);
 		break;
 	default: return false; 
 	}
 	return true;
 }
 
-void MainContentComponent::AddStageAreaIDPressed()
+void MainContentComponent::addStageAreaIDPressed()
 {
-	GUI.StageAreas.add(new StageArea); // Add a new area.
-	GUI.SetStageEditState(false);
-	GUI.SetStageAreaEditState(true); // Enable menuBars edit area button.
-	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaSelectedState(false); // Deselect currently selected area.
-	GUI.StageAreas.getLast()->SetAreaSelectedState(true); // Select the newly created area.
-	GUI.SetCurrentlySelectedArea(GUI.StageAreas.size() - 1); // Set Selected Area Index to the newly created area.
-	GUI.StageAreas.getLast()->updateTrackingGUIWidthAndHeight(GUI.getWidth(), GUI.getHeight());
+	trackingGUI.stageAreas.add(new StageArea); // Add a new area.
+	trackingGUI.setStageEditState(false);
+	trackingGUI.setStageAreaEditState(true); // Enable menuBars edit area button.
+	trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->setAreaSelectedState(false); // Deselect currently selected area.
+	trackingGUI.stageAreas.getLast()->setAreaSelectedState(true); // Select the newly created area.
+	trackingGUI.setCurrentlySelectedArea(trackingGUI.stageAreas.size() - 1); // Set Selected Area Index to the newly created area.
+	trackingGUI.stageAreas.getLast()->updateTrackingGUIWidthAndHeight(trackingGUI.getWidth(), trackingGUI.getHeight());
 
-	valueTree.addChild(GUI.StageAreas.getLast()->getValueTree(), 0, nullptr);
+	valueTree.addChild(trackingGUI.stageAreas.getLast()->getValueTree(), 0, nullptr);
 
-	GUI.StageAreas.getLast()->setValueTreeChildIndex(valueTree.getNumChildren());
+	trackingGUI.stageAreas.getLast()->setValueTreeChildIndex(valueTree.getNumChildren());
 
 	audioEngine.addNewStageAreaAudioPanel();
 
@@ -160,62 +160,58 @@ void MainContentComponent::AddStageAreaIDPressed()
 }
 
 
-void MainContentComponent::EditStageAreasIDPressed()
+void MainContentComponent::editStageAreasIDPressed()
 {
-	if (GUI.GetStageAreaEditState() == false)
+	if (trackingGUI.getStageAreaEditState() == false)
 	{
-		GUI.SetStageAreaEditState(true);
-		GUI.StageAreas[0]->SetAreaSelectedState(true);
-		GUI.SetCurrentlySelectedArea(0);
+		trackingGUI.setStageAreaEditState(true);
+		trackingGUI.stageAreas[0]->setAreaSelectedState(true);
+		trackingGUI.setCurrentlySelectedArea(0);
 	}
-	else if (GUI.GetStageAreaEditState() == true)
+	else if (trackingGUI.getStageAreaEditState() == true)
 	{
-		GUI.SetStageAreaEditState(false);
-		for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
+		trackingGUI.setStageAreaEditState(false);
+		for (int areaIndex = 0; areaIndex < trackingGUI.stageAreas.size(); areaIndex++)
 		{
-			GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
+			trackingGUI.stageAreas[areaIndex]->setAreaSelectedState(false);
 		}
 	}
-	GUI.SetStageEditState(false);
+	trackingGUI.setStageEditState(false);
 }
 
-void MainContentComponent::RemoveStageAreaIDPressed()
+void MainContentComponent::removeStageAreaIDPressed()
 {
-	//valueTree.removeChild(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getValueTreeChildIndex(), nullptr);
-	//DBG( "Index beign removed is  " + (String)GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getValueTreeChildIndex());
-	//GUI.StageAreas.remove(GUI.GetCurrentlySelectedArea(), true);
+	trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->setActive(false);
 
-	GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->setActive(false);
-
-	if (GUI.StageAreas.size() < 1) 
+	if (trackingGUI.stageAreas.size() < 1)
 	{ 
-		GUI.SetStageAreaEditState(false); 
-		AreaColourSelector.setVisible(false);
+		trackingGUI.setStageAreaEditState(false);
+		areaColourSelector.setVisible(false);
 	}
 	else
 	{
-		GUI.SetCurrentlySelectedArea(0);
-		GUI.StageAreas[0]->SetAreaSelectedState(true);
+		trackingGUI.setCurrentlySelectedArea(0);
+		trackingGUI.stageAreas[0]->setAreaSelectedState(true);
 	}
 }
 
 void MainContentComponent::editAudioParametersPressed()
 {
-	GUI.setAudioPanelState(!GUI.getAudioPanelState());
+	trackingGUI.setAudioPanelState(!trackingGUI.getAudioPanelState());
 
-	if (GUI.getAudioPanelState() == true)
+	if (trackingGUI.getAudioPanelState() == true)
 	{
-		AreaColourSelector.setVisible(true);
+		areaColourSelector.setVisible(true);
 		audioEngine.setVisible(true);
 	}
 	else
 	{
-		AreaColourSelector.setVisible(false);
+		areaColourSelector.setVisible(false);
 		audioEngine.setVisible(false);
 
-		for (int AreaIndex = 0; AreaIndex < GUI.StageAreas.size(); AreaIndex++)
+		for (int areaIndex = 0; areaIndex < trackingGUI.stageAreas.size(); areaIndex++)
 		{
-			GUI.StageAreas[AreaIndex]->SetAreaSelectedState(false);
+			trackingGUI.stageAreas[areaIndex]->setAreaSelectedState(false);
 		}
 	}
 	resized();

@@ -24,24 +24,24 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		setSize(1000, 600);
 	//	deviceManager.initialise(2, 2, nullptr, true, String(), nullptr);
 		setAudioChannels(2, 2);
-		KinectSensor.StartKinectST();
-		startTimer(KinectUpdateTimer, 40);
-		startTimer(GUITimer, 30);
+		kinectSensor.startKinectST();
+		startTimer(kinectUpdateTimer, 40);
+		startTimer(guiTimer, 30);
 
-		addAndMakeVisible(GUI);
-		addAndMakeVisible(MenuBar);
+		addAndMakeVisible(trackingGUI);
+		addAndMakeVisible(menuBar);
 
 		addAndMakeVisible(audioEngine);
 		audioEngine.setVisible(false);
 
-		addAndMakeVisible(AreaColourSelector);
-		AreaColourSelector.addChangeListener(this);
-		AreaColourSelector.setVisible(false);
+		addAndMakeVisible(areaColourSelector);
+		areaColourSelector.addChangeListener(this);
+		areaColourSelector.setVisible(false);
 
-		addAndMakeVisible(CalibrationCountDownLabel);
-		Font LabelFont;
-		LabelFont.setSizeAndStyle(20, 1, 1, 0.25);
-		CalibrationCountDownLabel.setFont(LabelFont);
+		addAndMakeVisible(calibrationCountDownLabel);
+		Font labelFont;
+		labelFont.setSizeAndStyle(20, 1, 1, 0.25);
+		calibrationCountDownLabel.setFont(labelFont);
 
 		addAndMakeVisible(areaNameLabel);
 		areaNameLabel.addListener(this);
@@ -55,12 +55,12 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
 		{
-			addAndMakeVisible(GlobalButton[buttonNum]);
-			GlobalButton[buttonNum].addListener(this);
+			addAndMakeVisible(globalButton[buttonNum]);
+			globalButton[buttonNum].addListener(this);
 		}
 
-		GlobalButton[SelectNextAreaButtonID].setButtonText("Next Area");
-		GlobalButton[SelectPreviousAreaButtonID].setButtonText("Previous Area");
+		globalButton[selectNextAreaButtonID].setButtonText("Next Area");
+		globalButton[selectPreviousAreaButtonID].setButtonText("Previous Area");
 				
 		addAndMakeVisible(audioDeviceSelector);
 		addAndMakeVisible(audioSettingsWindow);
@@ -76,7 +76,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 		valueTree.setProperty("StageDrawingState", false, nullptr);
 
-		GUI.setValueTree(valueTree);
+		trackingGUI.setValueTree(valueTree);
 		snapshotManager.setValueTree(valueTree);
 	}
 
@@ -104,8 +104,8 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 	void MainContentComponent::releaseResources()
 	{
 		audioEngine.releaseResources();
-		stopTimer(KinectUpdateTimer);
-		stopTimer(GUITimer);
+		stopTimer(kinectUpdateTimer);
+		stopTimer(guiTimer);
 	}
 
 	// GUI FUNCTION CALLERS
@@ -117,64 +117,64 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 	void MainContentComponent::resized()
 	{
-		GUI.resized();
-		MenuBar.setBounds(10, 10, 500, 30);
+		trackingGUI.resized();
+		menuBar.setBounds(10, 10, 500, 30);
 	
 
-		if (GUI.getAudioPanelState() == false)
-			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(50).getHeight());
+		if (trackingGUI.getAudioPanelState() == false)
+			trackingGUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(50).getHeight());
 		else
-			GUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getHeight() * 0.5);
+			trackingGUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getHeight() * 0.5);
 
-		audioSettingsWindow.setBounds(GUI.getX() + 1, GUI.getY() + 1, 500, 600);
-		audioDeviceSelector.setBounds(GUI.getX() + 1, GUI.getY() + 1, 500, 600);
+		audioSettingsWindow.setBounds(trackingGUI.getX() + 1, trackingGUI.getY() + 1, 500, 600);
+		audioDeviceSelector.setBounds(trackingGUI.getX() + 1, trackingGUI.getY() + 1, 500, 600);
 
-		CalibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
-		AreaColourSelector.setBounds(GUI.getX() + GUI.getWidth() * 0.9, GUI.getHeight() + 55, GUI.getWidth() * 0.1, (getHeight() - GUI.getHeight()) * 0.3);
+		calibrationCountDownLabel.setBounds(getBounds().getWidth() - 150, getBounds().getHeight() - 50, 150, 50);
+		areaColourSelector.setBounds(trackingGUI.getX() + trackingGUI.getWidth() * 0.9, trackingGUI.getHeight() + 55, trackingGUI.getWidth() * 0.1, (getHeight() - trackingGUI.getHeight()) * 0.3);
 
-		audioEngine.setBounds(GUI.getX(), GUI.getHeight() + 50, GUI.getWidth() - AreaColourSelector.getWidth(), getHeight() - GUI.getHeight());
+		audioEngine.setBounds(trackingGUI.getX(), trackingGUI.getHeight() + 50, trackingGUI.getWidth() - areaColourSelector.getWidth(), getHeight() - trackingGUI.getHeight());
 
 		float MaxGuiHeight = getBounds().reduced(50).getHeight();
 		int GlobalPanelHeight = getHeight() - ((getHeight() - MaxGuiHeight) * 0.4);
 
-		GlobalButton[SelectPreviousAreaButtonID].setBounds(GUI.getX(), GlobalPanelHeight, getWidth() * 0.1, 25);
-		areaNameLabel.setBounds(GlobalButton[SelectPreviousAreaButtonID].getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
-		GlobalButton[SelectNextAreaButtonID].setBounds(areaNameLabel.getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
+		globalButton[selectPreviousAreaButtonID].setBounds(trackingGUI.getX(), GlobalPanelHeight, getWidth() * 0.1, 25);
+		areaNameLabel.setBounds(globalButton[selectPreviousAreaButtonID].getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
+		globalButton[selectNextAreaButtonID].setBounds(areaNameLabel.getRight() + (getWidth() * 0.01), GlobalPanelHeight, getWidth() * 0.1, 25);
 
-		stereoAudioMeter.setBounds(getBounds().reduced(50).getX() + GUI.getWidth() + 5, GUI.getBottom() - getHeight() * 0.2, 40, getHeight() * 0.2);
+		stereoAudioMeter.setBounds(getBounds().reduced(50).getX() + trackingGUI.getWidth() + 5, trackingGUI.getBottom() - getHeight() * 0.2, 40, getHeight() * 0.2);
 
-		snapshotManager.setBounds(GlobalButton[SelectNextAreaButtonID].getRight() + getWidth() * 0.1, GlobalPanelHeight, getWidth() * 0.3, 25);
+		snapshotManager.setBounds(globalButton[selectNextAreaButtonID].getRight() + getWidth() * 0.1, GlobalPanelHeight, getWidth() * 0.3, 25);
 
 	}
 
 	void MainContentComponent::timerCallback(int timerID)
 	{
-		if (timerID == KinectUpdateTimer)
+		if (timerID == kinectUpdateTimer)
 		{
-			KinectSensor.UpdateKinectST();
+			kinectSensor.updateKinectST();
 		}
-		if (timerID == GUITimer)
+		if (timerID == guiTimer)
 		{
 			for (int CurrentSkel = 0; CurrentSkel < SKELETON_COUNT; ++CurrentSkel)
 			{
-				if (KinectSensor.GetKinectTrackingState(CurrentSkel) == true)
+				if (kinectSensor.getKinectTrackingState(CurrentSkel) == true)
 				{
-					GUI.SetEllipseCoordinates(KinectSensor.GetX(CurrentSkel), KinectSensor.GetY(CurrentSkel), CurrentSkel);
+					trackingGUI.setEllipseCoordinates(kinectSensor.getX(CurrentSkel), kinectSensor.getY(CurrentSkel), CurrentSkel);
 				}
 
-				GUI.SetKinectTrackingState(CurrentSkel, KinectSensor.GetKinectTrackingState(CurrentSkel));
+				trackingGUI.setKinectTrackingState(CurrentSkel, kinectSensor.getKinectTrackingState(CurrentSkel));
 			}
 
-			if (GUI.hasStageAreaChanged() == true)
+			if (trackingGUI.hasStageAreaChanged() == true)
 			{
-				GUI.setStageAreaHasChangedState(false);
-				areaNameLabel.setText(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
-				audioEngine.reopenAudioPanel(GUI.GetCurrentlySelectedArea());
+				trackingGUI.setStageAreaHasChangedState(false);
+				areaNameLabel.setText(trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
+				audioEngine.reopenAudioPanel(trackingGUI.getCurrentlySelectedArea());
 			}
 
 			if (snapshotManager.hasSnapshotBeenFired() == true)
 			{
-				areaNameLabel.setText(GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
+				areaNameLabel.setText(trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
 				audioEngine.snapshotFired();
 				snapshotManager.setHasbeenFiredState(false);
 			}
@@ -186,25 +186,25 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 			repaint();
 		}
 
-		if (timerID == CalibrationIntervalTimer)
+		if (timerID == calibrationIntervalTimer)
 		{
-			switch (GUI.StageCalibrationCounter)
+			switch (trackingGUI.stageCalibrationCounter)
 			{
-			case 0: GUI.SetStageCoordinates(GUI.FrontLeft, KinectSensor.GetX(0), KinectSensor.GetY(0)); 
-					CalibrationCountDownLabel.setText("Calibrating Front Right", dontSendNotification);
+			case 0: trackingGUI.setStageCoordinates(trackingGUI.frontLeft, kinectSensor.getX(0), kinectSensor.getY(0));
+				calibrationCountDownLabel.setText("Calibrating Front Right", dontSendNotification);
 					break;
-			case 1: GUI.SetStageCoordinates(GUI.FrontRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
-					CalibrationCountDownLabel.setText("Calibrating Back Right", dontSendNotification);
+			case 1: trackingGUI.setStageCoordinates(trackingGUI.frontRight, kinectSensor.getX(0), kinectSensor.getY(0));
+				calibrationCountDownLabel.setText("Calibrating Back Right", dontSendNotification);
 					break;
-			case 2: GUI.SetStageCoordinates(GUI.BackRight, KinectSensor.GetX(0), KinectSensor.GetY(0));
-					CalibrationCountDownLabel.setText("Calibrating Back Left", dontSendNotification);
+			case 2: trackingGUI.setStageCoordinates(trackingGUI.backRight, kinectSensor.getX(0), kinectSensor.getY(0));
+				calibrationCountDownLabel.setText("Calibrating Back Left", dontSendNotification);
 					break;
-			case 3:	GUI.SetStageCoordinates(GUI.BackLeft, KinectSensor.GetX(0), KinectSensor.GetY(0));
-					stopTimer(CalibrationIntervalTimer);
-					CalibrationCountDownLabel.setText("", dontSendNotification);
+			case 3:	trackingGUI.setStageCoordinates(trackingGUI.backLeft, kinectSensor.getX(0), kinectSensor.getY(0));
+					stopTimer(calibrationIntervalTimer);
+					calibrationCountDownLabel.setText("", dontSendNotification);
 					break;
 			}
-			GUI.StageCalibrationCounter++;
+			trackingGUI.stageCalibrationCounter++;
 		}
 	}
 
@@ -212,9 +212,9 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 	{
 		for (int performerNum = 0; performerNum < 2; performerNum++)
 		{
-			for (int areaID = 0; areaID < GUI.StageAreas.size(); areaID++)
+			for (int areaID = 0; areaID < trackingGUI.stageAreas.size(); areaID++)
 			{
-				if (GUI.doesAreaIDContainPerfomer(performerNum, areaID))
+				if (trackingGUI.doesAreaIDContainPerfomer(performerNum, areaID))
 				{
 					if (audioEngine.getPerformerExitedAreaState(performerNum, areaID) == true)
 					{
@@ -225,7 +225,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 						audioEngine.setPerformerEnteredAreaState(performerNum, false, areaID);
 					}
 
-					if (GUI.doesAreaIDContainPerfomer(performerNum, areaID) == true)
+					if (trackingGUI.doesAreaIDContainPerfomer(performerNum, areaID) == true)
 					{
 						audioEngine.setAreaIDContainingPerformerState(performerNum, areaID, true);
 					}
@@ -235,7 +235,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 					}
 
 					audioEngine.setPerformerExitedAreaState(performerNum, false, areaID);
-					audioEngine.setAutoPannerAmount(GUI.getPerformerXPosInsideArea(areaID, performerNum), areaID);
+					audioEngine.setAutoPannerAmount(trackingGUI.getPerformerXPosInsideArea(areaID, performerNum), areaID);
 				}
 				else
 				{
@@ -252,13 +252,13 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 	void MainContentComponent::buttonClicked(Button* button)
 	{
-		if (button == &GlobalButton[SelectPreviousAreaButtonID] && GUI.GetCurrentlySelectedArea() > 0)
+		if (button == &globalButton[selectPreviousAreaButtonID] && trackingGUI.getCurrentlySelectedArea() > 0)
 		{
-			GUI.SetCurrentlySelectedArea(GUI.GetCurrentlySelectedArea() - 1);
+			trackingGUI.setCurrentlySelectedArea(trackingGUI.getCurrentlySelectedArea() - 1);
 		}
-		else if (button == &GlobalButton[SelectNextAreaButtonID] && GUI.GetCurrentlySelectedArea() < GUI.StageAreas.size() - 1)
+		else if (button == &globalButton[selectNextAreaButtonID] && trackingGUI.getCurrentlySelectedArea() < trackingGUI.stageAreas.size() - 1)
 		{
-			GUI.SetCurrentlySelectedArea(GUI.GetCurrentlySelectedArea() + 1);
+			trackingGUI.setCurrentlySelectedArea(trackingGUI.getCurrentlySelectedArea() + 1);
 		}
 	}
 
@@ -269,17 +269,17 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 	void MainContentComponent::changeListenerCallback(ChangeBroadcaster* source)
 	{
-		if (source == &AreaColourSelector && GUI.StageAreas.size() > 0)
+		if (source == &areaColourSelector && trackingGUI.stageAreas.size() > 0)
 		{
-			GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->SetAreaColour(AreaColourSelector.getCurrentColour());
+			trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->setAreaColour(areaColourSelector.getCurrentColour());
 		}
 	}
 
 	void MainContentComponent::labelTextChanged(Label* labelThatHasChanged) 
 	{
-		if (labelThatHasChanged == &areaNameLabel && GUI.StageAreas.size() >= 1)
+		if (labelThatHasChanged == &areaNameLabel && trackingGUI.stageAreas.size() >= 1)
 		{
-			GUI.StageAreas[GUI.GetCurrentlySelectedArea()]->setAreaName(areaNameLabel.getText());
+			trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->setAreaName(areaNameLabel.getText());
 		}
 	}
 

@@ -18,91 +18,88 @@ public:
 
 /** Draws the Area in Either Normal or Edit Mode.
 	Also Responds to the Performers Position Being Inside*/
-	void DrawArea(Graphics &g, bool Editmode);
+	void drawArea(Graphics &g, bool Editmode);
 
 /** Updates the Coordinates of one of the Areas Corners*/
-	void UpdateArea( int Corner, float X, float Y);
+	void updateArea( int Corner, float X, float Y);
 	
 	//==============================================================================	
 	/** Getters & Setters*/
 	
 /** Gets the X Coordinate of one of the Areas Corners */
-	float GetX(int CornerID);
+	float getX(int CornerID);
 
 /** Gets the Y Coordinate of one of the Areas Corners */
-	float GetY(int CornerID);
+	float getY(int CornerID);
 
+/** Sets the X coordinate value of one of the areas corners */
 	void setX(int CornerID, float value);
 
+/** Sets the Y coordinate value of one of the areas corners */
 	void setY(int CornerID, float value);
 
+/** Gets the length difference between the centre X coordinate and the specified corner X coordinate */
 	float getDifferenceX(int CornerID);
 
+/** Gets the length difference between the centre Y coordinate and the specified corner Y coordinate */
 	float getDifferenceY(int CornerID);
 
+/** Sets the length difference between the centre X coordinate and the specified corner X coordinate */
 	void setDifferenceX(int cornerID, float value);
 
+/** Sets the length difference between the centre Y coordinate and the specified corner Y coordinate */
 	void setDifferenceY(int cornerID, float value);
 
+/** Updates the UI bounds for scaling */
 	void updateTrackingGUIWidthAndHeight(float width, float height);
-
-	
+		
 /** Gets the Path Used to Draw the Area*/
-	Path GetAreaPath();
+	Path getAreaPath();
 
 /** Sets The Selection State of one of the Areas Corner*/
-	void SetCornerSelectedState(int Corner, bool State);
+	void setCornerSelectedState(int Corner, bool State);
 
 /** Gets The Selection State of one of the Areas Corner*/
-	bool GetCornerSelectedState(int Corner);
+	bool getCornerSelectedState(int Corner);
 
 /** Sets the Selection State of the Area*/
-	void SetAreaSelectedState(bool State);
+	void setAreaSelectedState(bool State);
 
 /** Gets the Selection State of the Area*/
-	bool GetAreaSelectedState();
+	bool getAreaSelectedState();
 
-	void SetAreaColour(Colour colour);
+/** Sets the colour of the area */
+	void setAreaColour(Colour colour);
 
-	Colour GetAreaColour();
+/** Gets the colour of the area */
+	Colour getAreaColour();
 
+/** Sets the name of the area */
 	void setAreaName(String name);
 
+/** Gets the name of the area */
 	String getAreaName();
 
-	ValueTree getValueTree()
-	{
-		return stageAreaValueTree;
-	}
+/** Sets the active state of the area*/
+	void setActive(bool state);
 
-	void setValueTreeChildIndex(int index)
-	{
-		valueTreeChildIndex = index;
-	}
+/** Gets the active state of the area*/
+	bool getActiveState();
+	
+/** returns this classes valuetree */
+	ValueTree getValueTree();
 
-	int getValueTreeChildIndex()
-	{
-		return valueTreeChildIndex;
-	}
+/** Sets the index value of the valuetree */
+	void setValueTreeChildIndex(int index);
 
-	void setActive(bool state)
-	{
-		stageAreaValueTree.setProperty("Active", state, nullptr);
+/** Gets the index value of the valuetree */
+	int getValueTreeChildIndex();
 
-		if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
-		{
-			setVisible(false);
-		}
-	}
-
-	bool getActiveState()
-	{
-		return stageAreaValueTree.getPropertyAsValue("Active", nullptr).getValue();
-	}
+	
 
 	//==============================================================================	
 
-	enum { FrontLeft, FrontRight, BackRight, BackLeft, Centre, NumOfAreaCorners};
+	enum { frontLeft, frontRight, backRight, backLeft, centre, numOfAreaCorners};
 
 private:
 
@@ -110,28 +107,31 @@ private:
 
 	struct AreaCorner
 	{
-		bool Selected = false;
+		bool selected = false;
 		float differenceX = 0.00;
 		float differenceY = 0.00;
+		Value x;
+		Value y;
 	};
 
-	AreaCorner AreaPosition[NumOfAreaCorners];
+	AreaCorner areaPosition[numOfAreaCorners];
 
 	struct Coordinates
 	{
 		float x = 0.00;
 		float y = 0.00;
 	};
-	Coordinates PerformerCoordinates;
+	Coordinates performerCoordinates;
 
-	Path AreaPath;
-	Colour AreaColour = Colours::floralwhite;
-	//String areaName;
+	Path areaPath;
+	Colour areaColour = Colours::floralwhite;
 
 	float trackingGUIWidth = 900.0;
 	float trackingGUIHeight = 500.0;
 	bool areaSelectedState = false;
 	int valueTreeChildIndex = 0;
-	//bool activeState = true;
+
+	Value areaName;
+	Value activeState;
 
 }; 

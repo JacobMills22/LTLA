@@ -5,91 +5,91 @@
 // ELLIPSE GETTERS & SETTERS.
 // ========================================================================================
 
-void LTLA_GUI::SetEllipseCoordinates(float PositionX, float PositionY, int SkeltonNum)
+void TrackingGUI::setEllipseCoordinates(float positionX, float positionY, int skeltonNum)
 {	// Coordinates are mapped based on the size of the window.
-	EllipseCoordinates[SkeltonNum].x = getLocalBounds().getWidth() * 0.5 * PositionX;
-	EllipseCoordinates[SkeltonNum].y = getLocalBounds().getHeight() * 0.5 * PositionY;
+	ellipseCoordinates[skeltonNum].x = getLocalBounds().getWidth() * 0.5 * positionX;
+	ellipseCoordinates[skeltonNum].y = getLocalBounds().getHeight() * 0.5 * positionY;
 }
 
 // ========================================================================================
 // STAGE GETTERS & SETTERS
 // ========================================================================================
 
-void LTLA_GUI::SetStageCoordinates(int StagePosition, float x, float y)
+void TrackingGUI::setStageCoordinates(int stagePosition, float x, float y)
 {
-	float ConvertedX = getLocalBounds().getWidth() * 0.5 * x;
-	float ConvertedY = getLocalBounds().getHeight() * 0.5 * y;
-	MainStageArea.UpdateArea(StagePosition, ConvertedX, ConvertedY);
+	float convertedX = getLocalBounds().getWidth() * 0.5 * x;
+	float convertedY = getLocalBounds().getHeight() * 0.5 * y;
+	mainStageArea.updateArea(stagePosition, convertedX, convertedY);
 }
 
-void LTLA_GUI::SetStageDrawingState(bool State)
+void TrackingGUI::setStageDrawingState(bool state)
 {
-	valueTree.setProperty("StageDrawingState", State, nullptr);
+	valueTree.setProperty("StageDrawingState", state, nullptr);
 }
 
-bool LTLA_GUI::GetStageDrawingState()
+bool TrackingGUI::getStageDrawingState()
 {
 	return valueTree.getPropertyAsValue("StageDrawingState", nullptr).getValue();
 }
 
-void LTLA_GUI::SetStageEditState(bool State)
+void TrackingGUI::setStageEditState(bool state)
 {
-	StageEditState = State;
+	stageEditState = state;
 }
 
-bool LTLA_GUI::GetStageEditState()
+bool TrackingGUI::getStageEditState()
 {
-	return StageEditState;
+	return stageEditState;
 }
 
 // ========================================================================================
 // STAGE AREA GETTERS & SETTERS
 // ========================================================================================
 
-void LTLA_GUI::SetStageAreaEditState(bool State)
+void TrackingGUI::setStageAreaEditState(bool state)
 {
-	StageAreaEditState = State;
+	stageAreaEditState = state;
 }
 
-bool LTLA_GUI::GetStageAreaEditState()
+bool TrackingGUI::getStageAreaEditState()
 {
-	return StageAreaEditState;
+	return stageAreaEditState;
 }
 
-void LTLA_GUI::SetCurrentlySelectedArea(int Index)
+void TrackingGUI::setCurrentlySelectedArea(int index)
 {
-	for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+	for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)
 	{
-		StageAreas[AreaIndex]->SetAreaSelectedState(false);
+		stageAreas[areaIndex]->setAreaSelectedState(false);
 	}
 
-	if (GetCurrentlySelectedArea() != Index)
+	if (getCurrentlySelectedArea() != index)
 		setStageAreaHasChangedState(true);
 
-	SelectedAreaIndex = Index;
-	StageAreas[Index]->SetAreaSelectedState(true);
+	selectedAreaIndex = index;
+	stageAreas[index]->setAreaSelectedState(true);
 }
-int LTLA_GUI::GetCurrentlySelectedArea()
+int TrackingGUI::getCurrentlySelectedArea()
 {
-	return SelectedAreaIndex;
+	return selectedAreaIndex;
 }
 
-void LTLA_GUI::setStageAreaHasChangedState(bool state)
+void TrackingGUI::setStageAreaHasChangedState(bool state)
 {
 	selectedAreaHasChanged = state;
 }
 
-bool LTLA_GUI::hasStageAreaChanged()
+bool TrackingGUI::hasStageAreaChanged()
 {
 	return selectedAreaHasChanged;
 }
 
-void LTLA_GUI::setAudioPanelState(bool state)
+void TrackingGUI::setAudioPanelState(bool state)
 {
 	audioPanelState = state;
 }
 
-bool LTLA_GUI::getAudioPanelState()
+bool TrackingGUI::getAudioPanelState()
 {
 	return audioPanelState;
 }
@@ -98,48 +98,48 @@ bool LTLA_GUI::getAudioPanelState()
 // GRID GETTERS & SETTERS
 // ========================================================================================
 
-void LTLA_GUI::SetGridDrawingState(bool state)
+void TrackingGUI::setGridDrawingState(bool state)
 {
-	GridDrawingState = state;
+	gridDrawingState = state;
 }
 
-bool LTLA_GUI::GetGridDrawingState()
+bool TrackingGUI::getGridDrawingState()
 {
-	return GridDrawingState;
+	return gridDrawingState;
 }
 
-void LTLA_GUI::SetGridSnappingState(bool state)
+void TrackingGUI::setGridSnappingState(bool state)
 {
-	GridSnappingState = state;
+	gridSnappingState = state;
 }
 
-bool LTLA_GUI::GetGridSnappingState()
+bool TrackingGUI::getGridSnappingState()
 {
-	return GridSnappingState;
+	return gridSnappingState;
 }
 
-void LTLA_GUI::SetGridIncrement(int Value)
+void TrackingGUI::setGridIncrement(int Value)
 {
-	GridIncrement = Value;
+	gridIncrement = Value;
 }
 
-int LTLA_GUI::GetGridIncrement()
+int TrackingGUI::getGridIncrement()
 {
-	return GridIncrement;
+	return gridIncrement;
 }
 
 // ========================================================================================
 // TRACKING GETTERS & SETTERS
 // ========================================================================================
 
-void LTLA_GUI::SetKinectTrackingState(int PerformerNum, bool State)
+void TrackingGUI::setKinectTrackingState(int performerNum, bool state)
 {
-	TrackingState[PerformerNum] = State;
+	trackingState[performerNum] = state;
 }
 
-bool LTLA_GUI::doesAreaIDContainPerfomer(int performerID, int areaID)
+bool TrackingGUI::doesAreaIDContainPerfomer(int performerID, int areaID)
 {
-	if (StageAreas[areaID]->GetAreaPath().contains(EllipseCoordinates[performerID].x, EllipseCoordinates[performerID].y) == true)
+	if (stageAreas[areaID]->getAreaPath().contains(ellipseCoordinates[performerID].x, ellipseCoordinates[performerID].y) == true)
 	{
 		return true;
 	}

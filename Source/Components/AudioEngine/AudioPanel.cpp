@@ -9,6 +9,7 @@
 		addAndMakeVisible(filePlayer);
 		addAndMakeVisible(autoPanner);
 		addAndMakeVisible(autoFilter);
+		addAndMakeVisible(autoEQ);
 
 		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
 		{
@@ -19,6 +20,7 @@
 		audioPanelButton[buttonFilePlayerID].setButtonText("File Player");
 		audioPanelButton[buttonAutoPannerID].setButtonText("AutoPanner");
 		audioPanelButton[buttonAutoFilterID].setButtonText("Filters");
+		audioPanelButton[buttonAutoEQID].setButtonText("EQ");
 
 		addAndMakeVisible(inputComboBox);
 		inputComboBox.addItem("File Player", 1);
@@ -30,6 +32,7 @@
 		filePlayer.closePanel();
 		autoPanner.closePanel();
 		autoFilter.closePanel();
+		autoEQ.closePanel();
 
 		audioPanelValueTree.setProperty("InputSource", FilePlayerInput, nullptr);
 
@@ -44,7 +47,7 @@
 		filePlayer.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoPanner.prepareToPlay(samplesPerBlockExpected, sampleRate);
 
-		autoFilter.initialise(sampleRate);
+	//	autoFilter.initialise(sampleRate);
 	}
 
 	void LTLAAudioPanel::releaseResources()
@@ -58,15 +61,17 @@
 	{	
 		if (getAudioInputID() == Performer1)
 		{
-			if (performerInsideArea[0] == true)
+			//if (performerInsideArea[0] == true)
 			{
-				autoPanner.process(*bufferToFill.buffer);
+			//	autoPanner.process(*bufferToFill.buffer);
 				autoFilter.process(*bufferToFill.buffer);
 			}
 		}
 		else if (getAudioInputID() == FilePlayerInput)
 		{
 			filePlayer.getNextAudioBlock(bufferToFill);
+			autoFilter.process(*bufferToFill.buffer);
+			autoEQ.process(*bufferToFill.buffer);
 		}
 	}
 
@@ -75,12 +80,14 @@
 		audioPanelButton[buttonFilePlayerID].setBounds(5, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoPannerID].setBounds(audioPanelButton[buttonFilePlayerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoFilterID].setBounds(audioPanelButton[buttonAutoPannerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
+		audioPanelButton[buttonAutoEQID].setBounds(audioPanelButton[buttonAutoFilterID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 
 		
 		inputComboBox.setBounds(5, getHeight() * 0.08, getWidth() * 0.15, getHeight() * 0.1);
 		filePlayer.setBounds(getWidth() * 0.25, audioPanelButton[buttonFilePlayerID].getBottom() + (getHeight() * 0.1), getWidth() * 0.6, getHeight() * 0.8);
 		autoPanner.setBounds(filePlayer.getBounds());
 		autoFilter.setBounds(filePlayer.getBounds());
+		autoEQ.setBounds(filePlayer.getBounds());
 	}
 
 	void LTLAAudioPanel::buttonClicked(Button* button)
@@ -103,6 +110,11 @@
 			audioPanelButton[buttonAutoFilterID].setToggleState(!audioPanelButton[buttonAutoFilterID].getToggleState(), dontSendNotification);
 			audioPanelButton[buttonAutoFilterID].getToggleState() == false ? autoFilter.closePanel() : autoFilter.openPanel();
 		}
+		else if (button == &audioPanelButton[buttonAutoEQID]) // Open Auto-Filter panel if selected.
+		{
+			audioPanelButton[buttonAutoEQID].setToggleState(!audioPanelButton[buttonAutoEQID].getToggleState(), dontSendNotification);
+			audioPanelButton[buttonAutoEQID].getToggleState() == false ? autoEQ.closePanel() : autoEQ.openPanel();
+		}
 	}
 
 	void LTLAAudioPanel::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
@@ -123,6 +135,7 @@
 		filePlayer.closePanel();
 		autoPanner.closePanel();
 		autoFilter.closePanel();
+		autoEQ.closePanel();
 	}
 
 	void LTLAAudioPanel::setPerformerInsideAreaState(int performerNum, bool state)
@@ -143,6 +156,11 @@
 	int LTLAAudioPanel::getAudioInputID()
 	{
 		return audioPanelValueTree.getPropertyAsValue("InputSource", nullptr).getValue();
+	}
+
+	ValueTree LTLAAudioPanel::getValueTree()
+	{
+		return audioPanelValueTree;
 	}
 
 	// FILEPLAYER FUNCTIONS
@@ -186,5 +204,15 @@
 	void LTLAAudioPanel::setAutoPannerAmount(float value)
 	{
 		autoPanner.setPanAmount(value);
+	}
+
+	// SNAPSHOT FUNCTIONS
+
+	void LTLAAudioPanel::snapshotFired()
+	{
+		inputComboBox.setSelectedId(audioPanelValueTree.getPropertyAsValue("InputSource", nullptr).getValue(), dontSendNotification);
+		filePlayer.snapshotFired();
+		autoPanner.snapshotFired();
+		autoFilter.snapshotFired();
 	}
 

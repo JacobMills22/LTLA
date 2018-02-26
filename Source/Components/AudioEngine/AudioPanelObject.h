@@ -20,6 +20,8 @@ public:
 		setVisible(false);
 	}
 
+	
+
 private:
 
 };

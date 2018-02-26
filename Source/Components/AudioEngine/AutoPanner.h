@@ -68,7 +68,7 @@ private:
 	TextButton resetPanButton;
 
 	float panAmount = 0.5;
-	//bool enablePanState = false;
+	bool enablePanState = false;
 
 	ValueTree autoPannerValueTree;
 

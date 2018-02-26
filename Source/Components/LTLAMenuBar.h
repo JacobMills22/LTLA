@@ -8,93 +8,36 @@ class LTLAMenuBar : public Component,
 {
 public:
 /** Creates new MenuBar Component.*/
-	LTLAMenuBar()
-	{
-		addAndMakeVisible(menuBar = new MenuBarComponent(this));
-	}
+	LTLAMenuBar();
 	
 /** Destroys MenuBar Component.*/
-	~LTLAMenuBar()
-	{
-		PopupMenu::dismissAllActiveMenus();	
-		menuBar.release();
-	}
+	~LTLAMenuBar();
 
 /** Called when component is resized, used to set bounds of component.*/
-	void resized() override
-	{
-		menuBar->setBounds(getLocalBounds().removeFromTop(LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
-	}
+	void resized() override;
 
-/** Gets the main menu bar heading names. */
-	StringArray getMenuBarNames() override
-	{
-		const char* const names[] = { "Stage Calibration", "Grid", "Stage Areas", "Preferences", nullptr };
-		return StringArray(names);
-	}
+	/** Gets the main menu bar heading names. */
+	StringArray getMenuBarNames() override;
 
 /** Called when a heading is opened.
 	Gets the Sub headings and adds them to the list.
 	Adds items to the command manager ready to be called.*/
-	PopupMenu getMenuForIndex(int menuIndex, const String& menuBar) override
-	{
-		ApplicationCommandManager* commandManager = &LTLACommandManager::getApplicationCommandManager();
-		PopupMenu menu;
-
-		if (menuIndex == CalibrationIndexID)
-		{
-			menu.addSeparator();
-			PopupMenu CalibrationIntervalSubMenu;
-			CalibrationIntervalSubMenu.addCommandItem(commandManager, Interval5SecondsID);
-			CalibrationIntervalSubMenu.addCommandItem(commandManager, Interval10SecondsID);
-			CalibrationIntervalSubMenu.addCommandItem(commandManager, Interval20SecondsID);
-			menu.addSubMenu("Calibration Interval", CalibrationIntervalSubMenu, true);
-			menu.addCommandItem(commandManager, CalibrationStartID);
-			menu.addSeparator();
-			menu.addCommandItem(commandManager, DrawStageID);
-			menu.addCommandItem(commandManager, EditStageID);
-		}
-		else if (menuIndex == GridIndexID)
-		{
-			menu.addCommandItem(commandManager, DrawGridID);
-			menu.addCommandItem(commandManager, SnaptoGridID);
-			PopupMenu GridSizeSubMenu;
-			GridSizeSubMenu.addCommandItem(commandManager, GridSize10ID);
-			GridSizeSubMenu.addCommandItem(commandManager, GridSize15ID);
-			GridSizeSubMenu.addCommandItem(commandManager, GridSize20ID);
-			menu.addSubMenu("Grid Size", GridSizeSubMenu, true);
-		}
-		else if (menuIndex == StageAreasID)
-		{
-			menu.addCommandItem(commandManager, AddStageAreaID);
-			menu.addCommandItem(commandManager, EditStageAreasID);
-			menu.addCommandItem(commandManager, RemoveStageAreaID);
-			menu.addCommandItem(commandManager, AudioParametersID);
-		}
-		else if (menuIndex == PreferencesID)
-		{
-			menu.addCommandItem(commandManager, AudioDeviceSettingsID);
-		}
-		return menu;
-	}
+	PopupMenu getMenuForIndex(int menuIndex, const String& menuBar) override;
 	
 /**  Called when a Sub Heading is selected.
 	Used to call any special cases that cannot be provided through the
 	command manager. */
-	void menuItemSelected(int menuItemID, int topLevelMenuIndex) override
-	{
-
-	}
+	void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
 	
-	enum MainCommandManagerIDs {CalibrationStartID = 1, Interval5SecondsID, Interval10SecondsID, 
-		Interval20SecondsID, DrawStageID, EditStageID, DrawGridID, SnaptoGridID, GridSize10ID, 
-		GridSize15ID, GridSize20ID, AddStageAreaID, EditStageAreasID, RemoveStageAreaID, 
-		AudioParametersID, AudioDeviceSettingsID, NumOfCommandIDs};
+	enum MainCommandManagerIDs {calibrationStartID = 1, interval5SecondsID, interval10SecondsID, 
+		interval20SecondsID, drawStageID, editStageID, drawGridID, snaptoGridID, gridSize10ID, 
+		gridSize15ID, gridSize20ID, addStageAreaID, editStageAreasID, removeStageAreaID, 
+		audioParametersID, audioDeviceSettingsID, numOfCommandIDs};
 
 private:
 
 	ScopedPointer<MenuBarComponent> menuBar;
-	enum { CalibrationIndexID, GridIndexID, StageAreasID, PreferencesID };
+	enum { calibrationIndexID, gridIndexID, stageAreasID, preferencesID };
 
 };
 

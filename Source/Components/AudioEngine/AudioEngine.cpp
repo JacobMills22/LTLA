@@ -264,6 +264,14 @@
 		}
 	}
 
+	void LTLAAudioEngine::snapshotFired()
+	{
+		for (int panel = 0; panel < audioPanel.size(); panel++)
+		{
+			audioPanel[panel]->snapshotFired();
+		}
+	}
+
 	void LTLAAudioEngine::setAutoPannerAmount(float value, int areaID)
 	{
 		audioPanel[areaID]->setAutoPannerAmount(value);
@@ -288,3 +296,5 @@
 	{
 		performerInput.setDeviceManagerToUse(deviceManager);
 	}
+
+	

@@ -22,12 +22,12 @@ public:
 /** Based on "Tracking Users with Kinect Skeletal Tracking" (Microsoft).
     Initialises kinect and open a skeleton stream.
 	Call once at application start. */
-	HRESULT StartKinectST();
+	HRESULT startKinectST();
 
 /** Based on "Skeleton Basics-D2D C++ Sample" (Microsoft)
 	Creates the first connected Kinect found, returns success or failure.
 	Called in StartKinectST() */
-	HRESULT CreateFirstConnected();
+	HRESULT createFirstConnected();
 	
 	//==============================================================================
 	
@@ -36,12 +36,12 @@ public:
 /** Based on "Tracking Users with Kinect Skeletal Tracking" (Microsoft).
 	Refreshes the Kinect and processes tracking data.
 	Called on each iteration of the application's update loop.*/		 
-	void UpdateKinectST();
+	void updateKinectST();
 
 /** Handles the tracking data of two skeletons.
 	Stores data in (Vector4) LocationData array.
 	Called in UpdateKinectST().*/
-	void SetSkeletonPositionData(NUI_SKELETON_FRAME* pSkeletonFrame);
+	void setSkeletonPositionData(NUI_SKELETON_FRAME* pSkeletonFrame);
 
 	//==============================================================================
 						
@@ -49,11 +49,11 @@ public:
 				
 /** Returns and Converts raw tracking data into more usable data. 
 	Converts X&Z to X&Y Coordinates to be displayed as a 2D top down view */
-	float GetX(int SkeletonNum);
-	float GetY(int SkeletonNum);
+	float getX(int SkeletonNum);
+	float getY(int SkeletonNum);
 
 /** Returns the tracking state of a skeleton slot */
-	bool GetKinectTrackingState(int SkeletonNum);
+	bool getKinectTrackingState(int SkeletonNum);
 
 	//==============================================================================
 
@@ -61,15 +61,15 @@ private:
 
 	INuiSensor* m_pNuiSensor = NULL;
 	HANDLE m_hNextSkeletonEvent;
-	int FirstSkeleton = -1;
-	int SecondSkeleton = -1;
+	int firstSkeleton = -1;
+	int secondSkeleton = -1;
 
 	struct TrackingData
 	{
-		Vector4 Coordinates;
-		bool TrackingState = false;
+		Vector4 coordinates;
+		bool trackingState = false;
 	};
-	TrackingData PerformerData[NUI_SKELETON_COUNT];
+	TrackingData performerData[NUI_SKELETON_COUNT];
 
 };
 

@@ -90,16 +90,7 @@ public:
 
 	void snapshotFired()
 	{
-		setLevel(getLevel());
-		filePlayerComboBox[performerExitBoxID].setSelectedId(filePlayerValueTree.getPropertyAsValue("playbackOnPerformerExit", nullptr).getValue());
-
-		int selectedID = filePlayerValueTree.getPropertyAsValue("PerformerWhichTriggers", nullptr).getValue();
-		selectedID += 1;
-		filePlayerComboBox[performerWhichTriggersBoxID].setSelectedId(selectedID);
-
-		int retriggerID = filePlayerValueTree.getPropertyAsValue("Retrigger", nullptr).getValue();
-		retriggerID += 1;
-		filePlayerComboBox[retriggerBoxID].setSelectedId(retriggerID);
+		//setLevel(getLevel());
 
 		if (filePlayerValueTree.getPropertyAsValue("AudioFilePath", nullptr).toString() != "NULL")
 		{
@@ -125,10 +116,10 @@ private:
 	enum { performerWhichTriggersBoxID, performerExitBoxID, retriggerBoxID, numOfComboBoxes };
 	ComboBox filePlayerComboBox[numOfComboBoxes];
 	float playbackLevel = 0.0;
-	//int PerformerWhichTriggers = 0;
+	int PerformerWhichTriggers = 0;
 	enum { continuePlaybackID = 1, stopPlaybackID };
-	//int playbackOnPerformerExit = stopPlaybackID;
-	//bool retriggerState = false;
+	int playbackOnPerformerExit = stopPlaybackID;
+	bool retriggerState = false;
 
 	// AUDIO VARIABLES/OBJECTS
 	AudioFormatReaderSource* audioFormatReaderSource;
@@ -150,5 +141,6 @@ private:
 
 	// VALUE TREE
 	ValueTree filePlayerValueTree;
+	Value audioFilePath;
 
 };

@@ -64,25 +64,24 @@ public:
 /** Called in timercallback when a performer exits an area, stops audio playback if required*/
 	void performerExitedArea(int performer, int areaID);
 
+/** Called when a snapshot is fired, used to update the GUI for each audio panel*/
+	void snapshotFired();
+
 /** Updates the AutoPanning amount of an area */
 	void setAutoPannerAmount(float value, int areaID);
 
+/** Sets the meter sample data*/
 	void setMeterData(int channel, float value);
 
+/** Returns the meter sample data*/
 	float getMeterData(int channel);
 
+/** Used to set the input channel number that the performer will use, along with the max number of output channels*/
 	void setPerformerParameters(int ActualInputChannel, int MaxOutputChannels);
 
+/** Sets the device manager*/
 	void setDeviceManagerToUse(AudioDeviceManager *deviceManager);
-
-	void snapshotFired()
-	{
-		for (int panel = 0; panel < audioPanel.size(); panel++)
-		{
-			audioPanel[panel]->snapshotFired();
-		}
-	}
-	
+		
 	OwnedArray<LTLAAudioPanel> audioPanel;
 
 private:

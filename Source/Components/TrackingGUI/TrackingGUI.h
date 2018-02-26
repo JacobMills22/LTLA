@@ -5,15 +5,15 @@
 
 #define SKELETON_COUNT 2
 
-class LTLA_GUI : public Component,
+class TrackingGUI : public Component,
 			     public MouseListener
 {
 
 public:
 	// Constructor
-	LTLA_GUI();
+	TrackingGUI();
 
-	~LTLA_GUI();
+	~TrackingGUI();
 
 	//==============================================================================	
 								/** Main GUI Functions */
@@ -22,7 +22,7 @@ public:
 	Handles all the GUI drawing code.*/
 	void paint(Graphics& g) override;
 
-	void PaintGrid(Graphics& g);
+	void paintGrid(Graphics& g);
 
 /** Overrides JUCE resized function called in MainComponent.
 	Handles all the GUI positioning code.*/
@@ -30,19 +30,19 @@ public:
 
 /** Draws an ellipse to represent performers position. 
 	Uses coordinates provided by KinectTracker  */
-	void PaintTrackedEllipse(Graphics& g, float PositionX, float PositionY, Colour colour);
+	void paintTrackedEllipse(Graphics& g, float PositionX, float PositionY, Colour colour);
 
 /** Draws a stage outline once calibrated */
-	void PaintStage(Graphics& g);
+	void paintStage(Graphics& g);
 
 /** Paint Stage Areas */
-	void PaintStageAreas(Graphics &g);
+	void paintStageAreas(Graphics &g);
 
 	//==============================================================================	
 							/** Object Specific Functions */
 
 /** Converts Stage Coordinates to be in-line with the Grid*/
-	void SnapStageToGrid();
+	void snapStageToGrid();
 
 /** Called when a mouse is clicked 
 	If Area edit State is Enabled, this will find the corner of the area that's currently
@@ -69,123 +69,119 @@ public:
 							 /** Getters & Setters */
 
 /** Sets Ellipse Coordinates. */
-	void SetEllipseCoordinates(float PositionX, float PositionY, int SkeltonNum);
+	void setEllipseCoordinates(float positionX, float positionY, int skeltonNum);
 
 	/** STAGE */ 
 
 /** Sets Stage Callibration State, used to determine whether the stage should be drawn. */
-	void SetStageDrawingState(bool State);
+	void setStageDrawingState(bool state);
 
 /** Gets the Stage Callibration State, used to determine whether the stage should be drawn. */
-	bool GetStageDrawingState();
+	bool getStageDrawingState();
 
 /** Sets the stage Coordinates. */
-	void SetStageCoordinates(int StagePosition, float x, float y);
+	void setStageCoordinates(int stagePosition, float x, float y);
 
 /** *Sets the Edit Stage State */
-	void SetStageEditState(bool State);
+	void setStageEditState(bool state);
 
 /** *Gets the Edit Stage State */
-	bool GetStageEditState();
+	bool getStageEditState();
 
 	/** STAGE AREAS */
 	
 /** *Sets the Edit Stage Area State */
-	void SetStageAreaEditState(bool State);
+	void setStageAreaEditState(bool state);
 
 /** *Gets the Edit Stage Area State */
-	bool GetStageAreaEditState();
+	bool getStageAreaEditState();
 
 /** Sets an Index for the Currently Selected Area*/
-	void SetCurrentlySelectedArea(int Index);
+	void setCurrentlySelectedArea(int index);
 
 /** Gets an Index for the Currently Selected Area*/
-	int GetCurrentlySelectedArea();
+	int getCurrentlySelectedArea();
 
+/** Sets the stage area has changed state */
 	void setStageAreaHasChangedState(bool state);
 
+/** Returns true if the stage area has been changed*/
 	bool hasStageAreaChanged();
 	
+/** Sets whether the audio panel is currently displayed*/
 	void setAudioPanelState(bool state);
 
+/** Returns true if the audio panel is currently displayed*/
 	bool getAudioPanelState();
 
 	/** GRID */ 
 
 /** Sets the state of Grid Drawing*/
-	void SetGridDrawingState(bool state);
+	void setGridDrawingState(bool state);
 
 /** Gets the state of Grid Drawing*/
-	bool GetGridDrawingState();
+	bool getGridDrawingState();
 
 /** Sets the state of Grid Snapping*/
-	void SetGridSnappingState(bool state);
+	void setGridSnappingState(bool state);
 
 /** Gets the state of Grid Snapping*/
-	bool GetGridSnappingState();
+	bool getGridSnappingState();
 
 /** Sets the Increment Value of Grid Snapping*/
-	void SetGridIncrement(int Value);
+	void setGridIncrement(int Value);
 
 /** Gets the Increment Value of Grid Snapping*/
-	int GetGridIncrement();
+	int getGridIncrement();
 
 	/** TRACKING */
 
 /** Sets the tracking state of each performer. */
-	void SetKinectTrackingState(int PerformerNum, bool State);
+	void setKinectTrackingState(int performerNum, bool state);
 
+/** Retuns true if the performerID is currently inside the AreaID*/
 	bool doesAreaIDContainPerfomer(int performerID, int areaID);
 
-	float getPerformerXPosInsideArea(int areaID, int performerID)
-	{
-		float areaLeft = StageAreas[areaID]->GetAreaPath().getBounds().getX();
-		float areaRight = StageAreas[areaID]->GetAreaPath().getBounds().getRight();
-		float performerX = EllipseCoordinates[performerID].x;
+/** Returns the performers x position in relation to the AreaID, this is generally used for the autoPanner*/
+	float getPerformerXPosInsideArea(int areaID, int performerID);
 
-	 // return (performerX - AreaMinimum) / (Max - Min)
-		return (performerX - areaLeft) / (areaRight - areaLeft);
-	}
-
-	void setValueTree(ValueTree ValueTree)
-	{
-		valueTree = ValueTree;
-	}
+/** Sets the valuetree for this class to use */
+	void setValueTree(ValueTree valueTree);
 
 	//==============================================================================	
 
-	enum { FrontLeft, FrontRight, BackRight, BackLeft, Centre, NumOfStagePositions };
-	int StageCalibrationCounter = 0;
-	int StageCalibrationInterval = 5;
+	enum { frontLeft, frontRight, backRight, backLeft, centre, numOfStagePositions };
+	int stageCalibrationCounter = 0;
+	int stageCalibrationInterval = 5;
 
-	StageArea MainStageArea;
-	OwnedArray<StageArea> StageAreas;
+	StageArea mainStageArea;
+	OwnedArray<StageArea> stageAreas;
 
 private:
 
 	// Stage Drawing Variables
-	bool StageDrawingState = false;
-	bool GridDrawingState = false;
-	bool TrackingState[2];
-	bool GridSnappingState = false;
-	bool StageCornerSelected[NumOfStagePositions];
-	bool StageEditState = false;
-	bool StageAreaEditState = false;
+	bool stageDrawingState = false;
+	bool gridDrawingState = false;
+	bool trackingState[2];
+	bool gridSnappingState = false;
+	bool stageCornerSelected[numOfStagePositions];
+	bool stageEditState = false;
+	bool stageAreaEditState = false;
 	bool audioPanelState = false;
 	bool selectedAreaHasChanged = false;
 
-	int GridIncrement = 15;
-	int SelectedAreaIndex = 0;
+	int gridIncrement = 15;
+	int selectedAreaIndex = 0;
 
 	struct LTLACoordinates
 	{
 		float x = 0.00;
 		float y = 0.00;
 	};
-	 LTLACoordinates StageCoordinates[NumOfStagePositions];
-	 LTLACoordinates EllipseCoordinates[SKELETON_COUNT];
+	 LTLACoordinates stageCoordinates[numOfStagePositions];
+	 LTLACoordinates ellipseCoordinates[SKELETON_COUNT];
 
-	 enum { StageFront, StageRight, StageBack, StageLeft, NumOfStageSides };
+	 enum { stageFront, stageRight, stageBack, stageLeft, numOfStageSides };
 
 	// ScopedPointer<ValueTree> valueTree;
 	ValueTree valueTree;

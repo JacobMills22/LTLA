@@ -40,8 +40,7 @@ public:
 	void sliderValueChanged(Slider* slider) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	void labelTextChanged(Label* labelThatHasChanged) override;
-
-
+	
 	//==============================================================================
 	/** Command Manager Functions. Implemented in Source/Components/CommandManager.cpp */
 
@@ -58,15 +57,17 @@ public:
 	bool perform(const InvocationInfo& info) override;
 
 	/** Split Perform Functions, called when specific toolbar item is pressed.*/
-	void AddStageAreaIDPressed();
-	void EditStageAreasIDPressed();
-	void RemoveStageAreaIDPressed();
+	void addStageAreaIDPressed();
+	void editStageAreasIDPressed();
+	void removeStageAreaIDPressed();
 	void editAudioParametersPressed();
 
+	//==============================================================================
+
+	/** Sends performer data to the audio engine*/
 	void setAudioEngineData();
 
-
-
+	//==============================================================================
 
 	void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
 
@@ -79,20 +80,23 @@ public:
 	void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override;
 
 
+	//==============================================================================
+
+
 private:
 	//==============================================================================
 
-	LTLA_GUI GUI;
-	KinectTracker KinectSensor;
-	LTLAMenuBar MenuBar;
+	TrackingGUI trackingGUI;
+	KinectTracker kinectSensor;
+	LTLAMenuBar menuBar;
 	LTLAAudioEngine audioEngine;
 
-	ColourSelector AreaColourSelector{(ColourSelector::showColourspace), 4, 7 };
+	ColourSelector areaColourSelector{(ColourSelector::showColourspace), 4, 7 };
 	AudioDeviceSelectorComponent audioDeviceSelector;
 	Label areaNameLabel;
-	Label CalibrationCountDownLabel;
+	Label calibrationCountDownLabel;
 
-	enum TimerID { KinectUpdateTimer, GUITimer, CalibrationIntervalTimer, NumOfTimerIDs };
+	enum TimerID { kinectUpdateTimer, guiTimer, calibrationIntervalTimer, numOfTimerIDs };
 
 	double samplerate = 0;
 	int samplesPerBlock = 0;
@@ -100,10 +104,8 @@ private:
 	int oldAreaIDContainingPerfromer[2]; 
 
 	// Global Parameters
-	enum { SelectNextAreaButtonID, SelectPreviousAreaButtonID, numOfButtons};
-	TextButton GlobalButton[numOfButtons];
-	enum {StagePanningSliderID, numOfSliders};
-	Slider GlobalSliders[numOfSliders];
+	enum { selectNextAreaButtonID, selectPreviousAreaButtonID, numOfButtons};
+	TextButton globalButton[numOfButtons];
 
 	AudioMeter stereoAudioMeter;
 

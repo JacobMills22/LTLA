@@ -3,6 +3,8 @@
 
 	AutoPanner::AutoPanner() : autoPannerValueTree("autoPannerValueTree")
 	{
+		autoPannerValueTree.setProperty("EnableAutoPan", false, nullptr);
+
 		addAndMakeVisible(panningSlider);
 		panningSlider.setRange(0.0, 1.0, 0.01);
 		panningSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -13,12 +15,11 @@
 		enablePanButton.addListener(this);
 		enablePanButton.setToggleState(false, dontSendNotification);
 		enablePanButton.setButtonText("Auto Panning Disabled");
+		enablePanButton.getToggleStateValue().referTo(autoPannerValueTree.getPropertyAsValue("EnableAutoPan", nullptr));
 
 		addAndMakeVisible(resetPanButton);
 		resetPanButton.addListener(this);
 		resetPanButton.setButtonText("Reset");
-
-		autoPannerValueTree.setProperty("EnableAutoPan", false, nullptr);
 
 		startTimer(50);
 	}
@@ -62,12 +63,12 @@
 	void AutoPanner::resized()
 	{
 		float centreX = getWidth() * 0.5;
-		float centreY = getHeight() * 0.5;
-		float sliderWidth = getWidth() * 0.3;
+		float centreY = getHeight() * 0.4;
+		float sliderWidth = getWidth() * 0.2;
 
 		panningSlider.setBounds(centreX - (sliderWidth * 0.5), centreY - (sliderWidth * 0.7), sliderWidth, sliderWidth);
-		enablePanButton.setBounds(centreX - sliderWidth * 0.4, centreY - (sliderWidth * 0.85), sliderWidth * 1.5, sliderWidth * 0.25);
-		resetPanButton.setBounds(centreX - (sliderWidth * 0.25), centreY * 1.1, sliderWidth * 0.5, sliderWidth * 0.15);
+		enablePanButton.setBounds(centreX - sliderWidth * 0.4, centreY - (sliderWidth * 0.85), sliderWidth * 1.5, sliderWidth * 0.2);
+		resetPanButton.setBounds(centreX - (sliderWidth * 0.25), centreY * 1.25, sliderWidth * 0.5, sliderWidth * 0.15);
 	}
 
 	void AutoPanner::sliderValueChanged(Slider* slider) 
@@ -86,14 +87,12 @@
 			if (enablePanButton.getToggleState() == true)
 			{
 				enablePanButton.setButtonText("Auto Panning Enabled");
-				//enablePanState = true;
-				autoPannerValueTree.setProperty("EnableAutoPan", true, nullptr);
+				enablePanState = true;
 			}
 			else
 			{
 				enablePanButton.setButtonText("Auto Panning Disabled");
-				//enablePanState = false;
-				autoPannerValueTree.setProperty("EnableAutoPan", false, nullptr);
+				enablePanState = false;
 			}
 		}
 		else if (button == &resetPanButton)
@@ -112,7 +111,7 @@
 
 	void AutoPanner::setPanAmount(float value)
 	{
-		if (autoPannerValueTree.getPropertyAsValue("EnableAutoPan", nullptr) == true)
+		if (enablePanState == true)
 		{
 			panAmount = value;
 		}

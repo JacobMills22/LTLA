@@ -1,22 +1,6 @@
 
 #include "StageAreas.h"
 
-#define FrontLeftXValue stageAreaValueTree.getPropertyAsValue("FrontLeftX", nullptr).getValue()
-#define FrontLeftYValue stageAreaValueTree.getPropertyAsValue("FrontLeftY", nullptr).getValue()
-
-#define FrontRightXValue stageAreaValueTree.getPropertyAsValue("FrontRightX", nullptr).getValue()
-#define FrontRightYValue stageAreaValueTree.getPropertyAsValue("FrontRightY", nullptr).getValue()
-
-#define BackleftXValue stageAreaValueTree.getPropertyAsValue("BackLeftX", nullptr).getValue()
-#define BackLeftYValue stageAreaValueTree.getPropertyAsValue("BackLeftY", nullptr).getValue()
-
-#define BackRightXValue stageAreaValueTree.getPropertyAsValue("BackRightX", nullptr).getValue()
-#define BackRightYValue stageAreaValueTree.getPropertyAsValue("BackRightY", nullptr).getValue()
-
-#define CentreXValue stageAreaValueTree.getPropertyAsValue("CentreX", nullptr).getValue()
-#define CentreYValue stageAreaValueTree.getPropertyAsValue("CentreY", nullptr).getValue()
-
-
 StageArea::StageArea() : stageAreaValueTree("LTLAValueTree")
 {
 	//areaName = "New Area";
@@ -40,194 +24,179 @@ StageArea::StageArea() : stageAreaValueTree("LTLAValueTree")
 
 	stageAreaValueTree.setProperty("Active", true, nullptr);
 
+
+	areaPosition[frontLeft].x.referTo(stageAreaValueTree.getPropertyAsValue("FrontLeftX", nullptr));
+	areaPosition[frontLeft].y.referTo(stageAreaValueTree.getPropertyAsValue("FrontLeftY", nullptr));
+
+	areaPosition[frontRight].x.referTo(stageAreaValueTree.getPropertyAsValue("FrontRightX", nullptr));
+	areaPosition[frontRight].y.referTo(stageAreaValueTree.getPropertyAsValue("FrontRightY", nullptr));
+
+	areaPosition[backLeft].x.referTo(stageAreaValueTree.getPropertyAsValue("BackLeftX", nullptr));
+	areaPosition[backLeft].y.referTo(stageAreaValueTree.getPropertyAsValue("BackLeftY", nullptr));
+
+	areaPosition[backRight].x.referTo(stageAreaValueTree.getPropertyAsValue("BackRightX", nullptr));
+	areaPosition[backRight].y.referTo(stageAreaValueTree.getPropertyAsValue("BackRightY", nullptr));
+
+	areaPosition[centre].x.referTo(stageAreaValueTree.getPropertyAsValue("CentreX", nullptr));
+	areaPosition[centre].y.referTo(stageAreaValueTree.getPropertyAsValue("CentreY", nullptr));
+
+	areaName.referTo(stageAreaValueTree.getPropertyAsValue("AreaName", nullptr));
+
+	activeState.referTo(stageAreaValueTree.getPropertyAsValue("Active", nullptr));
+
 }
 
 StageArea::~StageArea()
 {
 }
 
-void StageArea::DrawArea(Graphics &g, bool Editmode)
+void StageArea::drawArea(Graphics &g, bool Editmode)
 {
-	AreaPath.clear();
+	areaPath.clear();
 
-	if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
+	if (activeState == true)
 	{
-
-		AreaPath.addQuadrilateral(FrontLeftXValue, FrontLeftYValue, FrontRightXValue, FrontRightYValue,
-			BackRightXValue, BackRightYValue, BackleftXValue, BackLeftYValue);
-
-		g.setColour(GetAreaColour());
-		g.fillPath(AreaPath);
+		areaPath.addQuadrilateral(areaPosition[frontLeft].x.getValue(), areaPosition[frontLeft].y.getValue(),
+			                      areaPosition[frontRight].x.getValue(), areaPosition[frontRight].y.getValue(),
+			                      areaPosition[backRight].x.getValue(), areaPosition[backRight].y.getValue(),
+			                      areaPosition[backLeft].x.getValue(), areaPosition[backLeft].y.getValue());
+		
+		g.setColour(getAreaColour());
+		g.fillPath(areaPath);
 
 		g.setColour(Colours::black);
 		g.setOpacity(1.0);
-		g.strokePath(AreaPath, PathStrokeType(1.0));
+		g.strokePath(areaPath, PathStrokeType(1.0));
 
 
 		if (Editmode == true)
 		{
 			g.setColour(Colours::white);
-			if (AreaPosition[FrontLeft].Selected == true) { g.setColour(Colours::cyan); }
-			g.drawRect((int)FrontLeftXValue - 5, (int)FrontLeftYValue - 5, 10, 10, 1.0);
+			if (areaPosition[frontLeft].selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)areaPosition[frontLeft].x.getValue() - 5, (int)areaPosition[frontLeft].y.getValue() - 5, 10, 10, 1.0);
 
 			g.setColour(Colours::white);
-			if (AreaPosition[FrontRight].Selected == true) { g.setColour(Colours::cyan); }
-			g.drawRect((int)FrontRightXValue - 5, (int)FrontRightYValue - 5, 10, 10, 1.0);
+			if (areaPosition[frontRight].selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)areaPosition[frontRight].x.getValue() - 5, (int)areaPosition[frontRight].y.getValue() - 5, 10, 10, 1.0);
 
 			g.setColour(Colours::white);
-			if (AreaPosition[BackLeft].Selected == true) { g.setColour(Colours::cyan); }
-			g.drawRect((int)BackleftXValue - 5, (int)BackLeftYValue - 5, 10, 10, 1.0);
+			if (areaPosition[backLeft].selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)areaPosition[backLeft].x.getValue() - 5, (int)areaPosition[backLeft].y.getValue() - 5, 10, 10, 1.0);
 
 			g.setColour(Colours::white);
-			if (AreaPosition[BackRight].Selected == true) { g.setColour(Colours::cyan); }
-			g.drawRect((int)BackRightXValue - 5, (int)BackRightYValue - 5, 10, 10, 1.0);
+			if (areaPosition[backRight].selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)areaPosition[backRight].x.getValue() - 5, (int)areaPosition[backRight].y.getValue() - 5, 10, 10, 1.0);
 
 			g.setColour(Colours::blue);
-			if (AreaPosition[Centre].Selected == true) { g.setColour(Colours::cyan); }
-			g.drawRect((int)CentreXValue - 5, (int)CentreYValue - 5, 10, 10, 1.0);
+			if (areaPosition[centre].selected == true) { g.setColour(Colours::cyan); }
+			g.drawRect((int)areaPosition[centre].x.getValue() - 5, (int)areaPosition[centre].y.getValue() - 5, 10, 10, 1.0);
 
 		}
 
 		if (areaSelectedState == true)
 		{
 			g.setColour(Colours::white);
-			g.strokePath(AreaPath, PathStrokeType(1.0));
+			g.strokePath(areaPath, PathStrokeType(1.0));
 		}
 	}
 }
 
-void StageArea::UpdateArea(int Corner, float X, float Y)
+void StageArea::updateArea(int corner, float x, float y)
 {
-	if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
+	if (activeState == true)
 	{
-		if (Corner == Centre)
+		if (corner == centre)
 		{
-			if (X >= 0 && X <= trackingGUIWidth)
+			if (x >= 0 && x <= trackingGUIWidth)
 			{
-				stageAreaValueTree.setProperty("CentreX", X, nullptr);
+				areaPosition[centre].x = x;
 
-				for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+				for (int corner = 0; corner < numOfAreaCorners - 1; corner++)
 				{
-					setX(corner, (X - AreaPosition[corner].differenceX));
+					setX(corner, (x - areaPosition[corner].differenceX));
 				}
 			}
 			else
 			{
-				X <= 0 ? stageAreaValueTree.setProperty("CentreX", 0.0, nullptr) : stageAreaValueTree.setProperty("CentreX", trackingGUIWidth, nullptr);
+				x <= 0 ? areaPosition[centre].x = 0.0 : areaPosition[centre].x = trackingGUIWidth;
 			}
 
-			if (Y >= 0 && Y <= trackingGUIHeight)
+			if (y >= 0 && y <= trackingGUIHeight)
 			{
-				stageAreaValueTree.setProperty("CentreY", Y, nullptr);
-
-				for (int corner = 0; corner < NumOfAreaCorners - 1; corner++)
+				areaPosition[centre].y = y;
+				
+				for (int corner = 0; corner < numOfAreaCorners - 1; corner++)
 				{
-					setY(corner, (Y - AreaPosition[corner].differenceY));
+					setY(corner, (y - areaPosition[corner].differenceY));
 				}
 			}
 			else
 			{
-				Y <= 0 ? stageAreaValueTree.setProperty("CentreY", 0.0, nullptr) : stageAreaValueTree.setProperty("CentreY", trackingGUIHeight, nullptr);
+				y <= 0 ? areaPosition[centre].y = 0.0 : areaPosition[centre].y = trackingGUIHeight;
 			}
 		}
 		else
 		{
-			if (X >= 0 && X <= trackingGUIWidth)
+			if (x >= 0 && x <= trackingGUIWidth)
 			{
-				setX(Corner, X);
-				stageAreaValueTree.setProperty("CentreX", AreaPath.getBounds().getCentreX(), nullptr);
+				areaPosition[corner].x = x;
+				areaPosition[centre].x = areaPath.getBounds().getCentreX();
 			}
 			else
 			{
-				X <= 0 ? setX(Corner, 0.0) : setX(Corner, trackingGUIWidth);
+				x <= 0 ? areaPosition[corner].x = 0.0 : areaPosition[corner].x = trackingGUIWidth;
 			}
 
-			if (Y >= 0 && Y <= trackingGUIHeight)
+			if (y >= 0 && y <= trackingGUIHeight)
 			{
-				setY(Corner, Y);
-				stageAreaValueTree.setProperty("CentreY", AreaPath.getBounds().getCentreY(), nullptr);
+				areaPosition[corner].y = y;
+				areaPosition[centre].y = areaPath.getBounds().getCentreY();
 			}
 			else
 			{
-				Y <= 0 ? setY(Corner, 0.0) : setY(Corner, trackingGUIHeight);
+				y <= 0 ? areaPosition[corner].y = 0.0 : areaPosition[corner].y = trackingGUIHeight;
 			}
 		}
 	}
 }
 
-float StageArea::GetX(int CornerID)
+float StageArea::getX(int CornerID)
 {
-	if (CornerID == FrontLeft)
-		return FrontLeftXValue;
-	else if (CornerID == FrontRight)
-		return FrontRightXValue;
-	else if (CornerID == BackRight)
-		return BackRightXValue;
-	else if (CornerID == BackLeft)
-		return BackleftXValue;
-	else if (CornerID == Centre)
-		return CentreXValue;
+	return areaPosition[CornerID].x.getValue();
 }
-float StageArea::GetY(int CornerID)
+float StageArea::getY(int CornerID)
 {
-	if (CornerID == FrontLeft)
-		return FrontLeftYValue;
-	else if (CornerID == FrontRight)
-		return FrontRightYValue;
-	else if (CornerID == BackRight)
-		return BackRightYValue;
-	else if (CornerID == BackLeft)
-		return BackLeftYValue;
-	else if (CornerID == Centre)
-		return CentreYValue;
+	return areaPosition[CornerID].y.getValue();
 }
 
 void StageArea::setX(int CornerID, float value)
 {
-	if (CornerID == FrontLeft)
-		stageAreaValueTree.setProperty("FrontLeftX", value, nullptr);
-	else if (CornerID == FrontRight)
-		stageAreaValueTree.setProperty("FrontRightX", value, nullptr);
-	else if (CornerID == BackRight)
-		stageAreaValueTree.setProperty("BackRightX", value, nullptr);
-	else if (CornerID == BackLeft)
-		stageAreaValueTree.setProperty("BackLeftX", value, nullptr);
-	else if (CornerID == Centre)
-		stageAreaValueTree.setProperty("CentreX", value, nullptr);
+	areaPosition[CornerID].x = value;
 }
 
 void StageArea::setY(int CornerID, float value)
 {
-	if (CornerID == FrontLeft)
-		stageAreaValueTree.setProperty("FrontLeftY", value, nullptr);
-	else if (CornerID == FrontRight)
-		stageAreaValueTree.setProperty("FrontRightY", value, nullptr);
-	else if (CornerID == BackRight)
-		stageAreaValueTree.setProperty("BackRightY", value, nullptr);
-	else if (CornerID == BackLeft)
-		stageAreaValueTree.setProperty("BackLeftY", value, nullptr);
-	else if (CornerID == Centre)
-		stageAreaValueTree.setProperty("CentreY", value, nullptr);
+	areaPosition[CornerID].y = value;
 }
 
 float StageArea::getDifferenceX(int CornerID)
 {
-	return AreaPosition[CornerID].differenceX;
+	return areaPosition[CornerID].differenceX;
 }
 
 float StageArea::getDifferenceY(int CornerID)
 {
-	return AreaPosition[CornerID].differenceY;
+	return areaPosition[CornerID].differenceY;
 }
 
 void StageArea::setDifferenceX(int cornerID, float value)
 {
-	AreaPosition[cornerID].differenceX = value;
+	areaPosition[cornerID].differenceX = value;
 }
 
 void StageArea::setDifferenceY(int cornerID, float value)
 {
-	AreaPosition[cornerID].differenceY = value;
+	areaPosition[cornerID].differenceY = value;
 }
 
 void StageArea::updateTrackingGUIWidthAndHeight(float width, float height)
@@ -236,46 +205,75 @@ void StageArea::updateTrackingGUIWidthAndHeight(float width, float height)
 	trackingGUIHeight = height;
 }
 
-Path StageArea::GetAreaPath()
+Path StageArea::getAreaPath()
 {
-	return AreaPath;
+	return areaPath;
 }
 
-void StageArea::SetCornerSelectedState(int Corner, bool State)
+void StageArea::setCornerSelectedState(int Corner, bool State)
 {
-	AreaPosition[Corner].Selected = State;
+	areaPosition[Corner].selected = State;
 }
-bool StageArea::GetCornerSelectedState(int Corner)
+bool StageArea::getCornerSelectedState(int Corner)
 {
-	return AreaPosition[Corner].Selected;
+	return areaPosition[Corner].selected;
 }
 
-void StageArea::SetAreaSelectedState(bool State)
+void StageArea::setAreaSelectedState(bool State)
 {
 	areaSelectedState = State;
 }
-bool StageArea::GetAreaSelectedState()
+bool StageArea::getAreaSelectedState()
 {
 	return areaSelectedState;
 }
 
-void StageArea::SetAreaColour(Colour colour)
+void StageArea::setAreaColour(Colour colour)
 {
-	AreaColour = colour;
+	areaColour = colour;
 }
 
-Colour StageArea::GetAreaColour()
+Colour StageArea::getAreaColour()
 {
-	return AreaColour;
+	return areaColour;
 }
 
 void StageArea::setAreaName(String name)
 {
-	stageAreaValueTree.setProperty("AreaName", name, nullptr);
+	areaName = name;
 }
 
 String StageArea::getAreaName()
 {	
-	return stageAreaValueTree.getPropertyAsValue("AreaName", nullptr).getValue();
+	return areaName.getValue();
 }
 
+ValueTree StageArea::getValueTree()
+{
+	return stageAreaValueTree;
+}
+
+void StageArea::setValueTreeChildIndex(int index)
+{
+	valueTreeChildIndex = index;
+}
+
+int StageArea::getValueTreeChildIndex()
+{
+	return valueTreeChildIndex;
+}
+
+void StageArea::setActive(bool state)
+{
+	stageAreaValueTree.setProperty("Active", state, nullptr);
+
+	if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
+	{
+		setVisible(false);
+	}
+}
+
+bool StageArea::getActiveState()
+{
+	return stageAreaValueTree.getPropertyAsValue("Active", nullptr).getValue();
+}

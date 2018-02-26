@@ -4,7 +4,8 @@
 #include "../AudioEngine/FilePlayer.h"
 #include "AutoPanner.h"
 #include "PerformerInput.h"
-#include "AutoFilter.h"
+#include "Filtering&EQ\AutoFilter.h"
+#include "Filtering&EQ\AutoEQ.h"
 
 
 class LTLAAudioPanel : public AudioSource,
@@ -33,26 +34,28 @@ public:
 /**	Button callback, opens and closes the audio panels various DSP modules*/
 	void buttonClicked(Button* button) override;
 
+/** Called when a combobox value is changed, for example the audio input is set here */
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-
-
+	
 /** Closes all of the panels of all the DSP modules (Not the audioPanel itself) */
 	void closeAllPanels();
 
+/** Tells the audio panel whether a performer is inside its corressponding areaID */
 	void setPerformerInsideAreaState(int performerNum, bool state);
 
+/** Returns true if a performer is inside the audio panels corressponding areaID */
 	bool getPerformerInsideAreaState(int performerNum);
 
+/** Sets the audio input ID */
 	void setAudioInputID(int ID);
 
+/** Gets the audio input ID */
 	int getAudioInputID();
 
 	// VALUE TREE
 
-	ValueTree getValueTree()
-	{
-		return audioPanelValueTree;
-	}
+/** Sets the valuetree for this class to use*/
+	ValueTree getValueTree();
 
 	// FILEPLAYER FUNCTIONS
 
@@ -65,6 +68,7 @@ public:
 /** Returns the performer option ID which will cause the fileplayer to trigger playback (Can be both performers) */
 	int getPerfromerToTrigger();
 
+/** Returns true if the file player is set to retrigger audio samples when a performer re-enters the area. */
 	bool getFilePlayerRetriggerState();
 
 /** Returns the option ID which determines whether audio playback will stop or continue when a performer exits the area*/
@@ -78,13 +82,8 @@ public:
 /** Sets the Auto-Panner Amount */
 	void setAutoPannerAmount(float value);
 
-	void snapshotFired()
-	{
-		inputComboBox.setSelectedId(audioPanelValueTree.getPropertyAsValue("InputSource", nullptr).getValue(), dontSendNotification);
-		filePlayer.snapshotFired();
-		autoPanner.snapshotFired();
-		autoFilter.snapshotFired();
-	}
+/** Called when a snapshot is fired and is used to uodate GUI parameters */
+	void snapshotFired();
 
 	enum { FilePlayerInput = 1, Performer1, Performer2 };
 
@@ -93,12 +92,13 @@ private:
 	FilePlayer filePlayer;
 	AutoPanner autoPanner;
 	AutoFilter autoFilter;
+	AutoEQ autoEQ;
 
 	ValueTree audioPanelValueTree;
 
 	ComboBox inputComboBox;
 
-	enum {buttonFilePlayerID, buttonAutoPannerID, buttonAutoFilterID, numOfButtons};
+	enum {buttonFilePlayerID, buttonAutoPannerID, buttonAutoFilterID, buttonAutoEQID, numOfButtons};
 	TextButton audioPanelButton[numOfButtons];
 
 	int currentlySelectedAreaID = 0;

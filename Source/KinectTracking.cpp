@@ -2,19 +2,19 @@
 #include "KinectTracking.h"
 
 // Call StartKinectST once at application start.
-HRESULT KinectTracker::StartKinectST()
+HRESULT KinectTracker::startKinectST()
 {
 	// Initialise all Location Data.
 	for (int i = 0; i < NUI_SKELETON_COUNT; ++i)
 	{
-		PerformerData[i].Coordinates.x = 0.00;
-		PerformerData[i].Coordinates.y = 0.00;
+		performerData[i].coordinates.x = 0.00;
+		performerData[i].coordinates.y = 0.00;
 	}
 
 	m_hNextSkeletonEvent = NULL;
 
 	// Initialize m_pNuiSensor
-	HRESULT hr = CreateFirstConnected();
+	HRESULT hr = createFirstConnected();
 	if (SUCCEEDED(hr))
 	{
 		// Initialize the Kinect and specify that we'll be using skeleton
@@ -32,7 +32,7 @@ HRESULT KinectTracker::StartKinectST()
 }
 
 // Call UpdateKinectST on each iteration of the application's update loop.
-void KinectTracker::UpdateKinectST()
+void KinectTracker::updateKinectST()
 {
 	// Wait for 0ms, just quickly test if it is time to process a skeleton
 	if (WAIT_OBJECT_0 == WaitForSingleObject(m_hNextSkeletonEvent, 0))
@@ -43,13 +43,13 @@ void KinectTracker::UpdateKinectST()
 		if (SUCCEEDED(m_pNuiSensor->NuiSkeletonGetNextFrame(0, &skeletonFrame)))
 		{
 			// Process the skeleton frame
-			SetSkeletonPositionData(&skeletonFrame);
+			setSkeletonPositionData(&skeletonFrame);
 		}
 	}
 }
 
 // Called in StartKinectST
-HRESULT KinectTracker::CreateFirstConnected()
+HRESULT KinectTracker::createFirstConnected()
 {
 	INuiSensor * pNuiSensor;
 
@@ -107,59 +107,59 @@ HRESULT KinectTracker::CreateFirstConnected()
 }
 
 // Called in UpdateKinectST
-void KinectTracker::SetSkeletonPositionData(NUI_SKELETON_FRAME* pSkeletonFrame)
+void KinectTracker::setSkeletonPositionData(NUI_SKELETON_FRAME* pSkeletonFrame)
 {
 	// Since the kinect can identify 6 skeletons, the application needs to test each skeleton slot.
-	for (int CurrentSkel = 0; CurrentSkel < NUI_SKELETON_COUNT; ++CurrentSkel)
+	for (int currentSkel = 0; currentSkel < NUI_SKELETON_COUNT; ++currentSkel)
 	{
 		// If the current slot is tracking a skeleton.
-		if (pSkeletonFrame->SkeletonData[CurrentSkel].eTrackingState == NUI_SKELETON_TRACKED)
+		if (pSkeletonFrame->SkeletonData[currentSkel].eTrackingState == NUI_SKELETON_TRACKED)
 		{
 			// If the first performer was not being tracked, and the current slot isn't being used by the second perfromer.
-			if (PerformerData[0].TrackingState == false && CurrentSkel != SecondSkeleton)
+			if (performerData[0].trackingState == false && currentSkel != secondSkeleton)
 			{
-				FirstSkeleton = CurrentSkel; // Store the slot number in FirstSkeleton
-				PerformerData[0].TrackingState = true; // Set the first performers tracking state.
+				firstSkeleton = currentSkel; // Store the slot number in FirstSkeleton
+				performerData[0].trackingState = true; // Set the first performers tracking state.
 			}
 			// If the second performer was not being tracked, and the current slot isn't being used by the first perfromer.
-			if (PerformerData[1].TrackingState == false && CurrentSkel != FirstSkeleton)
+			if (performerData[1].trackingState == false && currentSkel != firstSkeleton)
 			{
-				SecondSkeleton = CurrentSkel; // Store the slot number in SecondSkeleton
-				PerformerData[1].TrackingState = true; // Set the Second performers tracking state.
+				secondSkeleton = currentSkel; // Store the slot number in SecondSkeleton
+				performerData[1].trackingState = true; // Set the Second performers tracking state.
 			}
 			// Store coordinates for both performers, taken from the currently tracked slots. 
-			PerformerData[0].Coordinates = pSkeletonFrame->SkeletonData[FirstSkeleton].Position;
-			PerformerData[1].Coordinates = pSkeletonFrame->SkeletonData[SecondSkeleton].Position;
+			performerData[0].coordinates = pSkeletonFrame->SkeletonData[firstSkeleton].Position;
+			performerData[1].coordinates = pSkeletonFrame->SkeletonData[secondSkeleton].Position;
 		}
 		// Else if the current slot is not tracking a skeleton.
-		else if (pSkeletonFrame->SkeletonData[CurrentSkel].eTrackingState == NUI_SKELETON_NOT_TRACKED)
+		else if (pSkeletonFrame->SkeletonData[currentSkel].eTrackingState == NUI_SKELETON_NOT_TRACKED)
 		{	
 			// If the slot is being used to track the first performer
-			if (CurrentSkel == FirstSkeleton)
+			if (currentSkel == firstSkeleton)
 			{
-				PerformerData[0].TrackingState = false;
-				FirstSkeleton = -1;
+				performerData[0].trackingState = false;
+				firstSkeleton = -1;
 			}
 			// If the slot is being used to track the second performer
-			else if (CurrentSkel == SecondSkeleton)
+			else if (currentSkel == secondSkeleton)
 			{
-				PerformerData[1].TrackingState = false; 
-				SecondSkeleton = -1; 
+				performerData[1].trackingState = false; 
+				secondSkeleton = -1; 
 			}
 		}
 	}
 }
 
-float KinectTracker::GetX(int SkeletonNum)
+float KinectTracker::getX(int SkeletonNum)
 {
-	return PerformerData[SkeletonNum].Coordinates.x + 1.0;
+	return performerData[SkeletonNum].coordinates.x + 1.0;
 }
-float KinectTracker::GetY(int SkeletonNum)
+float KinectTracker::getY(int SkeletonNum)
 {
-	return PerformerData[SkeletonNum].Coordinates.z - 1.0;
+	return performerData[SkeletonNum].coordinates.z - 1.0;
 }
 
-bool KinectTracker::GetKinectTrackingState(int SkeletonNum)
+bool KinectTracker::getKinectTrackingState(int SkeletonNum)
 {
-	return PerformerData[SkeletonNum].TrackingState;
+	return performerData[SkeletonNum].trackingState;
 }

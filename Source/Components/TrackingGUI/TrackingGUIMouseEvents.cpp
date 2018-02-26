@@ -2,40 +2,40 @@
 #include "TrackingGUI.h"
 
 
-void LTLA_GUI::mouseDown(const MouseEvent &event)
+void TrackingGUI::mouseDown(const MouseEvent &event)
 {
-	if (GetStageEditState() == true)
+	if (getStageEditState() == true)
 	{
-		for (int Corner = 0; Corner < MainStageArea.NumOfAreaCorners; Corner++)
+		for (int corner = 0; corner < mainStageArea.numOfAreaCorners; corner++)
 		{
-			if (event.getMouseDownX() <= MainStageArea.GetX(Corner) + 10 && event.getMouseDownX() >= MainStageArea.GetX(Corner) - 10)
+			if (event.getMouseDownX() <= mainStageArea.getX(corner) + 10 && event.getMouseDownX() >= mainStageArea.getX(corner) - 10)
 			{
-				if (event.getMouseDownY() <= MainStageArea.GetY(Corner) + 10 && event.getMouseDownY() >= MainStageArea.GetY(Corner) - 10)
+				if (event.getMouseDownY() <= mainStageArea.getY(corner) + 10 && event.getMouseDownY() >= mainStageArea.getY(corner) - 10)
 				{
-					MainStageArea.SetCornerSelectedState(Corner, true);
-					for (int corner = 0; corner < NumOfStagePositions - 1; corner++)
+					mainStageArea.setCornerSelectedState(corner, true);
+					for (int corner = 0; corner < numOfStagePositions - 1; corner++)
 					{
-						MainStageArea.setDifferenceX(corner, MainStageArea.GetX(Centre) - MainStageArea.GetX(corner));
-						MainStageArea.setDifferenceY(corner, MainStageArea.GetY(Centre) - MainStageArea.GetY(corner));
+						mainStageArea.setDifferenceX(corner, mainStageArea.getX(centre) - mainStageArea.getX(corner));
+						mainStageArea.setDifferenceY(corner, mainStageArea.getY(centre) - mainStageArea.getY(corner));
 					}
 					break;
 				}
 			}
 		}
 	}
-	else if (GetStageAreaEditState() == true)
+	else if (getStageAreaEditState() == true)
 	{
-		for (int Corner = 0; Corner < StageAreas[GetCurrentlySelectedArea()]->NumOfAreaCorners; Corner++)
+		for (int corner = 0; corner < stageAreas[getCurrentlySelectedArea()]->numOfAreaCorners; corner++)
 		{
-			if (event.getMouseDownX() <= StageAreas[SelectedAreaIndex]->GetX(Corner) + 10 && event.getMouseDownX() >= StageAreas[SelectedAreaIndex]->GetX(Corner) - 10 &&
-				event.getMouseDownY() <= StageAreas[SelectedAreaIndex]->GetY(Corner) + 10 && event.getMouseDownY() >= StageAreas[SelectedAreaIndex]->GetY(Corner) - 10)
+			if (event.getMouseDownX() <= stageAreas[selectedAreaIndex]->getX(corner) + 10 && event.getMouseDownX() >= stageAreas[selectedAreaIndex]->getX(corner) - 10 &&
+				event.getMouseDownY() <= stageAreas[selectedAreaIndex]->getY(corner) + 10 && event.getMouseDownY() >= stageAreas[selectedAreaIndex]->getY(corner) - 10)
 			{
-				StageAreas[SelectedAreaIndex]->SetCornerSelectedState(Corner, true);
+				stageAreas[selectedAreaIndex]->setCornerSelectedState(corner, true);
 
-				for (int corner = 0; corner < NumOfStagePositions - 1; corner++)
+				for (int corner = 0; corner < numOfStagePositions - 1; corner++)
 				{
-					StageAreas[SelectedAreaIndex]->setDifferenceX(corner, StageAreas[SelectedAreaIndex]->GetX(Centre) - StageAreas[SelectedAreaIndex]->GetX(corner));
-					StageAreas[SelectedAreaIndex]->setDifferenceY(corner, StageAreas[SelectedAreaIndex]->GetY(Centre) - StageAreas[SelectedAreaIndex]->GetY(corner));
+					stageAreas[selectedAreaIndex]->setDifferenceX(corner, stageAreas[selectedAreaIndex]->getX(centre) - stageAreas[selectedAreaIndex]->getX(corner));
+					stageAreas[selectedAreaIndex]->setDifferenceY(corner, stageAreas[selectedAreaIndex]->getY(centre) - stageAreas[selectedAreaIndex]->getY(corner));
 				}
 				break;
 			}
@@ -44,65 +44,65 @@ void LTLA_GUI::mouseDown(const MouseEvent &event)
 
 }
 
-void LTLA_GUI::mouseDoubleClick(const MouseEvent & event)
+void TrackingGUI::mouseDoubleClick(const MouseEvent & event)
 {
-	if (GetStageAreaEditState() == true)
+	if (getStageAreaEditState() == true)
 	{
-		for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+		for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)
 		{
-			if (StageAreas[AreaIndex]->GetAreaPath().contains(event.x, event.y) == true)
+			if (stageAreas[areaIndex]->getAreaPath().contains(event.x, event.y) == true)
 			{
-				if (StageAreas[AreaIndex]->GetAreaPath().contains(event.x, event.y) == true)
+				if (stageAreas[areaIndex]->getAreaPath().contains(event.x, event.y) == true)
 				{
-					SetCurrentlySelectedArea(AreaIndex);
+					setCurrentlySelectedArea(areaIndex);
 				}
 			}
 		}
 	}	
 }
 
-void LTLA_GUI::mouseDrag(const MouseEvent& event)
+void TrackingGUI::mouseDrag(const MouseEvent& event)
 {
-	if (StageEditState == true)
+	if (stageEditState == true)
 	{
-		for (int Corner = 0; Corner < MainStageArea.NumOfAreaCorners; Corner++)
+		for (int corner = 0; corner < mainStageArea.numOfAreaCorners; corner++)
 		{
-			if (MainStageArea.GetCornerSelectedState(Corner) == true)
+			if (mainStageArea.getCornerSelectedState(corner) == true)
 			{
-				MainStageArea.UpdateArea(Corner, event.x, event.y);
+				mainStageArea.updateArea(corner, event.x, event.y);
 			}
 		}
 	}
-	else if (GetStageAreaEditState() == true)
+	else if (getStageAreaEditState() == true)
 	{
-		for (int Corner = 0; Corner < StageAreas[SelectedAreaIndex]->NumOfAreaCorners; Corner++)
+		for (int corner = 0; corner < stageAreas[selectedAreaIndex]->numOfAreaCorners; corner++)
 		{
-			if (StageAreas[SelectedAreaIndex]->GetCornerSelectedState(Corner) == true)
+			if (stageAreas[selectedAreaIndex]->getCornerSelectedState(corner) == true)
 			{
-				StageAreas[SelectedAreaIndex]->UpdateArea(Corner, event.x, event.y);
+				stageAreas[selectedAreaIndex]->updateArea(corner, event.x, event.y);
 				break;
 			}
 		}
 	}
 }
 
-void LTLA_GUI::mouseUp(const MouseEvent& event)
+void TrackingGUI::mouseUp(const MouseEvent& event)
 {
-	if (StageEditState == true)
+	if (stageEditState == true)
 	{
-		for (int Corner = 0; Corner < MainStageArea.NumOfAreaCorners; Corner++)
+		for (int corner = 0; corner < mainStageArea.numOfAreaCorners; corner++)
 		{
-			MainStageArea.SetCornerSelectedState(Corner, false);
+			mainStageArea.setCornerSelectedState(corner, false);
 		}
 	}
 
-	if (GetStageAreaEditState() == true)
+	if (getStageAreaEditState() == true)
 	{
-		for (int AreaIndex = 0; AreaIndex < StageAreas.size(); AreaIndex++)
+		for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)
 		{
-			for (int Corner = 0; Corner < StageAreas[AreaIndex]->NumOfAreaCorners; Corner++)
+			for (int corner = 0; corner < stageAreas[areaIndex]->numOfAreaCorners; corner++)
 			{
-				StageAreas[AreaIndex]->SetCornerSelectedState(Corner, false);
+				stageAreas[areaIndex]->setCornerSelectedState(corner, false);
 			}
 		}
 	}
