@@ -162,8 +162,6 @@ public:
 			g.fillRect(eqInvisibleBorder[0]);
 			g.fillRect(eqInvisibleBorder[1]);
 			g.fillRect(eqInvisibleBorder[2]);
-
-
 		}
 
 		void sliderValueChanged(Slider* slider) override
@@ -177,13 +175,11 @@ public:
 						double cutoffValue = (frequencySlider.getValue() - 0.0) / (20000.0 - 0.0);
 						eqBand[band].bandPassFilter.setFirstCoefficient(cutoffValue);
 						eqBand[band].uiCentreFreqModifier = cutoffValue;
-						eqBand[band].bandPassFilter.printCutOffFreqInHz(48000);
 						eqBand[band].sliderValues.frequency = frequencySlider.getValue();
 					}
 					else if (slider == &bandWidthSlider)
 					{
 						eqBand[band].bandPassFilter.setBandWidth(bandWidthSlider.getValue());
-						eqBand[band].bandPassFilter.printBandWidthInHz();
 						eqBand[band].uiBandWidthModifier = bandWidthSlider.getValue() - 0.0000001 / (0.5 - 0.0000001);
 						eqBand[band].sliderValues.bandwidth = bandWidthSlider.getValue();
 

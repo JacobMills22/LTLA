@@ -12,54 +12,108 @@ public:
 		float* outputL = buffer.getWritePointer(0);
 		float* outputR = buffer.getWritePointer(1);
 
-		secondCoefficient = 1.0 - firstCoefficient;
-
+		const float* inputL = buffer.getReadPointer(0);
+		const float* inputR = buffer.getReadPointer(1);
+		
 		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 		{
-			outputL[sample] *= secondCoefficient;
-			outputR[sample] *= secondCoefficient;
+			outputL[sample] = (coefficientA0 * inputL[sample]) + (coefficientA1 * delayedSampleX1L) + (coefficientA2 * delayedSampleX2L)
+				                                               - (coefficientB1 * delayedSampleY1L) - (coefficientB2 * delayedSampleY2L);
 
-			previousSampleL *= firstCoefficient;
-			previousSampleR *= firstCoefficient;
+			outputR[sample] = (coefficientA0 * inputR[sample]) + (coefficientA1 * delayedSampleX1R) + (coefficientA2 * delayedSampleX2R)
+				                                               - (coefficientB1 * delayedSampleY1R) - (coefficientB2 * delayedSampleY2R);
 
-			outputL[sample] += previousSampleL;
-			outputR[sample] += previousSampleR;
+			delayedSampleX2L = delayedSampleX1L;
+			delayedSampleX1L = inputL[sample];
 
-			previousSampleL = outputL[sample];
-			previousSampleR = outputR[sample];
+			delayedSampleY2L = delayedSampleY1L;
+			delayedSampleY1L = outputL[sample];
+
+			delayedSampleX2R = delayedSampleX1R;
+			delayedSampleX1R = inputR[sample];
+
+			delayedSampleY2R = delayedSampleY1R;
+			delayedSampleY1R = outputR[sample];
+
 		}
 	}
 
-	void setFirstCoefficient(float value)
+	void setCutoffinHz(double cutoff, double sampleRate, double Qfactor)
 	{
-		firstCoefficient = value;
-		secondCoefficient = 1.0 - firstCoefficient;
+
+		if (filterType == lowpass)
+		{
+			double omega = (double_Pi * 2.0 * cutoff) / sampleRate;
+
+			coefficientB2 = (2.0 * Qfactor - sin(omega)) / (2.0 * Qfactor + sin(omega));
+
+			coefficientB1 = -(1.0 + coefficientB2) * cos(omega);
+
+			coefficientA0 = 0.25 * (1.0 + coefficientB1 + coefficientB2);
+			coefficientA1 = 2.0 * coefficientA0;
+			coefficientA2 = coefficientA0;
+		}
+		else if (filterType == highpass)
+		{
+			double omega = (double_Pi * 2.0 * cutoff) / sampleRate;
+
+			coefficientB2 = (2.0 * Qfactor - sin(omega)) / (2.0 * Qfactor + sin(omega));
+
+			coefficientB1 = -(1.0 + coefficientB2) * cos(omega);
+
+			coefficientA0 = 0.25 * (1.0 - coefficientB1 + coefficientB2);
+			coefficientA1 = -(2.0 * coefficientA0);
+			coefficientA2 = coefficientA0;
+		}
 	}
 
-	float getFirstCoefficient()
+	void makeLowPass()
 	{
-		return firstCoefficient;
+		filterType = lowpass;
 	}
 
-	float getSecondCoefficient()
+	void makeHighPass()
 	{
-		return secondCoefficient;
+		filterType = highpass;
 	}
 
 private:
 
-	float previousSampleL = 0.0;
-	float previousSampleR = 0.0;
+	double coefficientB1 = 0.0;
+	double coefficientB2 = 0.0;
+	double coefficientA0 = 0.0;
+	double coefficientA1 = 0.0;
+	double coefficientA2 = 0.0;
 
-	float firstCoefficient = 0.1;
-	float secondCoefficient = 1.0;
+	double delayedSampleX1L = 0.0;
+	double delayedSampleY1L = 0.0;
 
+	double delayedSampleX1R = 0.0;
+	double delayedSampleY1R = 0.0;
+
+	double delayedSampleX2L = 0.0;
+	double delayedSampleY2L = 0.0;
+
+	double delayedSampleX2R = 0.0;
+	double delayedSampleY2R = 0.0;
+
+	enum { lowpass, highpass };
+	int filterType = lowpass;
+	
 };
 
 class LowpassIIRFilter
 {
 
 public:
+
+	LowpassIIRFilter()
+	{
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].makeLowPass();
+		}
+	}
 
 	void process(AudioSampleBuffer &buffer)
 	{
@@ -69,26 +123,18 @@ public:
 		}
 	}
 
-	void setFirstCoefficient(float value)
+	void setCutoff(double cutoff, double sampleRate, double qFactor)
 	{
 		for (int filterID = 0; filterID < numOfFilters; filterID++)
 		{
-			filterSeries[filterID].setFirstCoefficient(value);
+			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor);
 		}
 	}
-
-	double calculateCutoff(float sampleRate)
-	{
-		double cutoff = 0.0;
-		cutoff = acos(1.0 - ((filterSeries[0].getFirstCoefficient() * filterSeries[0].getFirstCoefficient()) / (2.0 * filterSeries[0].getSecondCoefficient()))) * (sampleRate / (double_Pi * 2.0));
-		return cutoff;
-	}
-
+	
 private:
 
 	enum { numOfFilters = 3 };
 	FilterProcess filterSeries[numOfFilters];
-
 };
 
 class HighpassIIRFilter
@@ -96,45 +142,34 @@ class HighpassIIRFilter
 
 public:
 
-	void prepareToPlay(int samplesPerBlockExpected, double sampleRate)
+	HighpassIIRFilter()
 	{
-		rawInputBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].makeHighPass();
+		}
 	}
 
 	void process(AudioSampleBuffer &buffer)
 	{
-		rawInputBuffer.makeCopyOf(buffer, false);
-
-		lowpassFilter.process(buffer);
-
-		float* outputL = buffer.getWritePointer(0);
-		float* outputR = buffer.getWritePointer(1);
-
-		float* rawInputL = rawInputBuffer.getWritePointer(0);
-		float* rawInputR = rawInputBuffer.getWritePointer(1);
-
-		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
 		{
-			outputL[sample] = rawInputL[sample] - outputL[sample];
-			outputR[sample] = rawInputR[sample] - outputR[sample];
+			filterSeries[filterID].process(buffer);
 		}
 	}
 
-	void setFirstCoefficient(float value)
+	void setCutoff(double cutoff, double sampleRate, double qFactor)
 	{
-		lowpassFilter.setFirstCoefficient(value);
-	}
-
-	double calculateCutoff(float sampleRate)
-	{
-		return lowpassFilter.calculateCutoff(sampleRate);
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor);
+		}
 	}
 
 private:
 
-	LowpassIIRFilter lowpassFilter;
-	AudioSampleBuffer rawInputBuffer;
-
+	enum { numOfFilters = 3 };
+	FilterProcess filterSeries[numOfFilters];
 };
 
 class BandPassFilter
@@ -151,8 +186,8 @@ public:
 	void setFirstCoefficient(float value)
 	{
 		firstCoefficient = value;
-		lowpassFilter.setFirstCoefficient(value - bandWidth);
-		highpassFilter.setFirstCoefficient(value + bandWidth);
+	//	lowpassFilter.setFirstCoefficient(value - bandWidth);
+	//	highpassFilter.setFirstCoefficient(value + bandWidth);
 	}
 
 	void setBandWidth(float value)
@@ -169,16 +204,6 @@ public:
 	float getBandWidth()
 	{
 		return bandWidth;
-	}
-
-	void printBandWidthInHz()
-	{
-		DBG("Band Width is between " + (String)lowpassFilter.calculateCutoff(48000) + " and " + (String)highpassFilter.calculateCutoff(48000));
-	}
-
-	void printCutOffFreqInHz(float sampleRate)
-	{
-		DBG((String)lowpassFilter.calculateCutoff(sampleRate));
 	}
 
 private:

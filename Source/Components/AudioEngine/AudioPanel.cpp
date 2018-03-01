@@ -48,6 +48,7 @@
 		autoPanner.prepareToPlay(samplesPerBlockExpected, sampleRate);
 
 		//autoFilter.initialise(sampleRate);
+		autoFilter.setSampleRate(sampleRate);
 	}
 
 	void LTLAAudioPanel::releaseResources()
