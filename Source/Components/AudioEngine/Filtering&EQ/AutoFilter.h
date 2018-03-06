@@ -30,9 +30,7 @@ public:
 			 qFactorSlider[filterNum].setTextBoxStyle(Slider::TextBoxBelow, false, cutoffSlider[filterNum].getWidth() * 0.5, 30);
 
 		}
-
 		
-
 		cutoffSlider[highPassID].setRange(0.0, 10000, 10.0);
 
 		cutoffSlider[lowPassID].setValue(1.0);

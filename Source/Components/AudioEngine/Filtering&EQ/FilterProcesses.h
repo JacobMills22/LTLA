@@ -38,7 +38,7 @@ public:
 		}
 	}
 
-	void setCutoffinHz(double cutoff, double sampleRate, double Qfactor)
+	void setCutoffinHz(double cutoff, double sampleRate, double Qfactor, double gain)
 	{
 
 		if (filterType == lowpass)
@@ -65,6 +65,34 @@ public:
 			coefficientA1 = -(2.0 * coefficientA0);
 			coefficientA2 = coefficientA0;
 		}
+		else if (filterType == bandpass)
+		{
+			double omega = (double_Pi * 2.0 * cutoff) / sampleRate;
+
+			coefficientB2 = tan((double_Pi / 4) - (omega / (2.0 * Qfactor)));
+
+			coefficientB1 = -(1.0 + coefficientB2) * cos(omega);
+
+			coefficientA0 = 0.5 * (1.0 - coefficientB2);
+			coefficientA1 = 0.0;
+			coefficientA2 = -coefficientA0;
+		}
+		else if (filterType == peaking)
+		{
+			double omega = (double_Pi * 2.0 * cutoff) / sampleRate;
+			double g0 = 0.5 * (pow(10.0, (gain / 20)) - 1.0);
+			double g1 = 2.0 / (1.0 + g0);
+
+			coefficientB2 = (1.0 - g1 * tan(omega / (2.0 * Qfactor))) / (1.0 + g1 * tan(omega / (2.0 * Qfactor)));
+			coefficientB1 = -(1.0 + coefficientB2) * cos(omega);
+
+			coefficientA0 = 1.0 + g0 * (1.0 - coefficientB2);
+			coefficientA1 = coefficientB1;
+			coefficientA2 = 1.0 + (coefficientB2 - coefficientA0);
+
+			DBG("F = " + (String)cutoff + " Q = " + (String)Qfactor + " G = " + (String)gain);
+
+		}
 	}
 
 	void makeLowPass()
@@ -75,6 +103,16 @@ public:
 	void makeHighPass()
 	{
 		filterType = highpass;
+	}
+
+	void makeBandPass()
+	{
+		filterType = bandpass;
+	}
+
+	void makePeaking()
+	{
+		filterType = peaking;
 	}
 
 private:
@@ -97,7 +135,7 @@ private:
 	double delayedSampleX2R = 0.0;
 	double delayedSampleY2R = 0.0;
 
-	enum { lowpass, highpass };
+	enum { lowpass, highpass, bandpass, peaking};
 	int filterType = lowpass;
 	
 };
@@ -127,7 +165,7 @@ public:
 	{
 		for (int filterID = 0; filterID < numOfFilters; filterID++)
 		{
-			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor);
+			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor, 0.0);
 		}
 	}
 	
@@ -162,7 +200,7 @@ public:
 	{
 		for (int filterID = 0; filterID < numOfFilters; filterID++)
 		{
-			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor);
+			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor, 0.0);
 		}
 	}
 
@@ -177,40 +215,67 @@ class BandPassFilter
 
 public:
 
+	BandPassFilter()
+	{
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].makeBandPass();
+		}
+	}
+
 	void process(AudioSampleBuffer &buffer)
 	{
-		lowpassFilter.process(buffer);
-		highpassFilter.process(buffer);
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].process(buffer);
+		}
 	}
 
-	void setFirstCoefficient(float value)
+	void setCutoff(double cutoff, double sampleRate, double qFactor)
 	{
-		firstCoefficient = value;
-	//	lowpassFilter.setFirstCoefficient(value - bandWidth);
-	//	highpassFilter.setFirstCoefficient(value + bandWidth);
-	}
-
-	void setBandWidth(float value)
-	{
-		bandWidth = value;
-		setFirstCoefficient(firstCoefficient);
-	}
-
-	float getFirstCoefficient()
-	{
-		return firstCoefficient;
-	}
-
-	float getBandWidth()
-	{
-		return bandWidth;
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor, 0.0);
+		}
 	}
 
 private:
 
-	LowpassIIRFilter lowpassFilter;
-	HighpassIIRFilter highpassFilter;
+	enum { numOfFilters = 3 };
+	FilterProcess filterSeries[numOfFilters];
+};
 
-	float bandWidth = 0.001;
-	float firstCoefficient = 0.0;
+class PeakingFilter
+{
+
+public:
+
+	PeakingFilter()
+	{
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].makePeaking();
+		}
+	}
+
+	void process(AudioSampleBuffer &buffer)
+	{
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].process(buffer);
+		}
+	}
+
+	void setCutoff(double cutoff, double sampleRate, double qFactor, double gain)
+	{
+		for (int filterID = 0; filterID < numOfFilters; filterID++)
+		{
+			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor, gain);
+		}
+	}
+
+private:
+
+	enum { numOfFilters = 1 };
+	FilterProcess filterSeries[numOfFilters];
 };

@@ -6,6 +6,7 @@
 #include "PerformerInput.h"
 #include "Filtering&EQ\AutoFilter.h"
 #include "Filtering&EQ\AutoEQ.h"
+#include "Delay&Reverb\AutoReverb.h"
 
 
 class LTLAAudioPanel : public AudioSource,
@@ -93,12 +94,12 @@ private:
 	AutoPanner autoPanner;
 	AutoFilter autoFilter;
 	AutoEQ autoEQ;
-
+	AutoReverb autoReverb;
 	ValueTree audioPanelValueTree;
 
 	ComboBox inputComboBox;
 
-	enum {buttonFilePlayerID, buttonAutoPannerID, buttonAutoFilterID, buttonAutoEQID, numOfButtons};
+	enum {buttonFilePlayerID, buttonAutoPannerID, buttonAutoFilterID, buttonAutoEQID, buttonAutoReverbID, numOfButtons};
 	TextButton audioPanelButton[numOfButtons];
 
 	int currentlySelectedAreaID = 0;

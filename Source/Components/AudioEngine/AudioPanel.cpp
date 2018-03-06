@@ -10,6 +10,7 @@
 		addAndMakeVisible(autoPanner);
 		addAndMakeVisible(autoFilter);
 		addAndMakeVisible(autoEQ);
+		addAndMakeVisible(autoReverb);
 
 		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
 		{
@@ -21,6 +22,7 @@
 		audioPanelButton[buttonAutoPannerID].setButtonText("AutoPanner");
 		audioPanelButton[buttonAutoFilterID].setButtonText("Filters");
 		audioPanelButton[buttonAutoEQID].setButtonText("EQ");
+		audioPanelButton[buttonAutoReverbID].setButtonText("Reverb");
 
 		addAndMakeVisible(inputComboBox);
 		inputComboBox.addItem("File Player", 1);
@@ -33,6 +35,8 @@
 		autoPanner.closePanel();
 		autoFilter.closePanel();
 		autoEQ.closePanel();
+		autoReverb.closePanel();
+
 
 		audioPanelValueTree.setProperty("InputSource", FilePlayerInput, nullptr);
 
@@ -49,6 +53,7 @@
 
 		//autoFilter.initialise(sampleRate);
 		autoFilter.setSampleRate(sampleRate);
+		autoReverb.prepareToPlay(samplesPerBlockExpected, sampleRate);
 	}
 
 	void LTLAAudioPanel::releaseResources()
@@ -73,6 +78,7 @@
 			filePlayer.getNextAudioBlock(bufferToFill);
 			autoFilter.process(*bufferToFill.buffer);
 			autoEQ.process(*bufferToFill.buffer);
+			autoReverb.process(*bufferToFill.buffer);
 		}
 	}
 
@@ -82,6 +88,7 @@
 		audioPanelButton[buttonAutoPannerID].setBounds(audioPanelButton[buttonFilePlayerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoFilterID].setBounds(audioPanelButton[buttonAutoPannerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoEQID].setBounds(audioPanelButton[buttonAutoFilterID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
+		audioPanelButton[buttonAutoReverbID].setBounds(audioPanelButton[buttonAutoEQID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 
 		
 		inputComboBox.setBounds(5, getHeight() * 0.08, getWidth() * 0.15, getHeight() * 0.1);
@@ -89,6 +96,8 @@
 		autoPanner.setBounds(filePlayer.getBounds());
 		autoFilter.setBounds(filePlayer.getBounds());
 		autoEQ.setBounds(filePlayer.getBounds());
+		autoReverb.setBounds(filePlayer.getBounds());
+
 	}
 
 	void LTLAAudioPanel::buttonClicked(Button* button)
@@ -111,10 +120,15 @@
 			audioPanelButton[buttonAutoFilterID].setToggleState(!audioPanelButton[buttonAutoFilterID].getToggleState(), dontSendNotification);
 			audioPanelButton[buttonAutoFilterID].getToggleState() == false ? autoFilter.closePanel() : autoFilter.openPanel();
 		}
-		else if (button == &audioPanelButton[buttonAutoEQID]) // Open Auto-Filter panel if selected.
+		else if (button == &audioPanelButton[buttonAutoEQID]) // Open Auto-EQ panel if selected.
 		{
 			audioPanelButton[buttonAutoEQID].setToggleState(!audioPanelButton[buttonAutoEQID].getToggleState(), dontSendNotification);
 			audioPanelButton[buttonAutoEQID].getToggleState() == false ? autoEQ.closePanel() : autoEQ.openPanel();
+		}
+		else if (button == &audioPanelButton[buttonAutoReverbID]) // Open Auto-Reverb panel if selected.
+		{
+			audioPanelButton[buttonAutoReverbID].setToggleState(!audioPanelButton[buttonAutoReverbID].getToggleState(), dontSendNotification);
+			audioPanelButton[buttonAutoReverbID].getToggleState() == false ? autoReverb.closePanel() : autoReverb.openPanel();
 		}
 	}
 
@@ -137,6 +151,7 @@
 		autoPanner.closePanel();
 		autoFilter.closePanel();
 		autoEQ.closePanel();
+		autoReverb.closePanel();
 	}
 
 	void LTLAAudioPanel::setPerformerInsideAreaState(int performerNum, bool state)
