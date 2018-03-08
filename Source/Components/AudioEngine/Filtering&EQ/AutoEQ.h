@@ -80,9 +80,12 @@ public:
 				float* outputL = buffer.getWritePointer(0);
 				float* outputR = buffer.getWritePointer(1);
 
+				const float* inputL = buffer.getReadPointer(0);
+				const float* inputR = buffer.getReadPointer(1);
+
 				for (int band = 0; band < numOfBands; band++)
 				{
-					eqBand[band].buffer.makeCopyOf(buffer, true);
+					eqBand[band].buffer.makeCopyOf(buffer, false);
 				}
 
 				for (int sample = 0; sample < buffer.getNumSamples(); sample++)
@@ -91,7 +94,7 @@ public:
 					outputR[sample] = 0.0;
 				}
 
-				for (int band = 0; band < 4; band++)
+				for (int band = 0; band < numOfBands; band++)
 				{
 					eqBand[band].peakingFilter.process(eqBand[band].buffer);
 
@@ -215,7 +218,7 @@ public:
 					double qFactor = eqSlider[qFactorSliderID].getValue();
 					double gainSliderValue = eqSlider[gainSliderID].getValue();
 
-					if (isFilterSafe(centreFrequency, qFactor) == true)
+				//	if (isFilterSafe(centreFrequency, qFactor) == true)
 					{
 						if (slider == &eqSlider[frequencySliderID])
 						{

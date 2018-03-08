@@ -31,7 +31,7 @@ public:
 
 		}
 		
-		cutoffSlider[highPassID].setRange(0.0, 10000, 10.0);
+		cutoffSlider[highPassID].setRange(0.0, 24000.0, 10.0);
 
 		cutoffSlider[lowPassID].setValue(1.0);
 		cutoffSlider[highPassID].setValue(20.0);

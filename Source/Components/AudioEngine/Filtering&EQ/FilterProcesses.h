@@ -79,18 +79,32 @@ public:
 		}
 		else if (filterType == peaking)
 		{
-			double omega = (double_Pi * 2.0 * cutoff) / sampleRate;
-			double g0 = 0.5 * (pow(10.0, (gain / 20)) - 1.0);
+			double omega = double_Pi * 2.0 * cutoff / sampleRate;
+
+			double gainIndec = pow(10, (gain / 20));
+			double g0 = 0.5 * (gainIndec - 1.0);
+			
 			double g1 = 2.0 / (1.0 + g0);
+			
+			double twoQ = 2.0 * Qfactor;
+			coefficientB2 = (1.0 - g1 * tan(omega / twoQ)) / (1.0 + g1 * tan(omega / twoQ));
 
-			coefficientB2 = (1.0 - g1 * tan(omega / (2.0 * Qfactor))) / (1.0 + g1 * tan(omega / (2.0 * Qfactor)));
 			coefficientB1 = -(1.0 + coefficientB2) * cos(omega);
-
+			
 			coefficientA0 = 1.0 + g0 * (1.0 - coefficientB2);
 			coefficientA1 = coefficientB1;
 			coefficientA2 = 1.0 + (coefficientB2 - coefficientA0);
 
 			DBG("F = " + (String)cutoff + " Q = " + (String)Qfactor + " G = " + (String)gain);
+			DBG("Omega = " + (String)omega);
+			DBG("g0 = " + (String)g0);
+			DBG("g1 = " + (String)g1);
+			DBG("coefficientB2 = " + (String)coefficientB2);
+			DBG("coefficientB1 = " + (String)coefficientB1);
+			DBG("coefficientA0 = " + (String)coefficientA0);
+			DBG("coefficientA1 = " + (String)coefficientA1);
+			DBG("coefficientA2 = " + (String)coefficientA2);
+
 
 		}
 	}
