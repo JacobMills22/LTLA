@@ -91,21 +91,21 @@ public:
 	{
 		delayUnit[0].setDelayTimeInMS(2.0);
 		delayUnit[1].setDelayTimeInMS(5.15);
-		delayUnit[2].setDelayTimeInMS(5.94);
-		delayUnit[3].setDelayTimeInMS(7.54);
-		delayUnit[4].setDelayTimeInMS(8.878);
-		delayUnit[5].setDelayTimeInMS(10.422);
-		delayUnit[6].setDelayTimeInMS(13.9);
-		delayUnit[7].setDelayTimeInMS(17.1);
+	//	delayUnit[2].setDelayTimeInMS(5.94);
+	//	delayUnit[3].setDelayTimeInMS(7.54);
+	//	delayUnit[4].setDelayTimeInMS(8.878);
+	//	delayUnit[5].setDelayTimeInMS(10.422);
+	//	delayUnit[6].setDelayTimeInMS(13.9);
+	//	delayUnit[7].setDelayTimeInMS(17.1);
 		
 		gain[0] = 0.609;
 		gain[1] = 0.262;
-		gain[2] = 0.3;
-		gain[3] = 0.47;
-		gain[4] = 0.29;
-		gain[5] = 0.042;
-		gain[6] = 0.1;
-		gain[7] = 0.2;
+	//	gain[2] = 0.3;
+	//	gain[3] = 0.47;
+	//	gain[4] = 0.29;
+	//	gain[5] = 0.042;
+	//	gain[6] = 0.1;
+	//	gain[7] = 0.2;
 
 	}
 
@@ -119,8 +119,7 @@ public:
 			delayUnit[reflection].prepareToPlay(samplesPerBlockExpected, sampleRate);
 		}
 
-		highpassFilter[0].setCutoff(500, samplerate, 0.72);
-		highpassFilter[1].setCutoff(500, samplerate, 0.72);
+		highpassFilter.setCutoff(500, samplerate, 0.72);
 
 
 		lowpassFilter.setCutoff(15000, samplerate, 0.72);
@@ -128,8 +127,7 @@ public:
 
 	void process(AudioSampleBuffer &buffer)
 	{
-		highpassFilter[0].process(buffer);
-		highpassFilter[1].process(buffer);
+		highpassFilter.process(buffer);
 		
 		lowpassFilter.process(buffer);
 
@@ -156,8 +154,7 @@ public:
 
 	void setFilterCutoff(float lowpassCutoff, float highpassCutoff)
 	{
-		highpassFilter[0].setCutoff(highpassCutoff, samplerate, 0.72);
-		highpassFilter[1].setCutoff(highpassCutoff, samplerate, 0.72);
+		highpassFilter.setCutoff(highpassCutoff, samplerate, 0.72);
 
 
 		lowpassFilter.setCutoff(lowpassCutoff, samplerate, 0.72);
@@ -169,9 +166,9 @@ private:
 
 	float samplerate = 48000;
 	LowpassIIRFilter lowpassFilter;
-	HighpassIIRFilter highpassFilter[2];
+	HighpassIIRFilter highpassFilter;
 
-	enum { numOfReflections = 8};
+	enum { numOfReflections = 2};
 	float delayTime[numOfReflections];
 	float gain[numOfReflections];
 
@@ -297,7 +294,8 @@ private:
 
 class AutoReverb : public AudioPanelObject,
 	public Slider::Listener,
-	public Button::Listener
+	public Button::Listener,
+	public Label::Listener
 {
 
 public:
@@ -309,7 +307,7 @@ public:
 			addAndMakeVisible(gainSliders[stage]);
 			gainSliders[stage].addListener(this);
 			gainSliders[stage].setRange(0.0, 1.0, 0.01);
-			gainSliders[stage].setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+			gainSliders[stage].setTextBoxStyle(Slider::TextBoxBelow, false, 50, 15);
 
 			gain[stage] = 0.0;
 		}
@@ -318,12 +316,20 @@ public:
 		{
 			addAndMakeVisible(sliderParam[param]);
 			sliderParam[param].addListener(this);
-			sliderParam[param].setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+			sliderParam[param].setTextBoxStyle(Slider::TextBoxBelow, false, 50, 15);
 		}
 
 		sliderParam[preDelay].setRange(5, 200, 1);
 		sliderParam[delayModifierID].setRange(1, 20, 1);
 		sliderParam[feedbackAmount].setRange(0.0, 5.0, 0.1);
+
+		for (int labelID = 0; labelID < numOfLabels; labelID++)
+		{
+			addAndMakeVisible(labels[labelID]);
+			labels[labelID].addListener(this);
+		}
+
+		labels[filterLabel].setText("Filtering", dontSendNotification);
 
 
 		addAndMakeVisible(filterCutoffSlider);
@@ -336,11 +342,21 @@ public:
 		addAndMakeVisible(bypassButton);
 		bypassButton.addListener(this);
 		bypassButton.setButtonText("Bypass");
+
+		bypassButton.setToggleState(true, sendNotification);
+		gainSliders[direct].setValue(0.5, sendNotification);
+		gainSliders[earlyReflections].setValue(0.2, sendNotification);
+		gainSliders[lateReflections1].setValue(0.7, sendNotification);
+		gainSliders[lateReflections2].setValue(0.9, sendNotification);
+		sliderParam[feedbackAmount].setValue(1.0, sendNotification);
+		sliderParam[preDelay].setValue(20, sendNotification);
+		sliderParam[delayModifierID].setValue(10, sendNotification);
+		
 	}
 
 	void paint(Graphics &g) override
 	{
-		//g.fillAll(Colours::pink);
+	//	g.fillAll(Colours::pink);
 	}
 
 	void prepareToPlay(int samplesPerBlockExpected, double sampleRate)
@@ -387,8 +403,8 @@ public:
 
 			for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 			{
-				//	outputL[sample] = 0.0;
-				//	outputR[sample] = 0.0;
+				outputL[sample] = 0.0; //force
+				outputR[sample] = 0.0;
 			}
 
 			for (int stage = 0; stage < numOfStages; stage++)
@@ -453,19 +469,30 @@ public:
 		}
 	}
 
+	void labelTextChanged(Label* labelThatHasChanged) override
+	{
+
+	}
+
 	void resized() override
 	{
-		gainSliders[direct].setBounds(          getWidth() * 0.1, 0, 150, 30);
-		gainSliders[earlyReflections].setBounds(getWidth() * 0.1, 40, 150, 30);
-		gainSliders[lateReflections1].setBounds(getWidth() * 0.1, 80, 150, 30);
-		gainSliders[lateReflections2].setBounds(getWidth() * 0.1, 120, 150, 30);
 
-		sliderParam[preDelay].setBounds(getWidth() * 0.4, 40, 150, 30);
-		sliderParam[delayModifierID].setBounds(getWidth() * 0.4, 80, 150, 30);
-		sliderParam[feedbackAmount].setBounds(getWidth() * 0.4, 120, 150, 30);
+		float sliderWidth = getWidth() * 0.2;
+		float sliderHeight = getHeight() * 0.12;
 
-		filterCutoffSlider.setBounds(10, 0, 30, getHeight() * 0.5);
-		bypassButton.setBounds(gainSliders[direct].getRight() + 10, 0, 70, 30);
+		float buttonWidth = getWidth() * 0.15;
+
+		gainSliders[direct].setBounds(          getWidth() * 0.1, 0, sliderWidth, sliderHeight);
+		gainSliders[earlyReflections].setBounds(getWidth() * 0.1, 40, sliderWidth, sliderHeight);
+		gainSliders[lateReflections1].setBounds(getWidth() * 0.1, 80, sliderWidth, sliderHeight);
+		gainSliders[lateReflections2].setBounds(getWidth() * 0.1, 120, sliderWidth, sliderHeight);
+
+		sliderParam[preDelay].setBounds(getWidth() * 0.4, 40, sliderWidth, sliderHeight);
+		sliderParam[delayModifierID].setBounds(getWidth() * 0.4, 80, sliderWidth, sliderHeight);
+		sliderParam[feedbackAmount].setBounds(getWidth() * 0.4, 120, sliderWidth, sliderHeight);
+
+		filterCutoffSlider.setBounds(10, 0, sliderWidth * 0.1, sliderHeight * 5);
+		bypassButton.setBounds(getWidth() - (buttonWidth * 1.3), 0, buttonWidth, sliderHeight);
 
 
 	}
@@ -474,6 +501,7 @@ private:
 
 	enum { direct, earlyReflections, lateReflections1, lateReflections2, numOfStages };
 	enum {preDelay, delayModifierID, feedbackAmount, numOfSliderParams};
+	enum {filterLabel, numOfLabels};
 
 
 	Slider gainSliders[numOfStages];
@@ -487,6 +515,8 @@ private:
 	EarlyReflectionsGenerator earlyReflectionsGenerator;
 	LaterReflectionsGenerator laterReflectionsGenerator[2];
 	DelayUnit preDelayUnit;
+
+	Label labels[numOfLabels];
 
 	float delayModifier = 10.0;
 	bool bypassState = false;
