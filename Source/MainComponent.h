@@ -7,6 +7,7 @@
 #include "Components\AudioEngine\AudioEngine.h"
 #include "Components\AudioEngine\Meter.h"
 #include "SnapshotManager.h"
+#include "SaveAndLoadingManager.h"
 
 
 class MainContentComponent : public AudioAppComponent,
@@ -81,7 +82,16 @@ public:
 
 
 	//==============================================================================
+	// Save and Loading Manager
+	
+	void saveProjectAs();
 
+	void saveProject();
+	
+	void loadProjectFile(ValueTree valueTreeToLoadInto);
+
+
+	//==============================================================================
 
 private:
 	//==============================================================================
@@ -115,6 +125,9 @@ private:
 
 	ValueTree valueTree;
 	SnapshotManager snapshotManager;
+	//SaveAndLoadingManager saveAndLoadingManager;
+
+	String currentProjectFullPath = "";
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };

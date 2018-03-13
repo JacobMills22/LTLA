@@ -1,7 +1,7 @@
 
 #include "StageAreas.h"
 
-StageArea::StageArea() : stageAreaValueTree("LTLAValueTree")
+StageArea::StageArea() : stageAreaValueTree("StageArea")
 {
 	//areaName = "New Area";
 

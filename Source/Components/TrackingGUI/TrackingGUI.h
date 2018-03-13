@@ -114,6 +114,14 @@ public:
 /** Returns true if the audio panel is currently displayed*/
 	bool getAudioPanelState();
 
+	void deselectAllStageAreas()
+	{
+		for (int area = 0; area < stageAreas.size(); area++)
+		{
+			stageAreas[area]->setAreaSelectedState(false);
+		}
+	}
+
 	/** GRID */ 
 
 /** Sets the state of Grid Drawing*/
@@ -156,6 +164,7 @@ public:
 
 	StageArea mainStageArea;
 	OwnedArray<StageArea> stageAreas;
+	Value numOfStageAreas;
 
 private:
 

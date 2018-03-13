@@ -3,16 +3,21 @@
 
 	// Single Snapshot
 	//====================================================
-	void Snapshot::recallSnapshot(ValueTree valueTree)
+	void Snapshot::recallSnapshot(ValueTree valueTree, int index)
 	{
+		
 		// Main Tree
 		valueTree.copyPropertiesFrom(snapshotValueTree, nullptr);
 
+		int numOfStageAreas = valueTree.getPropertyAsValue("NumberOfStageAreas", nullptr).getValue();
+		
 		for (int childTree = 0; childTree < valueTree.getNumChildren(); childTree++)
 		{
 			// Childtree such as StageAreas and Audio Panels
 			//DBG("Number of trees at Level 2 is " + (String)valueTree.getNumChildren());
+			
 			valueTree.getChild(childTree).copyPropertiesFrom(snapshotValueTree.getChild(childTree), nullptr);
+			
 
 			for (int subChildTree = 0; subChildTree < valueTree.getChild(childTree).getNumChildren(); subChildTree++)
 			{
@@ -20,7 +25,7 @@
 				//DBG("Number of trees at Level 3 is " + (String)valueTree.getChild(childTree).getNumChildren());
 				valueTree.getChild(childTree).getChild(subChildTree).copyPropertiesFrom(snapshotValueTree.getChild(childTree).getChild(subChildTree), nullptr);
 			}
-		}
+		}		
 	}
 
 	void Snapshot::updateSnapshot(ValueTree valueTree)
@@ -36,6 +41,15 @@
 	String Snapshot::getSnapshotName()
 	{
 		return snapshotName;
+	}
+
+	ValueTree Snapshot::getValueTree()
+	{
+		return snapshotValueTree;
+	}
+
+	void Snapshot::setValueTree(ValueTree tree)
+	{
 	}
 
 	// Snapshot Manager
@@ -59,20 +73,36 @@
 		currentSnapshotLabel.addListener(this);
 		currentSnapshotLabel.setEditable(false, true, false);
 
-		createNewSnapshot();
+		//createNewSnapshot();
 	}
 
 	void SnapshotManager::createNewSnapshot()
 	{
 		snapshots.add(new Snapshot);
+		valueTree.addChild(snapshots.getLast()->getValueTree(), -1, nullptr);
+		if (valueTree.getNumChildren() <= 3)
+		{
+			snapshots.getLast()->valueTreeChildIndex = 2;
+		}
+		else
+		{
+			snapshots.getLast()->valueTreeChildIndex = valueTree.getNumChildren() - 1;
+		}
+
 		snapshots.getLast()->updateSnapshot(valueTree);
 		snapshots.getLast()->setSnapshotName("Snapshot " + (String)(snapshots.size()));
 		setCurrentSnapshot(snapshots.size() - 1, false);
+
+		valueTree.setProperty("NumberOfSnapshots", snapshots.size(), nullptr);
+
 	}
 
 	void SnapshotManager::setValueTree(ValueTree ValueTree)
 	{
 		valueTree = ValueTree;
+
+		valueTree.setProperty("NumberOfSnapshots", 1, nullptr);
+		numberOfSnapshots.referTo(valueTree.getPropertyAsValue("NumberOfSnapshots", nullptr));
 	}
 
 	void SnapshotManager::setCurrentSnapshot(int ID, bool alsoFireSnapshot)
@@ -85,7 +115,7 @@
 
 		if (alsoFireSnapshot == true)
 		{
-			snapshots[currentSnapshotID]->recallSnapshot(valueTree);
+			snapshots[currentSnapshotID]->recallSnapshot(valueTree, currentSnapshotID + 1);
 			snapshotHasbeenFired = true;
 		}
 	}
@@ -111,6 +141,31 @@
 		else if (button == &snapshotButtons[updateSnapshotID])
 		{
 			snapshots[currentSnapshotID]->updateSnapshot(valueTree);
+
+		//	valueTree.getChild(snapshots[currentSnapshotID]->valueTreeChildIndex) = valueTree.createCopy();
+
+			ValueTree currentTree = valueTree.getChild(snapshots[currentSnapshotID]->valueTreeChildIndex);
+
+			int totalSnapshots = numberOfSnapshots.getValue();
+
+			for (int childTree = 0; childTree < valueTree.getNumChildren() - totalSnapshots; childTree++)
+			{
+				if (currentTree.getChild(childTree).isValid())
+				{
+					currentTree.removeChild(childTree, nullptr);
+					currentTree.addChild(valueTree.getChild(childTree).createCopy(), childTree, nullptr);
+
+					//currentTree.getChild(childTree) = valueTree.getChild(childTree).createCopy();
+				}
+				else
+				{
+					currentTree.addChild(valueTree.getChild(childTree).createCopy(), -1, nullptr);
+				}
+			}
+		//	currentTree.addChild(valueTree.getChild(0).createCopy(), -1, nullptr);
+		//	currentTree.addChild(valueTree.getChild(1).createCopy(), -1, nullptr);
+
+		//	currentTree.setProperty("Test", "testproeprty", nullptr);
 		}
 		else if (button == &snapshotButtons[addNewSnapshotID])
 		{

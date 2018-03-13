@@ -119,15 +119,18 @@ public:
 			delayUnit[reflection].prepareToPlay(samplesPerBlockExpected, sampleRate);
 		}
 
-		highpassFilter.setCutoff(500, samplerate, 0.72);
+		highpassFilter[0].setCutoff(500, samplerate, 0.72);
+		highpassFilter[1].setCutoff(500, samplerate, 0.72);
+
 
 		lowpassFilter.setCutoff(15000, samplerate, 0.72);
 	}
 
 	void process(AudioSampleBuffer &buffer)
 	{
-		highpassFilter.process(buffer);
-
+		highpassFilter[0].process(buffer);
+		highpassFilter[1].process(buffer);
+		
 		lowpassFilter.process(buffer);
 
 		for (int reflection = 0; reflection < numOfReflections; reflection++)
@@ -153,7 +156,9 @@ public:
 
 	void setFilterCutoff(float lowpassCutoff, float highpassCutoff)
 	{
-		highpassFilter.setCutoff(highpassCutoff, samplerate, 0.72);
+		highpassFilter[0].setCutoff(highpassCutoff, samplerate, 0.72);
+		highpassFilter[1].setCutoff(highpassCutoff, samplerate, 0.72);
+
 
 		lowpassFilter.setCutoff(lowpassCutoff, samplerate, 0.72);
 
@@ -164,7 +169,7 @@ private:
 
 	float samplerate = 48000;
 	LowpassIIRFilter lowpassFilter;
-	HighpassIIRFilter highpassFilter;
+	HighpassIIRFilter highpassFilter[2];
 
 	enum { numOfReflections = 8};
 	float delayTime[numOfReflections];
@@ -193,12 +198,12 @@ public:
 		samplerate = sampleRate;
 	}
 
-	void initialise(float delayTime1, float delayTime2, float delayTime3, float delayTime4, float cutoff, float audioGain)
+	void initialise(float delayTime1, float delayTime2, float delayTime3, float delayTime4, float delayModifier, float cutoff, float audioGain)
 	{
-		delayPath[0].setDelayTimeInMS(delayTime1);
-		delayPath[1].setDelayTimeInMS(delayTime2);
-		delayPath[2].setDelayTimeInMS(delayTime3);
-		delayPath[3].setDelayTimeInMS(delayTime4);
+		delayPath[0].setDelayTimeInMS(delayTime1 * delayModifier);
+		delayPath[1].setDelayTimeInMS(delayTime2 * delayModifier);
+		delayPath[2].setDelayTimeInMS(delayTime3 * delayModifier);
+		delayPath[3].setDelayTimeInMS(delayTime4 * delayModifier);
 
 		for (int pathNum = 0; pathNum < numOfDelays; pathNum++)
 		{
@@ -223,8 +228,8 @@ public:
 
 			for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 			{
-				DelayPathOutputL[sample] += feedbackOutputL[sample];
-				DelayPathOutputR[sample] += feedbackOutputR[sample];
+				DelayPathOutputL[sample] += (feedbackOutputL[sample] * feedbackModifier);
+				DelayPathOutputR[sample] += (feedbackOutputR[sample] * feedbackModifier);
 			}
 		
 			//=======================================================
@@ -268,6 +273,11 @@ public:
 		
 	}
 
+	void setFeedbackModifier(float amount)
+	{
+		feedbackModifier = amount;
+	}
+
 private:
 
 	enum { numOfDelays = 4 };
@@ -282,7 +292,7 @@ private:
 	bool test = false;
 
 	float samplerate = 48000;
-
+	float feedbackModifier = 1.0;
 };
 
 class AutoReverb : public AudioPanelObject,
@@ -299,9 +309,22 @@ public:
 			addAndMakeVisible(gainSliders[stage]);
 			gainSliders[stage].addListener(this);
 			gainSliders[stage].setRange(0.0, 1.0, 0.01);
+			gainSliders[stage].setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
 
 			gain[stage] = 0.0;
 		}
+
+		for (int param = 0; param < numOfSliderParams; param++)
+		{
+			addAndMakeVisible(sliderParam[param]);
+			sliderParam[param].addListener(this);
+			sliderParam[param].setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+		}
+
+		sliderParam[preDelay].setRange(5, 200, 1);
+		sliderParam[delayModifierID].setRange(1, 20, 1);
+		sliderParam[feedbackAmount].setRange(0.0, 5.0, 0.1);
+
 
 		addAndMakeVisible(filterCutoffSlider);
 		filterCutoffSlider.addListener(this);
@@ -327,8 +350,11 @@ public:
 		laterReflectionsGenerator[0].prepareToPlay(samplesPerBlockExpected, sampleRate);
 		laterReflectionsGenerator[1].prepareToPlay(samplesPerBlockExpected, sampleRate);
 
-		laterReflectionsGenerator[0].initialise(6.040 * delayModifier, 8.864 * delayModifier, 17.39 * delayModifier, 48.87 * delayModifier, 4000, 0.25);
-		laterReflectionsGenerator[1].initialise(34.27 * delayModifier, 61.72 * delayModifier, 74.6 * delayModifier, 96.13 * delayModifier, 900, 0.35);
+		laterReflectionsGenerator[0].initialise(6.040, 8.864, 17.39, 48.87, delayModifier, 4000, 0.25);
+		laterReflectionsGenerator[1].initialise(34.27, 61.72, 74.6, 96.13, delayModifier, 900, 0.35);
+
+		preDelayUnit.prepareToPlay(samplesPerBlockExpected, sampleRate);
+		preDelayUnit.setDelayTimeInMS(5);
 
 		for (int stage = 0; stage < numOfStages; stage++)
 		{
@@ -344,6 +370,8 @@ public:
 			{
 				stageBuffer[stage].makeCopyOf(buffer, true);
 			}
+
+			preDelayUnit.process(stageBuffer[earlyReflections]);
 
 			earlyReflectionsGenerator.process(stageBuffer[earlyReflections]);
 
@@ -399,6 +427,22 @@ public:
 		{
 			earlyReflectionsGenerator.setFilterCutoff(filterCutoffSlider.getMaxValue(), filterCutoffSlider.getMinValue());
 		}
+		else if (slider == &sliderParam[preDelay])
+		{
+			preDelayUnit.setDelayTimeInMS(sliderParam[preDelay].getValue());
+		}
+		else if (slider == &sliderParam[delayModifierID])
+		{
+			delayModifier = sliderParam[delayModifierID].getValue();
+
+			laterReflectionsGenerator[0].initialise(6.040, 8.864, 17.39, 48.87, delayModifier, 4000, 0.25);
+			laterReflectionsGenerator[1].initialise(34.27, 61.72, 74.6, 96.13, delayModifier, 900, 0.35);
+		}
+		else if (slider == &sliderParam[feedbackAmount])
+		{
+			laterReflectionsGenerator[0].setFeedbackModifier(sliderParam[feedbackAmount].getValue());
+			laterReflectionsGenerator[1].setFeedbackModifier(sliderParam[feedbackAmount].getValue());
+		}
 	}
 
 	void buttonClicked(Button* button) override
@@ -415,23 +459,34 @@ public:
 		gainSliders[earlyReflections].setBounds(getWidth() * 0.1, 40, 150, 30);
 		gainSliders[lateReflections1].setBounds(getWidth() * 0.1, 80, 150, 30);
 		gainSliders[lateReflections2].setBounds(getWidth() * 0.1, 120, 150, 30);
+
+		sliderParam[preDelay].setBounds(getWidth() * 0.4, 40, 150, 30);
+		sliderParam[delayModifierID].setBounds(getWidth() * 0.4, 80, 150, 30);
+		sliderParam[feedbackAmount].setBounds(getWidth() * 0.4, 120, 150, 30);
+
 		filterCutoffSlider.setBounds(10, 0, 30, getHeight() * 0.5);
 		bypassButton.setBounds(gainSliders[direct].getRight() + 10, 0, 70, 30);
+
 
 	}
 
 private:
 
 	enum { direct, earlyReflections, lateReflections1, lateReflections2, numOfStages };
+	enum {preDelay, delayModifierID, feedbackAmount, numOfSliderParams};
+
 
 	Slider gainSliders[numOfStages];
-	Slider filterCutoffSlider;
+	Slider filterCutoffSlider; // Two Value Verticle
+	Slider sliderParam[numOfSliderParams];
+
 	ToggleButton bypassButton;
 	float gain[numOfStages];
-
+	
 	AudioSampleBuffer stageBuffer[numOfStages];
 	EarlyReflectionsGenerator earlyReflectionsGenerator;
 	LaterReflectionsGenerator laterReflectionsGenerator[2];
+	DelayUnit preDelayUnit;
 
 	float delayModifier = 10.0;
 	bool bypassState = false;

@@ -29,7 +29,7 @@ public:
 	command manager. */
 	void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
 	
-	enum MainCommandManagerIDs {calibrationStartID = 1, interval5SecondsID, interval10SecondsID, 
+	enum MainCommandManagerIDs {saveID = 1, saveAsID, loadID, calibrationStartID, interval5SecondsID, interval10SecondsID, 
 		interval20SecondsID, drawStageID, editStageID, drawGridID, snaptoGridID, gridSize10ID, 
 		gridSize15ID, gridSize20ID, addStageAreaID, editStageAreasID, removeStageAreaID, 
 		audioParametersID, audioDeviceSettingsID, numOfCommandIDs};
@@ -37,7 +37,7 @@ public:
 private:
 
 	ScopedPointer<MenuBarComponent> menuBar;
-	enum { calibrationIndexID, gridIndexID, stageAreasID, preferencesID };
+	enum { fileIndexID, calibrationIndexID, gridIndexID, stageAreasID, preferencesID };
 
 };
 

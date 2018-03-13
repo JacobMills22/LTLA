@@ -74,10 +74,13 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 		valueTree.addListener(this);
 
-		valueTree.setProperty("StageDrawingState", false, nullptr);
+		//valueTree.setProperty("StageDrawingState", false, nullptr);
 
 		trackingGUI.setValueTree(valueTree);
 		snapshotManager.setValueTree(valueTree);
+		snapshotManager.createNewSnapshot();
+
+//		saveAndLoadingManager.setValueTree(valueTree);
 	}
 
 	MainContentComponent::~MainContentComponent()

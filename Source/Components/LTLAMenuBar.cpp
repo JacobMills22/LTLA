@@ -19,7 +19,7 @@
 
 	StringArray LTLAMenuBar::getMenuBarNames() 
 	{
-		const char* const names[] = { "Stage Calibration", "Grid", "Stage Areas", "Preferences", nullptr };
+		const char* const names[] = { "File", "Stage Calibration", "Grid", "Stage Areas", "Preferences", nullptr };
 		return StringArray(names);
 	}
 
@@ -28,7 +28,14 @@
 		ApplicationCommandManager* commandManager = &LTLACommandManager::getApplicationCommandManager();
 		PopupMenu menu;
 
-		if (menuIndex == calibrationIndexID)
+		if (menuIndex == fileIndexID)
+		{
+			menu.addCommandItem(commandManager, saveID);
+			menu.addCommandItem(commandManager, saveAsID);
+			menu.addSeparator();
+			menu.addCommandItem(commandManager, loadID);
+		}
+		else if (menuIndex == calibrationIndexID)
 		{
 			menu.addSeparator();
 			PopupMenu CalibrationIntervalSubMenu;

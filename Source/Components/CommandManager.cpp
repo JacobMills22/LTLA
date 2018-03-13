@@ -12,7 +12,7 @@ ApplicationCommandTarget* MainContentComponent::getNextCommandTarget()
 
 void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 {
-	const CommandID ids[] = { menuBar.interval5SecondsID, menuBar.interval10SecondsID, menuBar.interval20SecondsID,
+	const CommandID ids[] = {  menuBar.saveID, menuBar.saveAsID, menuBar.loadID, menuBar.interval5SecondsID, menuBar.interval10SecondsID, menuBar.interval20SecondsID,
 		menuBar.calibrationStartID, menuBar.drawStageID, menuBar.editStageID, menuBar.drawGridID, menuBar.snaptoGridID, menuBar.gridSize10ID,
 		menuBar.gridSize15ID, menuBar.gridSize20ID, menuBar.addStageAreaID, menuBar.editStageAreasID, menuBar.removeStageAreaID, menuBar.audioParametersID,
 		menuBar.audioDeviceSettingsID };
@@ -24,6 +24,15 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 {
 	switch (commandID)
 	{
+	case LTLAMenuBar::saveID:
+		result.setInfo("Save Project", "Saves the whole project", "File", 0);
+		break;
+	case LTLAMenuBar::saveAsID:
+		result.setInfo("Save Project As", "Saves the whole project as a new file", "File", 0);
+		break;
+	case LTLAMenuBar::loadID:
+		result.setInfo("Load Project", "Loads a project", "File", 0);
+		break;
 	case LTLAMenuBar::interval5SecondsID:
 		result.setInfo("5 Seconds", "Set the Interval to 5 seconds", "Calibration", 0);
 		if (trackingGUI.stageCalibrationInterval == 5) result.setTicked(true);
@@ -91,6 +100,12 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 {
 	switch (info.commandID)
 	{
+	case LTLAMenuBar::saveAsID: saveProjectAs();
+		break;
+	case LTLAMenuBar::saveID: saveProject();
+		break;
+	case LTLAMenuBar::loadID: loadProjectFile(valueTree);
+		break;
 	case LTLAMenuBar::interval5SecondsID: trackingGUI.stageCalibrationInterval = 5;
 		break;
 	case LTLAMenuBar::interval10SecondsID: trackingGUI.stageCalibrationInterval = 10;
@@ -142,9 +157,10 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 void MainContentComponent::addStageAreaIDPressed()
 {
 	trackingGUI.stageAreas.add(new StageArea); // Add a new area.
+	trackingGUI.deselectAllStageAreas();
+
 	trackingGUI.setStageEditState(false);
 	trackingGUI.setStageAreaEditState(true); // Enable menuBars edit area button.
-	trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->setAreaSelectedState(false); // Deselect currently selected area.
 	trackingGUI.stageAreas.getLast()->setAreaSelectedState(true); // Select the newly created area.
 	trackingGUI.setCurrentlySelectedArea(trackingGUI.stageAreas.size() - 1); // Set Selected Area Index to the newly created area.
 	trackingGUI.stageAreas.getLast()->updateTrackingGUIWidthAndHeight(trackingGUI.getWidth(), trackingGUI.getHeight());
@@ -156,6 +172,9 @@ void MainContentComponent::addStageAreaIDPressed()
 	audioEngine.addNewStageAreaAudioPanel();
 
 	valueTree.addChild(audioEngine.audioPanel.getLast()->getValueTree(), 0, nullptr);
+
+	trackingGUI.numOfStageAreas = trackingGUI.stageAreas.size();
+
 	//DBG((String)valueTree.getNumChildren());
 }
 
@@ -193,6 +212,8 @@ void MainContentComponent::removeStageAreaIDPressed()
 		trackingGUI.setCurrentlySelectedArea(0);
 		trackingGUI.stageAreas[0]->setAreaSelectedState(true);
 	}
+
+	trackingGUI.numOfStageAreas = trackingGUI.stageAreas.size();
 }
 
 void MainContentComponent::editAudioParametersPressed()

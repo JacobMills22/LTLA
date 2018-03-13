@@ -7,7 +7,7 @@
 TrackingGUI::TrackingGUI()
 {	
 	trackingState[0] = false;
-	trackingState[1] = false;
+	trackingState[1] = false;	
 }
 
 TrackingGUI::~TrackingGUI()
@@ -134,7 +134,10 @@ float TrackingGUI::getPerformerXPosInsideArea(int areaID, int performerID)
 	return (performerX - areaLeft) / (areaRight - areaLeft);
 }
 
-void TrackingGUI::setValueTree(ValueTree valueTree)
+void TrackingGUI::setValueTree(ValueTree ValueTree)
 {
-	valueTree = valueTree;
+	valueTree = ValueTree;
+
+	valueTree.setProperty("NumberOfStageAreas", 0, nullptr);
+	numOfStageAreas.referTo(valueTree.getPropertyAsValue("NumberOfStageAreas", nullptr));
 }
