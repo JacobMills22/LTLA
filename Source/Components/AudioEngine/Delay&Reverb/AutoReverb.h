@@ -307,7 +307,8 @@ public:
 			addAndMakeVisible(gainSliders[stage]);
 			gainSliders[stage].addListener(this);
 			gainSliders[stage].setRange(0.0, 1.0, 0.01);
-			gainSliders[stage].setTextBoxStyle(Slider::TextBoxBelow, false, 50, 15);
+			gainSliders[stage].setTextBoxStyle(Slider::NoTextBox, false, 50, 15);
+			gainSliders[stage].setSliderStyle(Slider::LinearVertical);
 
 			gain[stage] = 0.0;
 		}
@@ -328,9 +329,18 @@ public:
 			addAndMakeVisible(labels[labelID]);
 			labels[labelID].addListener(this);
 		}
-
+		
 		labels[filterLabel].setText("Filtering", dontSendNotification);
+		labels[gainLabel].setText("Stage Gain", dontSendNotification);
+		labels[directGain].setText("Direct", dontSendNotification);
+		labels[earlyReflectionsLabel].setText("ER", dontSendNotification);
+		labels[lateReflections1Label].setText("LR1", dontSendNotification);
+		labels[lateReflections2Label].setText("LR2", dontSendNotification);
+		labels[preDelayLabel].setText("Pre-Delay", dontSendNotification);
+		labels[feedbackLabel].setText("Feedback Amount", dontSendNotification);
+		labels[roomSizeLabel].setText("Room Size", dontSendNotification);
 
+		
 
 		addAndMakeVisible(filterCutoffSlider);
 		filterCutoffSlider.addListener(this);
@@ -356,7 +366,7 @@ public:
 
 	void paint(Graphics &g) override
 	{
-	//	g.fillAll(Colours::pink);
+		//g.fillAll(Colours::purple);
 	}
 
 	void prepareToPlay(int samplesPerBlockExpected, double sampleRate)
@@ -478,21 +488,45 @@ public:
 	{
 
 		float sliderWidth = getWidth() * 0.2;
-		float sliderHeight = getHeight() * 0.12;
+		float sliderHeight = getHeight() * 0.15;
+
+		float verticalSliderWidth = getWidth() * 0.05;
+		float verticalSliderHeight = getHeight() * 0.5;
+
+		float sliderY = getHeight() * 0.1;
 
 		float buttonWidth = getWidth() * 0.15;
 
-		gainSliders[direct].setBounds(          getWidth() * 0.1, 0, sliderWidth, sliderHeight);
-		gainSliders[earlyReflections].setBounds(getWidth() * 0.1, 40, sliderWidth, sliderHeight);
-		gainSliders[lateReflections1].setBounds(getWidth() * 0.1, 80, sliderWidth, sliderHeight);
-		gainSliders[lateReflections2].setBounds(getWidth() * 0.1, 120, sliderWidth, sliderHeight);
+		gainSliders[direct].setBounds(          getWidth() * 0.2, sliderY, verticalSliderWidth, verticalSliderHeight);
+		gainSliders[earlyReflections].setBounds(getWidth() * 0.3, sliderY, verticalSliderWidth, verticalSliderHeight);
+		gainSliders[lateReflections1].setBounds(getWidth() * 0.4, sliderY, verticalSliderWidth, verticalSliderHeight);
+		gainSliders[lateReflections2].setBounds(getWidth() * 0.5, sliderY, verticalSliderWidth, verticalSliderHeight);
 
-		sliderParam[preDelay].setBounds(getWidth() * 0.4, 40, sliderWidth, sliderHeight);
-		sliderParam[delayModifierID].setBounds(getWidth() * 0.4, 80, sliderWidth, sliderHeight);
-		sliderParam[feedbackAmount].setBounds(getWidth() * 0.4, 120, sliderWidth, sliderHeight);
+		sliderParam[preDelay].setBounds(getWidth() * 0.6, getHeight() * 0.13, sliderWidth, sliderHeight);
+		sliderParam[feedbackAmount].setBounds(getWidth() * 0.6, getHeight() * 0.4, sliderWidth, sliderHeight);
+		sliderParam[delayModifierID].setBounds(getWidth() * 0.8, getHeight() * 0.4, sliderWidth, sliderHeight);
 
-		filterCutoffSlider.setBounds(10, 0, sliderWidth * 0.1, sliderHeight * 5);
-		bypassButton.setBounds(getWidth() - (buttonWidth * 1.3), 0, buttonWidth, sliderHeight);
+
+
+		filterCutoffSlider.setBounds(getWidth() * 0.03, sliderY, sliderWidth * 0.2, verticalSliderHeight);
+		bypassButton.setBounds(getWidth() - (buttonWidth * 1.3), getHeight() * 0.1, buttonWidth, sliderHeight);
+
+		float labelY = sliderY + verticalSliderHeight * 0.9;
+
+		labels[filterLabel].setBounds(getWidth() * 0.001, 0, 80, 30);
+		labels[gainLabel].setBounds(getWidth() * 0.3, 0, 80, 30);
+		labels[directGain].setBounds(getWidth() * 0.18, labelY, 50, 30);
+		labels[earlyReflectionsLabel].setBounds(getWidth() * 0.3, labelY, 50, 30);
+		labels[lateReflections1Label].setBounds(getWidth() * 0.39, labelY, 50, 30);
+		labels[lateReflections2Label].setBounds(getWidth() * 0.49, labelY, 50, 30);
+
+		labels[preDelayLabel].setBounds(getWidth() * 0.62, 0, 100, 30);
+		labels[feedbackLabel].setBounds(getWidth() * 0.60, getHeight() * 0.3, 100, 30);
+		labels[roomSizeLabel].setBounds(getWidth() * 0.82, getHeight() * 0.3, 100, 30);
+
+
+
+
 
 
 	}
@@ -501,7 +535,8 @@ private:
 
 	enum { direct, earlyReflections, lateReflections1, lateReflections2, numOfStages };
 	enum {preDelay, delayModifierID, feedbackAmount, numOfSliderParams};
-	enum {filterLabel, numOfLabels};
+	enum { filterLabel, gainLabel, directGain, earlyReflectionsLabel, lateReflections1Label, lateReflections2Label, 
+		   preDelayLabel, feedbackLabel, roomSizeLabel, numOfLabels };
 
 
 	Slider gainSliders[numOfStages];

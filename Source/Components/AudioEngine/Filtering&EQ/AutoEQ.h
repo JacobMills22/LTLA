@@ -43,7 +43,7 @@ public:
 		eqSliderValueLabel[frequencySliderID].setEditable(true, true, false);
 		eqSliderNameLabel[frequencySliderID].setText("Frequency",dontSendNotification);
 				
-		eqSlider[qFactorSliderID].setRange(0.8, 10.0, 0.1);
+		eqSlider[qFactorSliderID].setRange(0.7, 10.0, 0.1);
 		eqSlider[qFactorSliderID].setValue(1.0, dontSendNotification);
 		eqSliderValueLabel[qFactorSliderID].setText("1.0", dontSendNotification);
 		eqSliderValueLabel[qFactorSliderID].setEditable(true, true, false);
@@ -58,8 +58,7 @@ public:
 		addAndMakeVisible(bypassButton);
 		bypassButton.addListener(this);
 		bypassButton.setButtonText("Bypass");
-
-		initialiseEQBands();
+		bypassButton.setToggleState(true, sendNotification);
 				
 	}
 
@@ -71,6 +70,12 @@ public:
 			{
 				eqBand[band].buffer.setSize(2, samplesPerBlockExpected, false, false, false);
 			}
+
+			testFilter.makePeaking();
+			testFilter.setCutoffinHz(7000, sampleRate, 1, 18, true);
+
+			initialiseEQBands(sampleRate);
+
 		}
 
 		void process(AudioSampleBuffer &buffer)
@@ -83,6 +88,14 @@ public:
 				const float* inputL = buffer.getReadPointer(0);
 				const float* inputR = buffer.getReadPointer(1);
 
+			//	testFilter.process(buffer);
+								
+				eqBand[0].peakingFilter.process(buffer);
+				eqBand[1].peakingFilter.process(buffer);
+				eqBand[2].peakingFilter.process(buffer);
+				eqBand[3].peakingFilter.process(buffer);
+				
+				/*
 				for (int band = 0; band < numOfBands; band++)
 				{
 					eqBand[band].buffer.makeCopyOf(buffer, false);
@@ -107,6 +120,7 @@ public:
 						outputR[sample] += (processedSampleR[sample] * 0.25);
 					}
 				}
+				*/
 			}
 		}
 
@@ -335,7 +349,7 @@ public:
 			}
 		}
 
-		void initialiseEQBands()
+		void initialiseEQBands(float sampleRate)
 		{
 			eqBand[0].uiCentreFreqModifier = 0.19;
 			eqBand[1].uiCentreFreqModifier = 0.40;
@@ -357,10 +371,10 @@ public:
 			eqBand[2].colour = Colours::blue;
 			eqBand[3].colour = Colours::yellow;
 
-			eqBand[0].peakingFilter.setCutoff(100, 48000, 2.0, 0.0);
-			eqBand[1].peakingFilter.setCutoff(1000, 48000, 2.0, 0.0);
-			eqBand[2].peakingFilter.setCutoff(2500, 48000, 2.0, 0.0);
-			eqBand[3].peakingFilter.setCutoff(5000, 48000, 2.0, 0.0);
+			eqBand[0].peakingFilter.setCutoff(100, sampleRate, 2.0, 0.0);
+			eqBand[1].peakingFilter.setCutoff(1000, sampleRate, 2.0, 0.0);
+			eqBand[2].peakingFilter.setCutoff(2500, sampleRate, 2.0, 0.0);
+			eqBand[3].peakingFilter.setCutoff(5000, sampleRate, 2.0, 0.0);
 
 			for (int band = 0; band < numOfBands; band++)
 			{
@@ -420,7 +434,8 @@ public:
 
 		double eqSampleRate = 48000;
 
-		GainToDecimalConverter gainToDecConv;
+		FilterProcess testFilter;
 
+		GainToDecimalConverter gainToDecConv;
 	};
 

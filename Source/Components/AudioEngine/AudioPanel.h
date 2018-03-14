@@ -7,12 +7,14 @@
 #include "Filtering&EQ\AutoFilter.h"
 #include "Filtering&EQ\AutoEQ.h"
 #include "Delay&Reverb\AutoReverb.h"
+#include "Utilities\SimpleFade.h"
 
 
 class LTLAAudioPanel : public AudioSource,
 					   public Component,
 					   public Button::Listener,
-					   public ComboBox::Listener
+					   public ComboBox::Listener,
+	                   public Slider::Listener
 {
 
 public:
@@ -37,7 +39,9 @@ public:
 
 /** Called when a combobox value is changed, for example the audio input is set here */
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-	
+
+	void sliderValueChanged(Slider* slider) override;
+		
 /** Closes all of the panels of all the DSP modules (Not the audioPanel itself) */
 	void closeAllPanels();
 
@@ -90,6 +94,9 @@ public:
 
 private:
 
+	enum { buttonFilePlayerID, buttonAutoPannerID, buttonAutoFilterID, buttonAutoEQID, buttonAutoReverbID, numOfButtons };
+	enum {inputLabel, fadeTimeLabel, numOfLabels};
+
 	FilePlayer filePlayer;
 	AutoPanner autoPanner;
 	AutoFilter autoFilter;
@@ -98,14 +105,23 @@ private:
 	ValueTree audioPanelValueTree;
 
 	ComboBox inputComboBox;
-
-	enum {buttonFilePlayerID, buttonAutoPannerID, buttonAutoFilterID, buttonAutoEQID, buttonAutoReverbID, numOfButtons};
+	Slider areaFadeTimeSlider;
 	TextButton audioPanelButton[numOfButtons];
+	Label labels[numOfLabels];
 
 	int currentlySelectedAreaID = 0;
-	//int audioInputID = FilePlayerInput;
 
 	bool performerInsideArea[2];
+	bool performerPreviouslyEnteredArea[2];
+	bool performerPreviouslyExitedArea[2];
+
+	AudioSampleBuffer rawInputBuffer;
+	SimpleFade processedBufferFade;
+	SimpleFade rawBufferFade;
+	float samplerate = 48000;
+	float fadeTimeInSamples;
+
+
 
 
 };

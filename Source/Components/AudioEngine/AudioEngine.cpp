@@ -204,7 +204,7 @@
 					// call performerEnteredArea if the enter state is true and they are still in the area
 					// and if either retrigger mode is turned on or the fileplayer has finished previous playback.
 					if (areaData[area]->performerEnteredAreaState[performer] == true && areaData[area]->areaContainsPerformer[performer] == true)
-					{
+					{						
 						if (audioPanel[area]->getFilePlayerRetriggerState() == true || audioPanel[area]->getFilePlayerPlayBackState() == false)
 						{
 							performerEnteredArea(performer, area);

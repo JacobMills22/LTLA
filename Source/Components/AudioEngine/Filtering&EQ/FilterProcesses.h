@@ -17,11 +17,9 @@ public:
 		
 		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 		{
-			outputL[sample] = (coefficientA0 * inputL[sample]) + (coefficientA1 * delayedSampleX1L) + (coefficientA2 * delayedSampleX2L)
-				                                               - (coefficientB1 * delayedSampleY1L) - (coefficientB2 * delayedSampleY2L);
+			outputL[sample] = (coefficientA0 * inputL[sample]) + (coefficientA1 * delayedSampleX1L) + (coefficientA2 * delayedSampleX2L) - (coefficientB1 * delayedSampleY1L) - (coefficientB2 * delayedSampleY2L);
 
-			outputR[sample] = (coefficientA0 * inputR[sample]) + (coefficientA1 * delayedSampleX1R) + (coefficientA2 * delayedSampleX2R)
-				                                               - (coefficientB1 * delayedSampleY1R) - (coefficientB2 * delayedSampleY2R);
+			outputR[sample] = (coefficientA0 * inputR[sample]) + (coefficientA1 * delayedSampleX1R) + (coefficientA2 * delayedSampleX2R) - (coefficientB1 * delayedSampleY1R) - (coefficientB2 * delayedSampleY2R);
 
 			delayedSampleX2L = delayedSampleX1L;
 			delayedSampleX1L = inputL[sample];
@@ -38,7 +36,26 @@ public:
 		}
 	}
 
-	void setCutoffinHz(double cutoff, double sampleRate, double Qfactor, double gain)
+	void processChannel(AudioSampleBuffer &buffer, int channel)
+	{
+		float* output = buffer.getWritePointer(channel);
+
+		const float* input = buffer.getReadPointer(channel);
+
+		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+		{
+			output[sample] = (coefficientA0 * input[sample]) + (coefficientA1 * delayedSampleX1L) + (coefficientA2 * delayedSampleX2L) - (coefficientB1 * delayedSampleY1L) - (coefficientB2 * delayedSampleY2L);
+			
+			delayedSampleX2L = delayedSampleX1L;
+			delayedSampleX1L = input[sample];
+
+			delayedSampleY2L = delayedSampleY1L;
+			delayedSampleY1L = output[sample];
+
+		}
+	}
+
+	void setCutoffinHz(double cutoff, double sampleRate, double Qfactor, double gain, bool test = false)
 	{
 
 		if (filterType == lowpass)
@@ -79,11 +96,13 @@ public:
 		}
 		else if (filterType == peaking)
 		{
+			cutoff = cutoff * 0.5;
+
 			double omega = double_Pi * 2.0 * cutoff / sampleRate;
 
 			double gainIndec = pow(10, (gain / 20));
 			double g0 = 0.5 * (gainIndec - 1.0);
-			
+
 			double g1 = 2.0 / (1.0 + g0);
 			
 			double twoQ = 2.0 * Qfactor;
@@ -266,30 +285,30 @@ public:
 
 	PeakingFilter()
 	{
-		for (int filterID = 0; filterID < numOfFilters; filterID++)
-		{
-			filterSeries[filterID].makePeaking();
-		}
+	//	for (int filterID = 0; filterID < numOfFilters; filterID++)
+	//	{
+			filterSeries.makePeaking();
+	//	}
 	}
 
 	void process(AudioSampleBuffer &buffer)
 	{
-		for (int filterID = 0; filterID < numOfFilters; filterID++)
-		{
-			filterSeries[filterID].process(buffer);
-		}
+	//	for (int filterID = 0; filterID < numOfFilters; filterID++)
+	//	{
+			filterSeries.process(buffer);
+	//	}
 	}
 
 	void setCutoff(double cutoff, double sampleRate, double qFactor, double gain)
 	{
-		for (int filterID = 0; filterID < numOfFilters; filterID++)
-		{
-			filterSeries[filterID].setCutoffinHz(cutoff, sampleRate, qFactor, gain);
-		}
+	//	for (int filterID = 0; filterID < numOfFilters; filterID++)
+	//	{
+			filterSeries.setCutoffinHz(cutoff, sampleRate, qFactor, gain);
+	//	}
 	}
 
 private:
 
-	enum { numOfFilters = 1 };
-	FilterProcess filterSeries[numOfFilters];
+//	enum { numOfFilters = 1 };
+	FilterProcess filterSeries;
 };

@@ -5,7 +5,9 @@
 	{
 		performerInsideArea[0] = false;
 		performerInsideArea[1] = false;
-		
+		performerPreviouslyExitedArea[0] = false;
+		performerPreviouslyExitedArea[1] = false;
+				
 		addAndMakeVisible(filePlayer);
 		addAndMakeVisible(autoPanner);
 		addAndMakeVisible(autoFilter);
@@ -30,7 +32,23 @@
 		inputComboBox.addItem("Performer 2", 3);
 		inputComboBox.addListener(this);
 		inputComboBox.setSelectedId(1, dontSendNotification);
-		
+
+		addAndMakeVisible(areaFadeTimeSlider);
+		areaFadeTimeSlider.addListener(this);
+		areaFadeTimeSlider.setRange(0.1, 5, 0.1);
+		areaFadeTimeSlider.setSliderStyle(Slider::RotaryVerticalDrag);
+		areaFadeTimeSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
+		areaFadeTimeSlider.setValue(0.3, sendNotification);
+
+		for (int labelID = 0; labelID < numOfLabels; labelID++)
+		{
+			addAndMakeVisible(labels[labelID]);
+			labels[labelID].setJustificationType(Justification::centred);
+		}
+
+		labels[inputLabel].setText("Area Input", dontSendNotification);
+		labels[fadeTimeLabel].setText("Fade Time", dontSendNotification);
+				
 		filePlayer.closePanel();
 		autoPanner.closePanel();
 		autoFilter.closePanel();
@@ -48,11 +66,16 @@
 
 	void LTLAAudioPanel::prepareToPlay(int samplesPerBlockExpected, double sampleRate)  
 	{
+		samplerate = sampleRate;
+
+		rawInputBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
+
 		filePlayer.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoPanner.prepareToPlay(samplesPerBlockExpected, sampleRate);
 
 		//autoFilter.initialise(sampleRate);
 		autoFilter.setSampleRate(sampleRate);
+		autoEQ.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoReverb.prepareToPlay(samplesPerBlockExpected, sampleRate);
 	}
 
@@ -67,11 +90,40 @@
 	{	
 		if (getAudioInputID() == Performer1)
 		{
-			//if (performerInsideArea[0] == true)
-			{
-			//	autoPanner.process(*bufferToFill.buffer);
+				rawInputBuffer.makeCopyOf(*bufferToFill.buffer);
+
+				autoPanner.process(*bufferToFill.buffer);
 				autoFilter.process(*bufferToFill.buffer);
-			}
+				autoEQ.process(*bufferToFill.buffer);
+				autoReverb.process(*bufferToFill.buffer);
+			
+				if (performerInsideArea[0] == true && performerPreviouslyEnteredArea[0] == false)
+				{
+					processedBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
+					rawBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
+				}
+
+				if (performerInsideArea[0] == false && performerPreviouslyExitedArea[0] == false)
+				{
+					processedBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
+					rawBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
+				}
+
+				float* outputL = bufferToFill.buffer->getWritePointer(0);
+				float* outputR = bufferToFill.buffer->getWritePointer(1);
+
+				float* rawInputL = rawInputBuffer.getWritePointer(0);
+				float* rawInputR = rawInputBuffer.getWritePointer(1);
+
+				for (int sample = 0; sample < bufferToFill.buffer->getNumSamples(); sample++)
+				{
+					outputL[sample] = (outputL[sample] * processedBufferFade.process()) + (rawInputL[sample] * rawBufferFade.process());
+					outputR[sample] = (outputR[sample] * processedBufferFade.process()) + (rawInputR[sample] * rawBufferFade.process());
+				}
+
+				performerInsideArea[0] == true ? performerPreviouslyEnteredArea[0] = true : performerPreviouslyEnteredArea[0] = false;
+				performerInsideArea[0] == false ? performerPreviouslyExitedArea[0] = true : performerPreviouslyExitedArea[0] = false;
+
 		}
 		else if (getAudioInputID() == FilePlayerInput)
 		{
@@ -84,19 +136,24 @@
 
 	void LTLAAudioPanel::resized()
 	{
-		audioPanelButton[buttonFilePlayerID].setBounds(5, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
+		audioPanelButton[buttonFilePlayerID].setBounds(getWidth() * 0.16, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoPannerID].setBounds(audioPanelButton[buttonFilePlayerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoFilterID].setBounds(audioPanelButton[buttonAutoPannerID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoEQID].setBounds(audioPanelButton[buttonAutoFilterID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 		audioPanelButton[buttonAutoReverbID].setBounds(audioPanelButton[buttonAutoEQID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
-
-		
+				
 		inputComboBox.setBounds(5, getHeight() * 0.08, getWidth() * 0.15, getHeight() * 0.1);
+		areaFadeTimeSlider.setBounds(5, getHeight() * 0.3, getWidth() * 0.15, getHeight() * 0.3);
+
 		filePlayer.setBounds(getWidth() * 0.25, audioPanelButton[buttonFilePlayerID].getBottom() + (getHeight() * 0.1), getWidth() * 0.6, getHeight() * 0.8);
 		autoPanner.setBounds(filePlayer.getBounds());
 		autoFilter.setBounds(filePlayer.getBounds());
 		autoEQ.setBounds(filePlayer.getBounds());
 		autoReverb.setBounds(filePlayer.getBounds());
+
+		labels[inputLabel].setBounds(5, 0, getWidth() * 0.15, getHeight() * 0.07);
+		labels[fadeTimeLabel].setBounds(5, getHeight() * 0.15, getWidth() * 0.15, getHeight() * 0.3);
+
 
 	}
 
@@ -139,6 +196,15 @@
 			setAudioInputID(inputComboBox.getSelectedId());
 		}
 	}
+
+	void LTLAAudioPanel::sliderValueChanged(Slider* slider)
+	{
+		if (slider == &areaFadeTimeSlider)
+		{
+			fadeTimeInSamples = samplerate * areaFadeTimeSlider.getValue();
+		}
+	}
+
 
 	void LTLAAudioPanel::closeAllPanels()
 	{
