@@ -26,6 +26,10 @@
 		audioPanelButton[buttonAutoEQID].setButtonText("EQ");
 		audioPanelButton[buttonAutoReverbID].setButtonText("Reverb");
 
+		addAndMakeVisible(autoMuteButton);
+		autoMuteButton.addListener(this);
+		autoMuteButton.setButtonText("Auto Mute");
+
 		addAndMakeVisible(inputComboBox);
 		inputComboBox.addItem("File Player", 1);
 		inputComboBox.addItem("Performer 1", 2);
@@ -35,7 +39,7 @@
 
 		addAndMakeVisible(areaFadeTimeSlider);
 		areaFadeTimeSlider.addListener(this);
-		areaFadeTimeSlider.setRange(0.1, 5, 0.1);
+		areaFadeTimeSlider.setRange(0.0, 5, 0.1);
 		areaFadeTimeSlider.setSliderStyle(Slider::RotaryVerticalDrag);
 		areaFadeTimeSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
 		areaFadeTimeSlider.setValue(0.3, sendNotification);
@@ -48,7 +52,7 @@
 
 		labels[inputLabel].setText("Area Input", dontSendNotification);
 		labels[fadeTimeLabel].setText("Fade Time", dontSendNotification);
-				
+
 		filePlayer.closePanel();
 		autoPanner.closePanel();
 		autoFilter.closePanel();
@@ -64,7 +68,7 @@
 
 	}
 
-	void LTLAAudioPanel::prepareToPlay(int samplesPerBlockExpected, double sampleRate)  
+	void LTLAAudioPanel::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 	{
 		samplerate = sampleRate;
 
@@ -87,39 +91,58 @@
 	}
 
 	void LTLAAudioPanel::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
-	{	
+	{
 		if (getAudioInputID() == Performer1)
 		{
-				rawInputBuffer.makeCopyOf(*bufferToFill.buffer);
+			rawInputBuffer.makeCopyOf(*bufferToFill.buffer);
 
-				autoPanner.process(*bufferToFill.buffer);
-				autoFilter.process(*bufferToFill.buffer);
-				autoEQ.process(*bufferToFill.buffer);
-				autoReverb.process(*bufferToFill.buffer);
-			
-				if (performerInsideArea[0] == true && performerPreviouslyEnteredArea[0] == false)
+			autoPanner.process(*bufferToFill.buffer);
+			autoFilter.process(*bufferToFill.buffer);
+			autoEQ.process(*bufferToFill.buffer);
+			autoReverb.process(*bufferToFill.buffer);
+
+			if (performerInsideArea[0] == true && performerPreviouslyEnteredArea[0] == false)
+			{
+				processedBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
+				rawBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
+
+				if (autoMuteState == true)
 				{
-					processedBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
-					rawBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
+					autoMuteFade.initialiseFade(0.0, 1.0, samplerate * 0.1);
 				}
+			}
 
-				if (performerInsideArea[0] == false && performerPreviouslyExitedArea[0] == false)
+			if (performerInsideArea[0] == false && performerPreviouslyExitedArea[0] == false)
+			{
+				processedBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
+				rawBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
+
+				if (autoMuteState == true)
 				{
-					processedBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
-					rawBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
+					autoMuteFade.initialiseFade(1.0, 0.0, samplerate * 0.1);
 				}
+			}
 
-				float* outputL = bufferToFill.buffer->getWritePointer(0);
-				float* outputR = bufferToFill.buffer->getWritePointer(1);
+			float* outputL = bufferToFill.buffer->getWritePointer(0);
+			float* outputR = bufferToFill.buffer->getWritePointer(1);
 
-				float* rawInputL = rawInputBuffer.getWritePointer(0);
-				float* rawInputR = rawInputBuffer.getWritePointer(1);
+			float* rawInputL = rawInputBuffer.getWritePointer(0);
+			float* rawInputR = rawInputBuffer.getWritePointer(1);
 
+			for (int sample = 0; sample < bufferToFill.buffer->getNumSamples(); sample++)
+			{
+				outputL[sample] = (outputL[sample] * processedBufferFade.process()) + (rawInputL[sample] * rawBufferFade.process());
+				outputR[sample] = (outputR[sample] * processedBufferFade.process()) + (rawInputR[sample] * rawBufferFade.process());
+			}
+
+			if (autoMuteState == true)
+			{
 				for (int sample = 0; sample < bufferToFill.buffer->getNumSamples(); sample++)
 				{
-					outputL[sample] = (outputL[sample] * processedBufferFade.process()) + (rawInputL[sample] * rawBufferFade.process());
-					outputR[sample] = (outputR[sample] * processedBufferFade.process()) + (rawInputR[sample] * rawBufferFade.process());
+					outputL[sample] = (outputL[sample] * autoMuteFade.process());
+					outputR[sample] = (outputR[sample] * autoMuteFade.process());
 				}
+			}
 
 				performerInsideArea[0] == true ? performerPreviouslyEnteredArea[0] = true : performerPreviouslyEnteredArea[0] = false;
 				performerInsideArea[0] == false ? performerPreviouslyExitedArea[0] = true : performerPreviouslyExitedArea[0] = false;
@@ -143,7 +166,8 @@
 		audioPanelButton[buttonAutoReverbID].setBounds(audioPanelButton[buttonAutoEQID].getRight() + getWidth() * 0.01, getHeight() * 0.01, getWidth() * 0.1, getHeight() * 0.05);
 				
 		inputComboBox.setBounds(5, getHeight() * 0.08, getWidth() * 0.15, getHeight() * 0.1);
-		areaFadeTimeSlider.setBounds(5, getHeight() * 0.3, getWidth() * 0.15, getHeight() * 0.3);
+		areaFadeTimeSlider.setBounds(5, getHeight() * 0.25, getWidth() * 0.15, getHeight() * 0.3);
+		autoMuteButton.setBounds(5 + (inputComboBox.getWidth() * 0.5) - (getWidth() * 0.1 * 0.5), getHeight() * 0.5, getWidth() * 0.1, getHeight() * 0.3);
 
 		filePlayer.setBounds(getWidth() * 0.25, audioPanelButton[buttonFilePlayerID].getBottom() + (getHeight() * 0.1), getWidth() * 0.6, getHeight() * 0.8);
 		autoPanner.setBounds(filePlayer.getBounds());
@@ -151,8 +175,8 @@
 		autoEQ.setBounds(filePlayer.getBounds());
 		autoReverb.setBounds(filePlayer.getBounds());
 
-		labels[inputLabel].setBounds(5, 0, getWidth() * 0.15, getHeight() * 0.07);
-		labels[fadeTimeLabel].setBounds(5, getHeight() * 0.15, getWidth() * 0.15, getHeight() * 0.3);
+		labels[inputLabel].setBounds(5, 0, getWidth() * 0.15, 30);
+		labels[fadeTimeLabel].setBounds(5, getHeight() * 0.19, getWidth() * 0.15, 30);
 
 
 	}
@@ -186,6 +210,11 @@
 		{
 			audioPanelButton[buttonAutoReverbID].setToggleState(!audioPanelButton[buttonAutoReverbID].getToggleState(), dontSendNotification);
 			audioPanelButton[buttonAutoReverbID].getToggleState() == false ? autoReverb.closePanel() : autoReverb.openPanel();
+		}
+		else if (button == &autoMuteButton)
+		{
+			autoMuteState = autoMuteButton.getToggleState();
+			//autoMuteState == true ? autoMuteFade.initialiseFade(1.0, 0.0, (samplerate * 0.1)) : autoMuteFade.initialiseFade(0.0, 1.0, (samplerate * 0.1));
 		}
 	}
 

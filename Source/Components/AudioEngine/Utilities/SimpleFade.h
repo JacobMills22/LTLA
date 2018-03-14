@@ -2,6 +2,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+// Based off this guide - http://www.martin-finke.de/blog/articles/audio-plugins-011-envelopes/
+
 class SimpleFade
 {
 

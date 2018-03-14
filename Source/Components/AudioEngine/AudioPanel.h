@@ -107,6 +107,8 @@ private:
 	ComboBox inputComboBox;
 	Slider areaFadeTimeSlider;
 	TextButton audioPanelButton[numOfButtons];
+	ToggleButton autoMuteButton;
+	bool autoMuteState = false;
 	Label labels[numOfLabels];
 
 	int currentlySelectedAreaID = 0;
@@ -118,6 +120,7 @@ private:
 	AudioSampleBuffer rawInputBuffer;
 	SimpleFade processedBufferFade;
 	SimpleFade rawBufferFade;
+	SimpleFade autoMuteFade;
 	float samplerate = 48000;
 	float fadeTimeInSamples;
 
