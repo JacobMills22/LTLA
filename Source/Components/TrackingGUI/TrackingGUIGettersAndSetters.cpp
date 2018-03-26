@@ -140,12 +140,7 @@ void TrackingGUI::setKinectTrackingState(int performerNum, bool state)
 bool TrackingGUI::doesAreaIDContainPerfomer(int performerID, int areaID)
 {
 	if (stageAreas[areaID]->getAreaPath().contains(ellipseCoordinates[performerID].x, ellipseCoordinates[performerID].y) == true)
-	{
 		return true;
-	}
 	else
-	{
 		return false;
-	}
-
 }

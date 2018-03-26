@@ -37,22 +37,10 @@ public:
 		return currentFade;
 	}
 
-	void setNeedsReinitialising(bool state)
-	{
-		needsInitialising = state;
-	}
-
-	bool getNeedsReinitialising()
-	{
-		return needsInitialising;
-	}
-
 private:
 
 	double multiplier = 0.0;
 	double currentFade = 0.0001;
 	int fadeLengthInSamples;
 	int timesProcessed = 0;
-
-	bool needsInitialising = true;
 };

@@ -49,7 +49,7 @@ public:
 		eqSliderValueLabel[qFactorSliderID].setEditable(true, true, false);
 		eqSliderNameLabel[qFactorSliderID].setText("Q Factor", dontSendNotification);
 						
-		eqSlider[gainSliderID].setRange(-18.0, 18.0, 0.5);
+		eqSlider[gainSliderID].setRange(-18.0, 30.0, 0.5);
 		eqSlider[gainSliderID].setValue(0.0, dontSendNotification);
 		eqSliderValueLabel[gainSliderID].setText("0.0 dB", dontSendNotification);
 		eqSliderValueLabel[gainSliderID].setEditable(true, true, false);

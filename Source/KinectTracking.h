@@ -39,7 +39,7 @@ public:
 	void updateKinectST();
 
 /** Handles the tracking data of two skeletons.
-	Stores data in (Vector4) LocationData array.
+	Stores data in (Vector4) performerData array.
 	Called in UpdateKinectST().*/
 	void setSkeletonPositionData(NUI_SKELETON_FRAME* pSkeletonFrame);
 

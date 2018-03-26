@@ -119,8 +119,6 @@ private:
 
 	AudioMeter stereoAudioMeter;
 
-	PerformerInput performerInput;
-
 	ResizableWindow audioSettingsWindow;
 
 	ValueTree valueTree;
