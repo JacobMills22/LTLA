@@ -92,8 +92,10 @@
 
 	void LTLAAudioPanel::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
 	{
-		if (getAudioInputID() == Performer1)
+		if (getAudioInputID() == Performer1 || getAudioInputID() == Performer2)
 		{
+			int performerID = getAudioInputID() - 2;
+
 			rawInputBuffer.makeCopyOf(*bufferToFill.buffer);
 
 			autoPanner.process(*bufferToFill.buffer);
@@ -101,7 +103,7 @@
 			autoEQ.process(*bufferToFill.buffer);
 			autoReverb.process(*bufferToFill.buffer);
 
-			if (performerInsideArea[0] == true && performerPreviouslyEnteredArea[0] == false)
+			if (performerInsideArea[performerID] == true && performerPreviouslyEnteredArea[performerID] == false)
 			{
 				processedBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
 				rawBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
@@ -112,7 +114,7 @@
 				}
 			}
 
-			if (performerInsideArea[0] == false && performerPreviouslyExitedArea[0] == false)
+			if (performerInsideArea[performerID] == false && performerPreviouslyExitedArea[performerID] == false)
 			{
 				processedBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
 				rawBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
@@ -144,8 +146,8 @@
 				}
 			}
 
-				performerInsideArea[0] == true ? performerPreviouslyEnteredArea[0] = true : performerPreviouslyEnteredArea[0] = false;
-				performerInsideArea[0] == false ? performerPreviouslyExitedArea[0] = true : performerPreviouslyExitedArea[0] = false;
+				performerInsideArea[performerID] == true ? performerPreviouslyEnteredArea[performerID] = true : performerPreviouslyEnteredArea[performerID] = false;
+				performerInsideArea[performerID] == false ? performerPreviouslyExitedArea[performerID] = true : performerPreviouslyExitedArea[performerID] = false;
 
 		}
 		else if (getAudioInputID() == FilePlayerInput)

@@ -52,10 +52,10 @@
 		// all fileplayers need to be added to a mixeraudiosource and removed if 
 		// the audiopanel doesn't have its input set to fileplayer.
 
-		// For each audiopanel which has its input set to performer 1
+		// For each audiopanel which has its input set to performer 1 or 2
 		for (int panel = 0; panel < audioPanel.size(); panel++)
 		{
-			if (audioPanel[panel]->getAudioInputID() == 2)
+			if (audioPanel[panel]->getAudioInputID() >= 2)
 			{
 				// Remove the fileplayer audiosource from the mixer and then process
 				mixerAudioSource.removeInputSource(audioPanel[panel]);

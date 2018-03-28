@@ -31,6 +31,14 @@ public:
 /**	Standard JUCE Function: Processes each DSP module*/
 	void getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) override;
 
+	void setChannelsToProcess(int leftChannel, int rightChannel)
+	{
+		leftChannelValue = leftChannel;
+		leftChannelValue = rightChannel;
+
+
+	}
+
 /**	Standard JUCE Function: sets the bounds of DSP modules */
 	void resized() override;
 
@@ -124,7 +132,7 @@ private:
 	float samplerate = 48000;
 	float fadeTimeInSamples;
 
-
-
+	int leftChannelValue = 0;
+	int RightChannelValue = 1;
 
 };

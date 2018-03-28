@@ -23,7 +23,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		
 		setSize(1000, 600);
 	//	deviceManager.initialise(2, 2, nullptr, true, String(), nullptr);
-		setAudioChannels(2, 2);
+		setAudioChannels(4, 2);
 		kinectSensor.startKinectST();
 		startTimer(kinectUpdateTimer, 40);
 		startTimer(guiTimer, 30);
