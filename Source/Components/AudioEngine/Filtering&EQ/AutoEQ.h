@@ -43,13 +43,13 @@ public:
 		eqSliderValueLabel[frequencySliderID].setEditable(true, true, false);
 		eqSliderNameLabel[frequencySliderID].setText("Frequency",dontSendNotification);
 				
-		eqSlider[qFactorSliderID].setRange(0.7, 10.0, 0.1);
+		eqSlider[qFactorSliderID].setRange(1.0, 10.0, 0.1);
 		eqSlider[qFactorSliderID].setValue(1.0, dontSendNotification);
 		eqSliderValueLabel[qFactorSliderID].setText("1.0", dontSendNotification);
 		eqSliderValueLabel[qFactorSliderID].setEditable(true, true, false);
 		eqSliderNameLabel[qFactorSliderID].setText("Q Factor", dontSendNotification);
 						
-		eqSlider[gainSliderID].setRange(-18.0, 30.0, 0.5);
+		eqSlider[gainSliderID].setRange(-18.0, 18.0, 0.5);
 		eqSlider[gainSliderID].setValue(0.0, dontSendNotification);
 		eqSliderValueLabel[gainSliderID].setText("0.0 dB", dontSendNotification);
 		eqSliderValueLabel[gainSliderID].setEditable(true, true, false);
@@ -74,8 +74,7 @@ public:
 			testFilter.makePeaking();
 			testFilter.setCutoffinHz(7000, sampleRate, 1, 18, true);
 
-			initialiseEQBands(sampleRate);
-
+			initialiseEQBands(sampleRate);			
 		}
 
 		void process(AudioSampleBuffer &buffer)
@@ -88,39 +87,14 @@ public:
 				const float* inputL = buffer.getReadPointer(0);
 				const float* inputR = buffer.getReadPointer(1);
 
-			//	testFilter.process(buffer);
-								
-				eqBand[0].peakingFilter.process(buffer);
-				eqBand[1].peakingFilter.process(buffer);
-				eqBand[2].peakingFilter.process(buffer);
-				eqBand[3].peakingFilter.process(buffer);
-				
-				/*
-				for (int band = 0; band < numOfBands; band++)
-				{
-					eqBand[band].buffer.makeCopyOf(buffer, false);
-				}
-
 				for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 				{
-					outputL[sample] = 0.0;
-					outputR[sample] = 0.0;
-				}
-
-				for (int band = 0; band < numOfBands; band++)
-				{
-					eqBand[band].peakingFilter.process(eqBand[band].buffer);
-
-					float* processedSampleL = eqBand[band].buffer.getWritePointer(0);
-					float* processedSampleR = eqBand[band].buffer.getWritePointer(1);
-
-					for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+					for (int band = 0; band < numOfBands; band++)
 					{
-						outputL[sample] += (processedSampleL[sample] * 0.25);
-						outputR[sample] += (processedSampleR[sample] * 0.25);
+						outputL[sample] = eqBand[band].peakingFilter[0].process(outputL[sample]);
+						outputR[sample] = eqBand[band].peakingFilter[0].process(outputR[sample]);
 					}
 				}
-				*/
 			}
 		}
 
@@ -161,10 +135,25 @@ public:
 
 			for (int band = 0; band < numOfBands; band++)
 			{
-				eqBand[band].uiGraphPoints[eqLineBandCentre].setXY((eqWidth * eqBand[band].uiCentreFreqModifier) + eqLeft, eqHeight * eqBand[band].uiGainModifierCurve);
-				eqBand[band].uiGraphPoints[eqLineBandStart].setXY(eqBand[band].uiGraphPoints[eqLineBandCentre].getX() - (eqWidth * eqBand[band].uiBandWidthModifier), eqCentreY);
-				eqBand[band].uiGraphPoints[eqLineBandEnd].setXY(eqBand[band].uiGraphPoints[eqLineBandCentre].getX() + (eqWidth * eqBand[band].uiBandWidthModifier), eqCentreY);
+				eqBand[band].uiGraphPoints[eqLineBandCentre].setXY((eqWidth * eqBand[band].uiCentreFreqModifier) + eqLeft, eqHeight * eqBand[band].uiGainModifierCurve);			
+				eqBand[band].uiGraphPoints[eqLineBandStart].setXY(eqBand[band].uiGraphPoints[eqLineBandCentre].getX() - (eqWidth * 0.4 * 0.25), eqCentreY);
+				eqBand[band].uiGraphPoints[eqLineBandEnd].setXY(eqBand[band].uiGraphPoints[eqLineBandCentre].getX() + (eqWidth * 0.4 * 0.25), eqCentreY);
+
+				float bandWidth = eqBand[band].uiGraphPoints[eqLineBandCentre].getX() - eqBand[band].uiGraphPoints[eqLineBandStart].getX();
+				float bandheight = eqBand[band].uiGraphPoints[eqLineBandCentre].getY() - eqCentreY;
+
+				float eqLineModLX = eqBand[band].uiGraphPoints[eqLineBandStart].getX() + (bandWidth * eqBand[band].uiBandWidthModifier);
+				float eqLineModLY = eqCentreY + (bandheight * (1.0 - eqBand[band].uiBandWidthModifier));
+
+				bandWidth = eqBand[band].uiGraphPoints[eqLineBandEnd].getX() - eqBand[band].uiGraphPoints[eqLineBandCentre].getX();
+				
+				float eqLineModRX = eqBand[band].uiGraphPoints[eqLineBandCentre].getX() + (bandWidth * (1.0 - eqBand[band].uiBandWidthModifier));
+				float eqLineModRY = eqCentreY + (bandheight * (1.0 - eqBand[band].uiBandWidthModifier));
+
+				eqBand[band].uiGraphPoints[eqLineModL].setXY(eqLineModLX, eqLineModLY);
+				eqBand[band].uiGraphPoints[eqLineModR].setXY(eqLineModRX, eqLineModRY);
 			}
+
 			mainEQLine[eqLineEnd].setXY(eqRight, eqCentreY);
 
 			eqCurve.clear();
@@ -176,17 +165,27 @@ public:
 			g.drawRect(eqBackground);
 
 			g.setColour(Colours::white);
+						
 			eqCurve.startNewSubPath(mainEQLine[eqLineStart]);
+
 			eqCurve.lineTo(eqBand[0].uiGraphPoints[eqLineBandStart]);
-			eqCurve.cubicTo(eqBand[0].uiGraphPoints[eqLineBandStart], eqBand[0].uiGraphPoints[eqLineBandCentre], eqBand[0].uiGraphPoints[eqLineBandEnd]);
+			eqCurve.quadraticTo(eqBand[0].uiGraphPoints[eqLineModL], eqBand[0].uiGraphPoints[eqLineBandCentre]);
+			eqCurve.quadraticTo(eqBand[0].uiGraphPoints[eqLineModR], eqBand[0].uiGraphPoints[eqLineBandEnd]);
+
 			eqCurve.lineTo(eqBand[1].uiGraphPoints[eqLineBandStart]);
-			eqCurve.cubicTo(eqBand[1].uiGraphPoints[eqLineBandStart], eqBand[1].uiGraphPoints[eqLineBandCentre], eqBand[1].uiGraphPoints[eqLineBandEnd]);
+			eqCurve.quadraticTo(eqBand[1].uiGraphPoints[eqLineModL], eqBand[1].uiGraphPoints[eqLineBandCentre]);
+			eqCurve.quadraticTo(eqBand[1].uiGraphPoints[eqLineModR], eqBand[1].uiGraphPoints[eqLineBandEnd]);
+
 			eqCurve.lineTo(eqBand[2].uiGraphPoints[eqLineBandStart]);
-			eqCurve.cubicTo(eqBand[2].uiGraphPoints[eqLineBandStart], eqBand[2].uiGraphPoints[eqLineBandCentre], eqBand[2].uiGraphPoints[eqLineBandEnd]);
+			eqCurve.quadraticTo(eqBand[2].uiGraphPoints[eqLineModL], eqBand[2].uiGraphPoints[eqLineBandCentre]);
+			eqCurve.quadraticTo(eqBand[2].uiGraphPoints[eqLineModR], eqBand[2].uiGraphPoints[eqLineBandEnd]);
+
 			eqCurve.lineTo(eqBand[3].uiGraphPoints[eqLineBandStart]);
-			eqCurve.cubicTo(eqBand[3].uiGraphPoints[eqLineBandStart], eqBand[3].uiGraphPoints[eqLineBandCentre], eqBand[3].uiGraphPoints[eqLineBandEnd]);
+			eqCurve.quadraticTo(eqBand[3].uiGraphPoints[eqLineModL], eqBand[3].uiGraphPoints[eqLineBandCentre]);
+			eqCurve.quadraticTo(eqBand[3].uiGraphPoints[eqLineModR], eqBand[3].uiGraphPoints[eqLineBandEnd]);
 
 			eqCurve.lineTo(mainEQLine[eqLineEnd]);
+
 
 			PathStrokeType strokeType(1.0, PathStrokeType::JointStyle::curved, PathStrokeType::EndCapStyle::rounded);
 			g.setColour(Colours::lightblue);
@@ -232,35 +231,40 @@ public:
 					double qFactor = eqSlider[qFactorSliderID].getValue();
 					double gainSliderValue = eqSlider[gainSliderID].getValue();
 
-				//	if (isFilterSafe(centreFrequency, qFactor) == true)
-					{
 						if (slider == &eqSlider[frequencySliderID])
 						{
-							eqBand[band].peakingFilter.setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
+							eqBand[band].peakingFilter[0].setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
+							eqBand[band].peakingFilter[1].setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
+
 							eqBand[band].sliderValues.frequency = centreFrequency;
 							eqSliderValueLabel[frequencySliderID].setText((String)centreFrequency + " Hz", dontSendNotification);
 						}
 						else if (slider == &eqSlider[qFactorSliderID])
 						{
-							eqBand[band].peakingFilter.setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
+							eqBand[band].peakingFilter[0].setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
+							eqBand[band].peakingFilter[1].setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
+
 							eqBand[band].sliderValues.qFactor = qFactor;
 							eqSliderValueLabel[qFactorSliderID].setText((String)qFactor, dontSendNotification);
 						}
 						else if (slider == &eqSlider[gainSliderID])
 						{
+							eqBand[band].peakingFilter[0].setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
+							eqBand[band].peakingFilter[1].setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
 							eqBand[band].sliderValues.gain = gainSliderValue;
-							eqBand[band].peakingFilter.setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
 							eqSliderValueLabel[gainSliderID].setText((String)gainSliderValue + " dB", dontSendNotification);
 							eqBand[band].audioGain = gainToDecConv.convertGainToDecimal(gainSliderValue);
 						}
 
 						//NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
 						eqBand[band].uiCentreFreqModifier = eqBand[band].freqUIRange.convertTo0to1(centreFrequency);
-						eqBand[band].uiBandWidthModifier = (centreFrequency / qFactor) / 20000;
 
-						eqBand[band].uiGainModifierCurve = (((gainSliderValue - -18.0) * (-0.5 - 1.5)) / (18.0 - -18.0)) + 1.5;
+						//eqBand[band].uiBandWidthModifier = ((centreFrequency / qFactor) / 20000);
+						eqBand[band].uiBandWidthModifier = (qFactor / 10) - 0.1;
+
 						eqBand[band].uiGainModifierHandle = (((gainSliderValue - -18.0) * (0.05 - 0.95)) / (18.0 - -18.0)) + 0.95;
-					}
+						eqBand[band].uiGainModifierCurve = eqBand[band].uiGainModifierHandle;
+					
 				}
 			}
 		}
@@ -371,10 +375,13 @@ public:
 			eqBand[2].colour = Colours::blue;
 			eqBand[3].colour = Colours::yellow;
 
-			eqBand[0].peakingFilter.setCutoff(100, sampleRate, 2.0, 0.0);
-			eqBand[1].peakingFilter.setCutoff(1000, sampleRate, 2.0, 0.0);
-			eqBand[2].peakingFilter.setCutoff(2500, sampleRate, 2.0, 0.0);
-			eqBand[3].peakingFilter.setCutoff(5000, sampleRate, 2.0, 0.0);
+			for (int chan = 0; chan < 2; chan++)
+			{
+				eqBand[0].peakingFilter[chan].setCutoff(100, sampleRate, 2.0, 0.0);
+				eqBand[1].peakingFilter[chan].setCutoff(1000, sampleRate, 2.0, 0.0);
+				eqBand[2].peakingFilter[chan].setCutoff(2500, sampleRate, 2.0, 0.0);
+				eqBand[3].peakingFilter[chan].setCutoff(5000, sampleRate, 2.0, 0.0);
+			}
 
 			for (int band = 0; band < numOfBands; band++)
 			{
@@ -389,7 +396,7 @@ public:
 
 		enum { numOfBands = 4 };
 		enum { eqLineStart, eqLineEnd };
-		enum { eqLineBandStart, eqLineBandCentre, eqLineBandEnd };
+		enum { eqLineBandStart, eqLineBandCentre, eqLineBandEnd, eqLineModL, eqLineModR };
 		
 		struct UISliderValues
 		{
@@ -400,14 +407,14 @@ public:
 
 		struct EQBand
 		{
-			PeakingFilter peakingFilter;
+			PeakingFilter peakingFilter[2];
 			AudioSampleBuffer buffer;
 			UISliderValues sliderValues;
 			float uiBandWidthModifier = 0.125;
 			float uiCentreFreqModifier = 0.5;
 			float uiGainModifierCurve = 0.5;
 			float uiGainModifierHandle = 0.5;
-			Point<float> uiGraphPoints[3];
+			Point<float> uiGraphPoints[5];
 			Point<float> handlePosition;
 			bool selected = false;
 			Colour colour = Colours::blue;

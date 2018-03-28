@@ -7,7 +7,6 @@
 #include "Components\AudioEngine\AudioEngine.h"
 #include "Components\AudioEngine\Meter.h"
 #include "SnapshotManager.h"
-#include "SaveAndLoadingManager.h"
 
 
 class MainContentComponent : public AudioAppComponent,
