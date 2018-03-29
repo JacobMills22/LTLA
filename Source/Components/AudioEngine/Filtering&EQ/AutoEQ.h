@@ -18,7 +18,7 @@ class AutoEQ : public AudioPanelObject,
 
 public:
 
-	AutoEQ()
+	AutoEQ() : autoEQValueTree("autoEQValueTree")
 	{
 
 		for (int parameter = 0; parameter < numOfSliders; parameter++)
@@ -59,7 +59,60 @@ public:
 		bypassButton.addListener(this);
 		bypassButton.setButtonText("Bypass");
 		bypassButton.setToggleState(true, sendNotification);
-				
+
+		for (int band = 0; band < numOfBands; band++)
+		{
+			eqBand[band].sliderValues.qFactor.setValue(2.0);
+		}
+
+
+		autoEQValueTree.setProperty("Bypassed", true, nullptr);
+		autoEQValueTree.setProperty("Band1_Frequency", 0, nullptr);
+		autoEQValueTree.setProperty("Band1_QFactor", 2.0, nullptr);
+		autoEQValueTree.setProperty("Band1_Gain", 0, nullptr);
+		autoEQValueTree.setProperty("Band2_Frequency", 0, nullptr);
+		autoEQValueTree.setProperty("Band2_QFactor", 2.0, nullptr);
+		autoEQValueTree.setProperty("Band2_Gain", 0, nullptr);
+		autoEQValueTree.setProperty("Band3_Frequency", 0, nullptr);
+		autoEQValueTree.setProperty("Band3_QFactor", 2.0, nullptr);
+		autoEQValueTree.setProperty("Band3_Gain", 0, nullptr);
+		autoEQValueTree.setProperty("Band4_Frequency", 0, nullptr);
+		autoEQValueTree.setProperty("Band4_QFactor", 2.0, nullptr);
+		autoEQValueTree.setProperty("Band4_Gain", 0, nullptr);
+		
+		bypassButton.getToggleStateValue().referTo(autoEQValueTree.getPropertyAsValue("Bypassed", nullptr));
+
+		eqBand[0].sliderValues.frequency.referTo(autoEQValueTree.getPropertyAsValue("Band1_Frequency", nullptr));
+		eqBand[0].sliderValues.qFactor.referTo(autoEQValueTree.getPropertyAsValue("Band1_QFactor", nullptr));
+		eqBand[0].sliderValues.gain.referTo(autoEQValueTree.getPropertyAsValue("Band1_Gain", nullptr));
+
+		eqBand[1].sliderValues.frequency.referTo(autoEQValueTree.getPropertyAsValue("Band2_Frequency", nullptr));
+		eqBand[1].sliderValues.qFactor.referTo(autoEQValueTree.getPropertyAsValue("Band2_QFactor", nullptr));
+		eqBand[1].sliderValues.gain.referTo(autoEQValueTree.getPropertyAsValue("Band2_Gain", nullptr));
+
+		eqBand[2].sliderValues.frequency.referTo(autoEQValueTree.getPropertyAsValue("Band3_Frequency", nullptr));
+		eqBand[2].sliderValues.qFactor.referTo(autoEQValueTree.getPropertyAsValue("Band3_QFactor", nullptr));
+		eqBand[2].sliderValues.gain.referTo(autoEQValueTree.getPropertyAsValue("Band3_Gain", nullptr));
+
+		eqBand[3].sliderValues.frequency.referTo(autoEQValueTree.getPropertyAsValue("Band4_Frequency", nullptr));
+		eqBand[3].sliderValues.qFactor.referTo(autoEQValueTree.getPropertyAsValue("Band4_QFactor", nullptr));
+		eqBand[3].sliderValues.gain.referTo(autoEQValueTree.getPropertyAsValue("Band4_Gain", nullptr));
+	}
+
+	void snapshotFired()
+	{
+		bypassState = bypassButton.getToggleState();
+
+		for (int band = 0; band < numOfBands; band++)
+		{
+			double frequency = eqBand[band].sliderValues.frequency.getValue();
+			double qFactor = eqBand[band].sliderValues.qFactor.getValue();
+			double gain = eqBand[band].sliderValues.gain.getValue();
+
+			updateBandData(band, frequency, qFactor, gain);
+		}
+
+		selectEQBand(0);
 	}
 
 		void prepareToPlay(int samplesPerBlockExpected, double sampleRate)
@@ -253,7 +306,6 @@ public:
 							eqBand[band].peakingFilter[1].setCutoff(centreFrequency, eqSampleRate, qFactor, gainSliderValue);
 							eqBand[band].sliderValues.gain = gainSliderValue;
 							eqSliderValueLabel[gainSliderID].setText((String)gainSliderValue + " dB", dontSendNotification);
-							eqBand[band].audioGain = gainToDecConv.convertGainToDecimal(gainSliderValue);
 						}
 
 						//NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
@@ -267,6 +319,30 @@ public:
 					
 				}
 			}
+		}
+
+		void updateBandData(int band, double frequency, double qFactor, double gain)
+		{
+			eqBand[band].peakingFilter[0].setCutoff(frequency, eqSampleRate, qFactor, gain);
+			eqBand[band].peakingFilter[1].setCutoff(frequency, eqSampleRate, qFactor, gain);
+
+			eqBand[band].sliderValues.frequency = frequency;
+			eqBand[band].sliderValues.qFactor = qFactor;
+			eqBand[band].sliderValues.gain = gain;
+			
+			eqSliderValueLabel[frequencySliderID].setText((String)frequency + " Hz", dontSendNotification);
+			eqSliderValueLabel[qFactorSliderID].setText((String)qFactor, dontSendNotification);
+			eqSliderValueLabel[gainSliderID].setText((String)gain + " dB", dontSendNotification);
+
+			//NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+			eqBand[band].uiCentreFreqModifier = eqBand[band].freqUIRange.convertTo0to1(frequency);
+
+			//eqBand[band].uiBandWidthModifier = ((centreFrequency / qFactor) / 20000);
+			eqBand[band].uiBandWidthModifier = (qFactor / 10) - 0.1;
+
+			eqBand[band].uiGainModifierHandle = (((gain - -18.0) * (0.05 - 0.95)) / (18.0 - -18.0)) + 0.95;
+			eqBand[band].uiGainModifierCurve = eqBand[band].uiGainModifierHandle;
+
 		}
 
 		void labelTextChanged(Label* labelThatHasChanged) override
@@ -322,9 +398,9 @@ public:
 			}
 
 			eqBand[bandID].selected = true;
-			eqSlider[frequencySliderID].setValue(eqBand[bandID].sliderValues.frequency, dontSendNotification);
-			eqSlider[qFactorSliderID].setValue(eqBand[bandID].sliderValues.qFactor, dontSendNotification);
-			eqSlider[gainSliderID].setValue(eqBand[bandID].sliderValues.gain, dontSendNotification);
+			eqSlider[frequencySliderID].setValue(eqBand[bandID].sliderValues.frequency.getValue(), dontSendNotification);
+			eqSlider[qFactorSliderID].setValue(eqBand[bandID].sliderValues.qFactor.getValue(), dontSendNotification);
+			eqSlider[gainSliderID].setValue(eqBand[bandID].sliderValues.gain.getValue(), dontSendNotification);
 
 			eqSliderValueLabel[frequencySliderID].setText((String)eqSlider[frequencySliderID].getValue() + " Hz", dontSendNotification);
 			eqSliderValueLabel[qFactorSliderID].setText((String)eqSlider[qFactorSliderID].getValue(), dontSendNotification);
@@ -392,6 +468,11 @@ public:
 			}
 		}
 
+		ValueTree getValueTree()
+		{
+			return autoEQValueTree;
+		}
+
 	private:
 
 		enum { numOfBands = 4 };
@@ -400,9 +481,9 @@ public:
 		
 		struct UISliderValues
 		{
-			float frequency = 0.0;
-			float qFactor = 2.0;
-			float gain = 0.0;
+			Value frequency;
+			Value qFactor;
+			Value gain;
 		};
 
 		struct EQBand
@@ -444,5 +525,8 @@ public:
 		FilterProcess testFilter;
 
 		GainToDecimalConverter gainToDecConv;
+
+		ValueTree autoEQValueTree;
+
 	};
 

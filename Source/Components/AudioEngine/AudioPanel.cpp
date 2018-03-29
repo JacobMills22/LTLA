@@ -65,6 +65,8 @@
 		audioPanelValueTree.addChild(filePlayer.getValueTree(), 0, nullptr);
 		audioPanelValueTree.addChild(autoPanner.getValueTree(), 0, nullptr);
 		audioPanelValueTree.addChild(autoFilter.getValueTree(), 0, nullptr);
+		audioPanelValueTree.addChild(autoEQ.getValueTree(), 0, nullptr);
+		audioPanelValueTree.addChild(autoReverb.getValueTree(), 0, nullptr);
 
 	}
 
@@ -327,5 +329,7 @@
 		filePlayer.snapshotFired();
 		autoPanner.snapshotFired();
 		autoFilter.snapshotFired();
+		autoEQ.snapshotFired();
+		autoReverb.snapshotFired();
 	}
 

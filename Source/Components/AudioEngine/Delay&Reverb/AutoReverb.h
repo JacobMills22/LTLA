@@ -300,7 +300,7 @@ class AutoReverb : public AudioPanelObject,
 
 public:
 
-	AutoReverb()
+	AutoReverb() : autoReverbValueTree("AutoReverbValueTree")
 	{
 		for (int stage = 0; stage < numOfStages; stage++)
 		{
@@ -339,15 +339,13 @@ public:
 		labels[preDelayLabel].setText("Pre-Delay", dontSendNotification);
 		labels[feedbackLabel].setText("Feedback Amount", dontSendNotification);
 		labels[roomSizeLabel].setText("Room Size", dontSendNotification);
-
 		
-
 		addAndMakeVisible(filterCutoffSlider);
 		filterCutoffSlider.addListener(this);
 		filterCutoffSlider.setSliderStyle(Slider::TwoValueVertical);
 		filterCutoffSlider.setRange(20, 20000, 1);
 		filterCutoffSlider.setSkewFactor(0.23);
-		filterCutoffSlider.setMinAndMaxValues(500, 15000, dontSendNotification);
+		filterCutoffSlider.setMinAndMaxValues(100, 15000, dontSendNotification);
 
 		addAndMakeVisible(bypassButton);
 		bypassButton.addListener(this);
@@ -361,6 +359,49 @@ public:
 		sliderParam[feedbackAmount].setValue(1.0, sendNotification);
 		sliderParam[preDelay].setValue(20, sendNotification);
 		sliderParam[delayModifierID].setValue(10, sendNotification);
+
+		autoReverbValueTree.setProperty("Bypassed", true, nullptr);
+		autoReverbValueTree.setProperty("LowPassCutoff", 100.0, nullptr);
+		autoReverbValueTree.setProperty("HighPassCutoff", 15000.0, nullptr);
+		autoReverbValueTree.setProperty("DirectGain", 0.5, nullptr);
+		autoReverbValueTree.setProperty("ER_Gain", 0.2, nullptr);
+		autoReverbValueTree.setProperty("LR1_Gain", 0.7, nullptr);
+		autoReverbValueTree.setProperty("LR2_Gain", 0.9, nullptr);
+		autoReverbValueTree.setProperty("FeedbackAmount", 1.0, nullptr);
+		autoReverbValueTree.setProperty("Pre-Delay", 20.0, nullptr);
+		autoReverbValueTree.setProperty("DelayModifier", 10.0, nullptr);
+
+		bypassButton.getToggleStateValue().referTo(autoReverbValueTree.getPropertyAsValue("Bypassed", nullptr));
+		filterCutoffSlider.getMinValueObject().referTo(autoReverbValueTree.getPropertyAsValue("LowPassCutoff", nullptr));
+		filterCutoffSlider.getMaxValueObject().referTo(autoReverbValueTree.getPropertyAsValue("HighPassCutoff", nullptr));
+		gainSliders[direct].getValueObject().referTo(autoReverbValueTree.getPropertyAsValue("DirectGain", nullptr));
+		gainSliders[earlyReflections].getValueObject().referTo(autoReverbValueTree.getPropertyAsValue("ER_Gain", nullptr));
+		gainSliders[lateReflections1].getValueObject().referTo(autoReverbValueTree.getPropertyAsValue("LR1_Gain", nullptr));
+		gainSliders[lateReflections2].getValueObject().referTo(autoReverbValueTree.getPropertyAsValue("LR2_Gain", nullptr));
+		sliderParam[feedbackAmount].getValueObject().referTo(autoReverbValueTree.getPropertyAsValue("FeedbackAmount", nullptr));
+		sliderParam[preDelay].getValueObject().referTo(autoReverbValueTree.getPropertyAsValue("Pre-Delay", nullptr));
+		sliderParam[delayModifierID].getValueObject().referTo(autoReverbValueTree.getPropertyAsValue("DelayModifier", nullptr));
+		
+	}
+
+	void snapshotFired()
+	{
+		bypassState = bypassButton.getToggleState();
+		
+		gain[direct] = gainSliders[direct].getValue();
+		gain[earlyReflections] = gainSliders[earlyReflections].getValue();
+		gain[lateReflections1] = gainSliders[lateReflections1].getValue();
+		gain[lateReflections2] = gainSliders[lateReflections2].getValue();
+		
+		earlyReflectionsGenerator.setFilterCutoff(filterCutoffSlider.getMaxValue(), filterCutoffSlider.getMinValue());
+		preDelayUnit.setDelayTimeInMS(sliderParam[preDelay].getValue());
+		delayModifier = sliderParam[delayModifierID].getValue();
+
+		laterReflectionsGenerator[0].initialise(6.040, 8.864, 17.39, 48.87, delayModifier, 4000, 0.25);
+		laterReflectionsGenerator[1].initialise(34.27, 61.72, 74.6, 96.13, delayModifier, 900, 0.35);
+		
+		laterReflectionsGenerator[0].setFeedbackModifier(sliderParam[feedbackAmount].getValue());
+		laterReflectionsGenerator[1].setFeedbackModifier(sliderParam[feedbackAmount].getValue()); //fo
 		
 	}
 
@@ -524,11 +565,11 @@ public:
 		labels[feedbackLabel].setBounds(getWidth() * 0.60, getHeight() * 0.3, 100, 30);
 		labels[roomSizeLabel].setBounds(getWidth() * 0.82, getHeight() * 0.3, 100, 30);
 
+	}
 
-
-
-
-
+	ValueTree getValueTree()
+	{
+		return autoReverbValueTree;
 	}
 
 private:
@@ -555,4 +596,7 @@ private:
 
 	float delayModifier = 10.0;
 	bool bypassState = false;
+
+	ValueTree autoReverbValueTree;
+
 };

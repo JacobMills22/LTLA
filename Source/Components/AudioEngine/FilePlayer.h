@@ -94,7 +94,10 @@ public:
 
 		if (filePlayerValueTree.getPropertyAsValue("AudioFilePath", nullptr).toString() != "NULL")
 		{
-			reloadAudioFile();
+			if (filePlayerValueTree.getPropertyAsValue("AudioFilePath", nullptr).toString() != fileChooser->getCurrentFile().getFullPathName())
+			{
+				reloadAudioFile();
+			}
 			playbackLevel = fileplayerSlider[levelSliderID].getValue();
 		}
 	}
