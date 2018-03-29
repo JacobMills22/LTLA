@@ -64,6 +64,9 @@ public:
 /** Called when a mouse click is released.
 	This will simply ensure that all corners are deselected.*/
 	void mouseUp(const MouseEvent& event);
+
+	void mouseMove(const MouseEvent& event);
+
 		
 	//==============================================================================	
 							 /** Getters & Setters */

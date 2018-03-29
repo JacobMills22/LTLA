@@ -90,8 +90,6 @@ public:
 
 	void snapshotFired()
 	{
-		//setLevel(getLevel());
-
 		if (filePlayerValueTree.getPropertyAsValue("AudioFilePath", nullptr).toString() != "NULL")
 		{
 			if (filePlayerValueTree.getPropertyAsValue("AudioFilePath", nullptr).toString() != fileChooser->getCurrentFile().getFullPathName())

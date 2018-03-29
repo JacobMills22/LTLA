@@ -10,7 +10,7 @@ public:
 	void prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 	{
 		samplerate = sampleRate;
-		circularBufferSize = samplerate * 2.0;
+		circularBufferSize = sampleRate * 2.0;
 		circularBufferL = new float[circularBufferSize];
 		circularBufferR = new float[circularBufferSize];
 		
@@ -29,12 +29,14 @@ public:
 
 		const float* inputL = buffer.getReadPointer(0);
 		const float* inputR = buffer.getReadPointer(1);
+
+		DBG("DELAY TIME IS " + (String)delayTimeInSamples);
 		
 		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 		{
 			circularBufferWritePosition++;
 
-			if (circularBufferWritePosition > circularBufferSize - 1)
+			if (circularBufferWritePosition >= circularBufferSize)
 			{
 				circularBufferWritePosition = 0;
 			}
@@ -42,7 +44,7 @@ public:
 			circularBufferL[circularBufferWritePosition] = inputL[sample];
 			circularBufferR[circularBufferWritePosition] = inputR[sample];
 
-			int circularBufferReadPosition = circularBufferWritePosition - delayTimeInSamples;
+			int circularBufferReadPosition = circularBufferWritePosition - delayTimeInSamples; //force 1,2,3,4
 
 			if (circularBufferReadPosition < 0)
 			{
@@ -68,8 +70,8 @@ public:
 private:
 
 	float samplerate = 48000;
-	float *circularBufferL;
-	float *circularBufferR;
+	ScopedPointer<float> circularBufferL;
+	ScopedPointer<float> circularBufferR;
 
 	int circularBufferSize = 0;
 	int circularBufferWritePosition = 0;

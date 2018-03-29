@@ -108,3 +108,22 @@ void TrackingGUI::mouseUp(const MouseEvent& event)
 	}
 }
 
+void TrackingGUI::mouseMove(const MouseEvent& event)
+{
+	if (getStageAreaEditState() == true && stageAreas.size() > 0)
+	{
+		for (int corner = 0; corner < stageAreas[getCurrentlySelectedArea()]->numOfAreaCorners; corner++)
+		{
+			if (event.getPosition().getX() <= stageAreas[selectedAreaIndex]->getX(corner) + 10 && event.getPosition().getX() >= stageAreas[selectedAreaIndex]->getX(corner) - 10 &&
+				event.getPosition().getY() <= stageAreas[selectedAreaIndex]->getY(corner) + 10 && event.getPosition().getY() >= stageAreas[selectedAreaIndex]->getY(corner) - 10)
+			{
+				setMouseCursor(MouseCursor::DraggingHandCursor);
+				break;
+			}
+			else
+			{
+				setMouseCursor(MouseCursor::NormalCursor);
+			}
+		}
+	}
+}

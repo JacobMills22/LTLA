@@ -35,14 +35,13 @@ public:
 			eqSliderNameLabel[parameter].addListener(this);
 			eqSliderNameLabel[parameter].setJustificationType(Justification::centred);
 		}
-
+	
 		eqSlider[frequencySliderID].setRange(20, 20000, 1.0);
 		eqSlider[frequencySliderID].setSkewFactor(0.23);
 		eqSlider[frequencySliderID].setValue(20, dontSendNotification);
 		eqSliderValueLabel[frequencySliderID].setText("20 Hz", dontSendNotification);
 		eqSliderValueLabel[frequencySliderID].setEditable(true, true, false);
 		eqSliderNameLabel[frequencySliderID].setText("Frequency",dontSendNotification);
-				
 		eqSlider[qFactorSliderID].setRange(1.0, 10.0, 0.1);
 		eqSlider[qFactorSliderID].setValue(1.0, dontSendNotification);
 		eqSliderValueLabel[qFactorSliderID].setText("1.0", dontSendNotification);
@@ -176,8 +175,8 @@ public:
 			eqLeft = getWidth() * 0.01;
 			eqRight = (getWidth() * 0.7) + eqLeft;
 			float eqCentreY = ((getHeight() * 0.65) * 0.5);
-			float eqWidth = eqRight - eqLeft;
-			float eqHeight = getHeight() * 0.65;
+			eqWidth = eqRight - eqLeft;
+			eqHeight = getHeight() * 0.65;
 
 			Path eqCurve;
 			juce::Rectangle<float> eqBackground;
@@ -385,10 +384,73 @@ public:
 					if (event.y >= eqBand[band].handlePosition.y && event.y <= (eqBand[band].handlePosition.y + 20))
 					{
 						selectEQBand(band);
+						eqBand[band].handleBeingMoved = true;
 					}
 				}
 			}
+
+			mousePositionY = event.y;
+			mousePositionX = event.x;
 		}
+
+		void mouseUp(const MouseEvent& event) override
+		{
+			for (int band = 0; band < numOfBands; band++)
+			{
+				eqBand[band].handleBeingMoved = false;
+			}
+		}
+
+		void mouseDrag(const MouseEvent& event) override
+		{
+			for (int band = 0; band < numOfBands; band++)
+			{
+				if (eqBand[band].handleBeingMoved == true)
+				{
+					float gain = eqBand[band].sliderValues.gain.getValue();
+					float frequency = eqBand[band].sliderValues.frequency.getValue();
+
+					float oldValue = event.y / eqHeight;
+					oldValue = 1.0 - oldValue;
+					int mouseToGain = (((oldValue - 0.0) * (18 - -18)) / (1.0 - 0.0)) + -18;
+					mouseToGain <= -18 ? mouseToGain = -18 : NULL;
+					mouseToGain >= 18 ? mouseToGain = 18 : NULL;
+
+					float mouseToFreq = eqBand[band].freqUIRange.convertFrom0to1((event.x / eqWidth));
+					mouseToFreq <= 20.0 ? mouseToFreq = 20.0 : mouseToFreq = mouseToFreq;
+					mouseToFreq >= 20000.0 ? mouseToFreq = 20000.0 : mouseToFreq = mouseToFreq;
+
+					updateBandData(band, mouseToFreq, eqBand[band].sliderValues.qFactor.getValue(), mouseToGain);
+
+					eqSlider[frequencySliderID].setValue(mouseToFreq, dontSendNotification);
+					eqSlider[gainSliderID].setValue(mouseToGain, dontSendNotification);
+				}
+			}
+		}
+
+		void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override
+		{
+			for (int band = 0; band < numOfBands; band++)
+			{
+				if (eqBand[band].selected == true)
+				{
+					int qincrement = 0;
+
+					wheel.deltaY < 0.0 ? qincrement = 1 : qincrement = -1;
+					
+					float frequency = eqBand[band].sliderValues.frequency.getValue();
+					float qFactor = eqBand[band].sliderValues.qFactor.getValue();
+					float gain = eqBand[band].sliderValues.gain.getValue();
+					
+					qFactor += qincrement;
+					qFactor <= 1 ? qFactor = 1 : NULL;
+					qFactor >= 10 ? qFactor = 10 : NULL;
+					
+					updateBandData(band, frequency, qFactor, gain);
+				}
+			}
+		}
+
 
 		void selectEQBand(int bandID)
 		{
@@ -498,6 +560,7 @@ public:
 			Point<float> uiGraphPoints[5];
 			Point<float> handlePosition;
 			bool selected = false;
+			bool handleBeingMoved = false;
 			Colour colour = Colours::blue;
 
 			float audioGain = 0.0;
@@ -527,6 +590,12 @@ public:
 		GainToDecimalConverter gainToDecConv;
 
 		ValueTree autoEQValueTree;
+
+		float mousePositionY = 0.0;
+		float mousePositionX = 0.0;
+
+		float eqWidth = 100.0;
+		float eqHeight = 100.0;
 
 	};
 
