@@ -39,5 +39,8 @@ private:
 	ScopedPointer<MenuBarComponent> menuBar;
 	enum { fileIndexID, calibrationIndexID, gridIndexID, stageAreasID, preferencesID };
 
+
+	LTLACommandManager LTLAcmd;
+
 };
 

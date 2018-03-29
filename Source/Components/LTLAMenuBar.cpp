@@ -24,49 +24,50 @@
 
 	PopupMenu LTLAMenuBar::getMenuForIndex(int menuIndex, const String& menuBar) 
 	{
-		ApplicationCommandManager* commandManager = &LTLACommandManager::getApplicationCommandManager();
+		auto& commandManager = LTLAcmd.getApplicationCommandManager();
+
 		PopupMenu menu;
 
 		if (menuIndex == fileIndexID)
 		{
-			menu.addCommandItem(commandManager, saveID);
-			menu.addCommandItem(commandManager, saveAsID);
+			menu.addCommandItem(&commandManager, saveID); 
+			menu.addCommandItem(&commandManager, saveAsID);
 			menu.addSeparator();
-			menu.addCommandItem(commandManager, loadID);
+			menu.addCommandItem(&commandManager, loadID);
 		} 
 		else if (menuIndex == calibrationIndexID)
 		{
 			menu.addSeparator();
 			PopupMenu CalibrationIntervalSubMenu;
-			CalibrationIntervalSubMenu.addCommandItem(commandManager, interval5SecondsID);
-			CalibrationIntervalSubMenu.addCommandItem(commandManager, interval10SecondsID);
-			CalibrationIntervalSubMenu.addCommandItem(commandManager, interval20SecondsID);
+			CalibrationIntervalSubMenu.addCommandItem(&commandManager, interval5SecondsID);
+			CalibrationIntervalSubMenu.addCommandItem(&commandManager, interval10SecondsID);
+			CalibrationIntervalSubMenu.addCommandItem(&commandManager, interval20SecondsID);
 			menu.addSubMenu("Calibration Interval", CalibrationIntervalSubMenu, true);
-			menu.addCommandItem(commandManager, calibrationStartID);
+			menu.addCommandItem(&commandManager, calibrationStartID);
 			menu.addSeparator();
-			menu.addCommandItem(commandManager, drawStageID);
-			menu.addCommandItem(commandManager, editStageID);
+			menu.addCommandItem(&commandManager, drawStageID);
+			menu.addCommandItem(&commandManager, editStageID);
 		}
 		else if (menuIndex == gridIndexID)
 		{
-			menu.addCommandItem(commandManager, drawGridID);
-			menu.addCommandItem(commandManager, snaptoGridID);
+			menu.addCommandItem(&commandManager, drawGridID);
+			menu.addCommandItem(&commandManager, snaptoGridID);
 			PopupMenu GridSizeSubMenu;
-			GridSizeSubMenu.addCommandItem(commandManager, gridSize10ID);
-			GridSizeSubMenu.addCommandItem(commandManager, gridSize15ID);
-			GridSizeSubMenu.addCommandItem(commandManager, gridSize20ID);
+			GridSizeSubMenu.addCommandItem(&commandManager, gridSize10ID);
+			GridSizeSubMenu.addCommandItem(&commandManager, gridSize15ID);
+			GridSizeSubMenu.addCommandItem(&commandManager, gridSize20ID);
 			menu.addSubMenu("Grid Size", GridSizeSubMenu, true);
 		}
 		else if (menuIndex == stageAreasID)
 		{
-			menu.addCommandItem(commandManager, addStageAreaID);
-			menu.addCommandItem(commandManager, editStageAreasID);
-			menu.addCommandItem(commandManager, removeStageAreaID);
-			menu.addCommandItem(commandManager, audioParametersID);
+			menu.addCommandItem(&commandManager, addStageAreaID);
+			menu.addCommandItem(&commandManager, editStageAreasID);
+			menu.addCommandItem(&commandManager, removeStageAreaID);
+			menu.addCommandItem(&commandManager, audioParametersID);
 		}
 		else if (menuIndex == preferencesID)
 		{
-			menu.addCommandItem(commandManager, audioDeviceSettingsID);
+			menu.addCommandItem(&commandManager, audioDeviceSettingsID);
 		}
 		return menu;
 	}

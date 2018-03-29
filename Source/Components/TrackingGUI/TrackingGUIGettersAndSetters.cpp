@@ -19,7 +19,7 @@ void TrackingGUI::setStageCoordinates(int stagePosition, float x, float y)
 {
 	float convertedX = getLocalBounds().getWidth() * 0.5 * x;
 	float convertedY = getLocalBounds().getHeight() * 0.5 * y;
-	mainStageArea->updateArea(stagePosition, convertedX, convertedY);
+	mainStageArea.updateArea(stagePosition, convertedX, convertedY);
 }
 
 void TrackingGUI::setStageDrawingState(bool state)

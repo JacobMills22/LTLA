@@ -51,8 +51,8 @@ void TrackingGUI::paintStage(Graphics& g)
 
 		if (valueTree.getPropertyAsValue("StageDrawingState", nullptr) == true)
 		{
-			mainStageArea->setAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));
-			mainStageArea->drawArea(g, getStageEditState());
+			mainStageArea.setAreaColour(Colours::darkgrey.darker(0.5).withAlpha(0.4f));
+			mainStageArea.drawArea(g, getStageEditState());
 		}
 }
 
@@ -97,11 +97,11 @@ void TrackingGUI::paintGrid(Graphics& g)
 
 void TrackingGUI::snapStageToGrid()
 {
-	for (int corner = 0; corner < mainStageArea->numOfAreaCorners - 1; corner++)
+	for (int corner = 0; corner < mainStageArea.numOfAreaCorners - 1; corner++)
 	{
-		float snappedStageCornerX = round(mainStageArea->getX(corner) / gridIncrement) * gridIncrement;
-		float snappedStageCornerY = round(mainStageArea->getY(corner) / gridIncrement) * gridIncrement;
-		mainStageArea->updateArea(corner, snappedStageCornerX, snappedStageCornerY);
+		float snappedStageCornerX = round(mainStageArea.getX(corner) / gridIncrement) * gridIncrement;
+		float snappedStageCornerY = round(mainStageArea.getY(corner) / gridIncrement) * gridIncrement;
+		mainStageArea.updateArea(corner, snappedStageCornerX, snappedStageCornerY);
 	}
 	
 	for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)

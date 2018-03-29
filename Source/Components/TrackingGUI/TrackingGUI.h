@@ -162,7 +162,8 @@ public:
 	int stageCalibrationCounter = 0;
 	int stageCalibrationInterval = 5;
 
-	ScopedPointer<StageArea> mainStageArea;
+	//ScopedPointer<StageArea> mainStageArea;
+	StageArea mainStageArea;
 	OwnedArray<StageArea> stageAreas;
 	Value numOfStageAreas;
 
