@@ -12,12 +12,14 @@ ApplicationCommandTarget* MainContentComponent::getNextCommandTarget()
 
 void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 {
+	
 	const CommandID ids[] = {  menuBar.saveID, menuBar.saveAsID, menuBar.loadID, menuBar.interval5SecondsID, menuBar.interval10SecondsID, menuBar.interval20SecondsID,
 		menuBar.calibrationStartID, menuBar.drawStageID, menuBar.editStageID, menuBar.drawGridID, menuBar.snaptoGridID, menuBar.gridSize10ID,
 		menuBar.gridSize15ID, menuBar.gridSize20ID, menuBar.addStageAreaID, menuBar.editStageAreasID, menuBar.removeStageAreaID, menuBar.audioParametersID,
 		menuBar.audioDeviceSettingsID };
 	
 	commands.addArray(ids, numElementsInArray(ids));
+	
 }
 
 void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result)

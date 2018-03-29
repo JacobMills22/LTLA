@@ -9,7 +9,6 @@
 	LTLAMenuBar::~LTLAMenuBar()
 	{
 		PopupMenu::dismissAllActiveMenus();
-		menuBar.release();
 	}
 
 	void LTLAMenuBar::resized() 
@@ -34,7 +33,7 @@
 			menu.addCommandItem(commandManager, saveAsID);
 			menu.addSeparator();
 			menu.addCommandItem(commandManager, loadID);
-		}
+		} 
 		else if (menuIndex == calibrationIndexID)
 		{
 			menu.addSeparator();

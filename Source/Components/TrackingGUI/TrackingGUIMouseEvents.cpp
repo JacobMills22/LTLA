@@ -6,17 +6,17 @@ void TrackingGUI::mouseDown(const MouseEvent &event)
 {
 	if (getStageEditState() == true)
 	{
-		for (int corner = 0; corner < mainStageArea.numOfAreaCorners; corner++)
+		for (int corner = 0; corner < mainStageArea->numOfAreaCorners; corner++)
 		{
-			if (event.getMouseDownX() <= mainStageArea.getX(corner) + 10 && event.getMouseDownX() >= mainStageArea.getX(corner) - 10)
+			if (event.getMouseDownX() <= mainStageArea->getX(corner) + 10 && event.getMouseDownX() >= mainStageArea->getX(corner) - 10)
 			{
-				if (event.getMouseDownY() <= mainStageArea.getY(corner) + 10 && event.getMouseDownY() >= mainStageArea.getY(corner) - 10)
+				if (event.getMouseDownY() <= mainStageArea->getY(corner) + 10 && event.getMouseDownY() >= mainStageArea->getY(corner) - 10)
 				{
-					mainStageArea.setCornerSelectedState(corner, true);
+					mainStageArea->setCornerSelectedState(corner, true);
 					for (int corner = 0; corner < numOfStagePositions - 1; corner++)
 					{
-						mainStageArea.setDifferenceX(corner, mainStageArea.getX(centre) - mainStageArea.getX(corner));
-						mainStageArea.setDifferenceY(corner, mainStageArea.getY(centre) - mainStageArea.getY(corner));
+						mainStageArea->setDifferenceX(corner, mainStageArea->getX(centre) - mainStageArea->getX(corner));
+						mainStageArea->setDifferenceY(corner, mainStageArea->getY(centre) - mainStageArea->getY(corner));
 					}
 					break;
 				}
@@ -65,11 +65,11 @@ void TrackingGUI::mouseDrag(const MouseEvent& event)
 {
 	if (stageEditState == true)
 	{
-		for (int corner = 0; corner < mainStageArea.numOfAreaCorners; corner++)
+		for (int corner = 0; corner < mainStageArea->numOfAreaCorners; corner++)
 		{
-			if (mainStageArea.getCornerSelectedState(corner) == true)
+			if (mainStageArea->getCornerSelectedState(corner) == true)
 			{
-				mainStageArea.updateArea(corner, event.x, event.y);
+				mainStageArea->updateArea(corner, event.x, event.y);
 			}
 		}
 	}
@@ -90,9 +90,9 @@ void TrackingGUI::mouseUp(const MouseEvent& event)
 {
 	if (stageEditState == true)
 	{
-		for (int corner = 0; corner < mainStageArea.numOfAreaCorners; corner++)
+		for (int corner = 0; corner < mainStageArea->numOfAreaCorners; corner++)
 		{
-			mainStageArea.setCornerSelectedState(corner, false);
+			mainStageArea->setCornerSelectedState(corner, false);
 		}
 	}
 

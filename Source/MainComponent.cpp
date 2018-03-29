@@ -20,7 +20,6 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 	audioSettingsWindow("Audio Device Settings", false), valueTree("LTLAValueTree")
 								             //  audioSettingsWindow("Audio Settings", Colours::black, 4, false)
 	{
-		
 		setSize(1000, 600);
 	//	deviceManager.initialise(2, 2, nullptr, true, String(), nullptr);
 		setAudioChannels(4, 2);
@@ -65,26 +64,24 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		addAndMakeVisible(audioDeviceSelector);
 		addAndMakeVisible(audioSettingsWindow);
 		audioSettingsWindow.setVisible(false);
-		audioSettingsWindow.setContentOwned(&audioDeviceSelector, true);
+		audioSettingsWindow.setContentNonOwned(&audioDeviceSelector, true);
 
-		auto& commandManager = LTLACommandManager::getApplicationCommandManager();
+
+		auto& commandManager = LTLAcmd.getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
 
 		addAndMakeVisible(snapshotManager);
 
 		valueTree.addListener(this);
-
-		//valueTree.setProperty("StageDrawingState", false, nullptr);
-
+		
 		trackingGUI.setValueTree(valueTree);
 		snapshotManager.setValueTree(valueTree);
 		snapshotManager.createNewSnapshot();
-
-//		saveAndLoadingManager.setValueTree(valueTree);
 	}
 
 	MainContentComponent::~MainContentComponent()
 	{
+		LTLAcmd.makeNullptr();
 		shutdownAudio();
 	}
 
@@ -123,7 +120,6 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		trackingGUI.resized();
 		menuBar.setBounds(10, 10, 500, 30);
 	
-
 		if (trackingGUI.getAudioPanelState() == false)
 			trackingGUI.setBounds(getBounds().reduced(50).getX(), getBounds().reduced(50).getY(), getBounds().reduced(50).getWidth(), getBounds().reduced(50).getHeight());
 		else
