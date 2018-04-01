@@ -2,6 +2,10 @@
 
 #include <math.h>
 
+/** Simple dB gain to decimal converter,
+	Not used in the end but could be useful 
+	to future developers. */
+
 class GainToDecimalConverter
 {
 

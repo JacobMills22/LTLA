@@ -17,11 +17,11 @@
 	*/
 	//==============================================================================
 MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager, 0, 256, 0, 256, false, false, true, true),
-	audioSettingsWindow("Audio Device Settings", false), valueTree("LTLAValueTree")
-								             //  audioSettingsWindow("Audio Settings", Colours::black, 4, false)
+	                                           audioSettingsWindow("Audio Device Settings", false), valueTree("LTLAValueTree")            
 	{
+		// Initialise Components
+
 		setSize(1000, 600);
-	//	deviceManager.initialise(2, 2, nullptr, true, String(), nullptr);
 		setAudioChannels(4, 2);
 		kinectSensor.startKinectST();
 		startTimer(kinectUpdateTimer, 40);
@@ -50,8 +50,6 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 		addAndMakeVisible(stereoAudioMeter);
 						
-		// Global Parameters Initialisation
-
 		for (int buttonNum = 0; buttonNum < numOfButtons; buttonNum++)
 		{
 			addAndMakeVisible(globalButton[buttonNum]);
@@ -65,17 +63,17 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		addAndMakeVisible(audioSettingsWindow);
 		audioSettingsWindow.setVisible(false);
 		audioSettingsWindow.setContentNonOwned(&audioDeviceSelector, true);
-
-
+		
 		auto& commandManager = LTLAcmd.getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
 
 		addAndMakeVisible(snapshotManager);
 
 		valueTree.addListener(this);
-		
 		trackingGUI.setValueTree(valueTree);
 		snapshotManager.setValueTree(valueTree);
+
+		// Create one snapshot to begin with.
 		snapshotManager.createNewSnapshot();
 	}
 
@@ -89,15 +87,17 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 	//==============================================================================
 	void MainContentComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 	{
+		// Initialise audio parameters and engine.
 		samplerate = sampleRate;
 		samplesPerBlock = samplesPerBlockExpected;
 		audioEngine.initialiseEngine(samplesPerBlockExpected, sampleRate);
 		audioEngine.prepareToPlay(samplesPerBlockExpected, sampleRate);
+		audioEngine.setDeviceManagerToUse(&deviceManager);
 	}
 
 	void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
-	{			
-		audioEngine.setDeviceManagerToUse(&deviceManager);
+	{
+		// All audio processing is handled by the audioEngine.
 		audioEngine.getNextAudioBlock(bufferToFill);
 	}
 
@@ -150,43 +150,56 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 	{
 		if (timerID == kinectUpdateTimer)
 		{
+			// Update Kinect sensor
 			kinectSensor.updateKinectST();
 		}
 		if (timerID == guiTimer)
 		{
+			// For each tracked skeleton (performer)
 			for (int CurrentSkel = 0; CurrentSkel < SKELETON_COUNT; ++CurrentSkel)
 			{
 				if (kinectSensor.getKinectTrackingState(CurrentSkel) == true)
 				{
+					// Send positional data to the trackingGUi if they are being tracked.
 					trackingGUI.setEllipseCoordinates(kinectSensor.getX(CurrentSkel), kinectSensor.getY(CurrentSkel), CurrentSkel);
 				}
 
+				// Send the tracking state to the trackingGUI
 				trackingGUI.setKinectTrackingState(CurrentSkel, kinectSensor.getKinectTrackingState(CurrentSkel));
 			}
 
-			if (trackingGUI.hasStageAreaChanged() == true)
+			// If user has selected a new stage area
+			if (trackingGUI.hasNewStageAreaBeenSelected() == true)
 			{
-				trackingGUI.setStageAreaHasChangedState(false);
+				// Reset state to false, update the area name label and open the audio panel which relates to the newly selected stage area.
+				trackingGUI.newStageAreaIsSelected(false);
 				areaNameLabel.setText(trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
 				audioEngine.reopenAudioPanel(trackingGUI.getCurrentlySelectedArea());
 			}
 
+			// If user has recalled a snapshot
 			if (snapshotManager.hasSnapshotBeenFired() == true)
 			{
+				// Reset hasbeenFiredState to false, update the area name label, and tell the audioEngine that it needs to respond to a snapshot recall.  
+				snapshotManager.setHasbeenFiredState(false);
 				areaNameLabel.setText(trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
 				audioEngine.snapshotFired();
-				snapshotManager.setHasbeenFiredState(false);
 			}
 
+			// Update meter data.
 			stereoAudioMeter.setMeterData(0, audioEngine.getMeterData(0));
 			stereoAudioMeter.setMeterData(1, audioEngine.getMeterData(1));
 
+			// Send various required data to the audioEngine.
 			setAudioEngineData();
+
 			repaint();
 		}
 
 		if (timerID == calibrationIntervalTimer)
 		{
+			/* Switch case called each time the calibration countdown as reached 0, each case updates the coordinates of one of the
+			main stage areas corners and sets the text telling the user to prepare for the next update. Timer is stopped once calibrated. */
 			switch (trackingGUI.stageCalibrationCounter)
 			{
 			case 0: trackingGUI.setStageCoordinates(trackingGUI.frontLeft, kinectSensor.getX(0), kinectSensor.getY(0));
@@ -209,35 +222,47 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 	void MainContentComponent::setAudioEngineData()
 	{
+		// For each perfomer
 		for (int performerNum = 0; performerNum < 2; performerNum++)
-		{
+		{	
+			// For each stage area
 			for (int areaID = 0; areaID < trackingGUI.stageAreas.size(); areaID++)
-			{
+			{	
+				// If the current performer is inside the current area
 				if (trackingGUI.doesAreaIDContainPerfomer(performerNum, areaID))
-				{
+				{	
+					// If the current performer has already exited this area
 					if (audioEngine.getPerformerExitedAreaState(performerNum, areaID) == true)
 					{
+						// Tell the audio engine which performer has just entered which area.
 						audioEngine.setPerformerEnteredAreaState(performerNum, true, areaID);
 					}
 					else
 					{
+						// Tell the audio engine that this performer has not just entered this area.
 						audioEngine.setPerformerEnteredAreaState(performerNum, false, areaID);
 					}
-
+						// If the current performer is stood inside the current area.
 					if (trackingGUI.doesAreaIDContainPerfomer(performerNum, areaID) == true)
 					{
+						// Tell the audio engine that this perfomer is stood inside this area.
 						audioEngine.setAreaIDContainingPerformerState(performerNum, areaID, true);
 					}
 					else
 					{
+						// Tell the audio engine that this perfomer is not stood inside this area.
 						audioEngine.setAreaIDContainingPerformerState(performerNum, areaID, false);
 					}
 
+					// Since the performer is stood in the area they cannot of exited it.
 					audioEngine.setPerformerExitedAreaState(performerNum, false, areaID);
+
+					// Update the audio engines panning amount based on the performers position relative the the areas bounds.
 					audioEngine.setAutoPannerAmount(trackingGUI.getPerformerXPosInsideArea(areaID, performerNum), areaID);
 				}
-				else
+				else // else if the current performer is not stood inside the current area.
 				{
+						// Esnure that the audioEngines states area correct
 					if (audioEngine.getPerformerEnteredAreaState(performerNum, areaID) == false)
 					{
 						audioEngine.setPerformerExitedAreaState(performerNum, true, areaID);
@@ -251,6 +276,8 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 	void MainContentComponent::buttonClicked(Button* button)
 	{
+		// Simple logic to select either the next or previous stage area in the array when 
+		// either the next or previous buttons are pressed.
 		if (button == &globalButton[selectPreviousAreaButtonID] && trackingGUI.getCurrentlySelectedArea() > 0)
 		{
 			trackingGUI.setCurrentlySelectedArea(trackingGUI.getCurrentlySelectedArea() - 1);
@@ -261,23 +288,22 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		}
 	}
 
-	void MainContentComponent::sliderValueChanged(Slider* slider)
-	{
-
-	}
-
 	void MainContentComponent::changeListenerCallback(ChangeBroadcaster* source)
 	{
+		// If the Colour selector has been changed and a stage area exists
 		if (source == &areaColourSelector && trackingGUI.stageAreas.size() > 0)
 		{
+			// Set the colour of the selected stage area to the current colour of the colour picker.
 			trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->setAreaColour(areaColourSelector.getCurrentColour());
 		}
 	}
 
 	void MainContentComponent::labelTextChanged(Label* labelThatHasChanged) 
 	{
+		// If the area name label has been changed and a stage area exists
 		if (labelThatHasChanged == &areaNameLabel && trackingGUI.stageAreas.size() >= 1)
 		{
+			// Update and store the stage areas name.
 			trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->setAreaName(areaNameLabel.getText());
 		}
 	}

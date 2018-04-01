@@ -3,6 +3,8 @@
 
 	LTLAAudioPanel::LTLAAudioPanel() : audioPanelValueTree("audioPanelValueTree")
 	{
+		// Initialisation
+
 		performerInsideArea[0] = false;
 		performerInsideArea[1] = false;
 		performerPreviouslyExitedArea[0] = false;
@@ -58,8 +60,7 @@
 		autoFilter.closePanel();
 		autoEQ.closePanel();
 		autoReverb.closePanel();
-
-
+		
 		audioPanelValueTree.setProperty("InputSource", FilePlayerInput, nullptr);
 
 		audioPanelValueTree.addChild(filePlayer.getValueTree(), 0, nullptr);
@@ -78,8 +79,6 @@
 
 		filePlayer.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoPanner.prepareToPlay(samplesPerBlockExpected, sampleRate);
-
-		//autoFilter.initialise(sampleRate);
 		autoFilter.setSampleRate(sampleRate);
 		autoEQ.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoReverb.prepareToPlay(samplesPerBlockExpected, sampleRate);
@@ -89,38 +88,45 @@
 	{
 		filePlayer.releaseResources();
 		autoPanner.releaseResources();
-
 	}
 
 	void LTLAAudioPanel::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
 	{
+		// If the audio panels input is a performer
 		if (getAudioInputID() == Performer1 || getAudioInputID() == Performer2)
 		{
-			int performerID = getAudioInputID() - 2;
+			int performerID = getAudioInputID() - 2; // Store the performer ID (0 or 1)
 
-			rawInputBuffer.makeCopyOf(*bufferToFill.buffer);
+			rawInputBuffer.makeCopyOf(*bufferToFill.buffer); // Store a raw copy of the buffer
 
+			// Process audio.
 			autoPanner.process(*bufferToFill.buffer);
 			autoFilter.process(*bufferToFill.buffer);
 			autoEQ.process(*bufferToFill.buffer);
 			autoReverb.process(*bufferToFill.buffer);
 
+			// If the performer has just enetered the area.
 			if (performerInsideArea[performerID] == true && performerPreviouslyEnteredArea[performerID] == false)
 			{
+				// Initialise the crossfade, (fade in the processed buffer and fade out the raw buffer)
 				processedBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
 				rawBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
 
+				// Initialise the short unmute fade if enabled.
 				if (autoMuteState == true)
 				{
 					autoMuteFade.initialiseFade(0.0, 1.0, samplerate * 0.1);
 				}
 			}
 
+			// If the performer has just exited the area.
 			if (performerInsideArea[performerID] == false && performerPreviouslyExitedArea[performerID] == false)
 			{
+				// Initialise the crossfade, (fade in the raw buffer and fade out the processed buffer)
 				processedBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
 				rawBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
 
+				// Initialise the short mute fade if enabled.
 				if (autoMuteState == true)
 				{
 					autoMuteFade.initialiseFade(1.0, 0.0, samplerate * 0.1);
@@ -133,12 +139,14 @@
 			float* rawInputL = rawInputBuffer.getWritePointer(0);
 			float* rawInputR = rawInputBuffer.getWritePointer(1);
 
+			// Set the output to the sum of both crossfaded buffers.
 			for (int sample = 0; sample < bufferToFill.buffer->getNumSamples(); sample++)
 			{
 				outputL[sample] = (outputL[sample] * processedBufferFade.process()) + (rawInputL[sample] * rawBufferFade.process());
 				outputR[sample] = (outputR[sample] * processedBufferFade.process()) + (rawInputR[sample] * rawBufferFade.process());
 			}
 
+			// Mute or unmute the output if enabled 
 			if (autoMuteState == true)
 			{
 				for (int sample = 0; sample < bufferToFill.buffer->getNumSamples(); sample++)
@@ -148,12 +156,14 @@
 				}
 			}
 
-				performerInsideArea[performerID] == true ? performerPreviouslyEnteredArea[performerID] = true : performerPreviouslyEnteredArea[performerID] = false;
-				performerInsideArea[performerID] == false ? performerPreviouslyExitedArea[performerID] = true : performerPreviouslyExitedArea[performerID] = false;
+			// Update the previously entered or exited states.
+			performerInsideArea[performerID] == true ? performerPreviouslyEnteredArea[performerID] = true : performerPreviouslyEnteredArea[performerID] = false;
+			performerInsideArea[performerID] == false ? performerPreviouslyExitedArea[performerID] = true : performerPreviouslyExitedArea[performerID] = false;
 
 		}
-		else if (getAudioInputID() == FilePlayerInput)
+		else if (getAudioInputID() == FilePlayerInput) // If the input is to this audio panel is from the file player
 		{
+			// Process the audio.
 			filePlayer.getNextAudioBlock(bufferToFill);
 			autoFilter.process(*bufferToFill.buffer);
 			autoEQ.process(*bufferToFill.buffer);
@@ -181,8 +191,6 @@
 
 		labels[inputLabel].setBounds(5, 0, getWidth() * 0.15, 30);
 		labels[fadeTimeLabel].setBounds(5, getHeight() * 0.19, getWidth() * 0.15, 30);
-
-
 	}
 
 	void LTLAAudioPanel::buttonClicked(Button* button)
@@ -218,7 +226,6 @@
 		else if (button == &autoMuteButton)
 		{
 			autoMuteState = autoMuteButton.getToggleState();
-			//autoMuteState == true ? autoMuteFade.initialiseFade(1.0, 0.0, (samplerate * 0.1)) : autoMuteFade.initialiseFade(0.0, 1.0, (samplerate * 0.1));
 		}
 	}
 
@@ -292,11 +299,7 @@
 
 	int LTLAAudioPanel::getPerfromerToTrigger()
 	{
-	//	if (&filePlayer != nullptr) // Guard to prevent this accessing unallocated memory
-		{
-			return filePlayer.getPerformerWhichTriggers();
-		}
-	//	else { return 0; }
+		return filePlayer.getPerformerWhichTriggers();
 	}
 
 	bool LTLAAudioPanel::getFilePlayerRetriggerState()

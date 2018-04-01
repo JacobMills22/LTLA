@@ -1,7 +1,6 @@
 
 #include "AudioEngine.h"
 
-
 	LTLAAudioEngine::~LTLAAudioEngine()
 	{
 		audioPanel.clear(true);
@@ -21,22 +20,28 @@
 
 	void LTLAAudioEngine::prepareToPlay(int samplesPerBlockExpected, double sampleRate) 
 	{
+		// Initalise buffers
 		rawInputBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
-		processedPerformerBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
+		processedPerformerBuffer[0].setSize(2, samplesPerBlockExpected, false, false, false);
+		processedPerformerBuffer[1].setSize(2, samplesPerBlockExpected, false, false, false);
 		filePlayerBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
 
 		if (audioPanel.size() > 0)
 		{
 			audioPanel.getLast()->prepareToPlay(samplesPerBlockExpected, sampleRate);
 			mixerAudioSource.addInputSource(audioPanel.getLast(), false);
-			DBG("ADDING MIXER SOURCE, SIZE IS " + (String)audioPanel.size());
 		}
 		else
 		{
 			mixerAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		}
 
-		performerInput.prepareToPlay(samplesPerBlockExpected, sampleRate);
+		performerInput[0].prepareToPlay(samplesPerBlockExpected, sampleRate);
+		performerInput[1].prepareToPlay(samplesPerBlockExpected, sampleRate);
+
+		//performerInput.initialise(1, 2);
+
+		DBG("PREPARETOPLAY!");
 	}
 
 	void LTLAAudioEngine::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) 
@@ -45,9 +50,13 @@
 		rawInputBuffer.makeCopyOf(*bufferToFill.buffer, true);
 
 		// Set the Input to the copy of the input buffer and process
-		performerInput.setInputBuffer(rawInputBuffer);
-		performerInput.getNextAudioBlock(bufferToFill);
-	
+	//	performerInput.setInputBuffer(rawInputBuffer);
+	//	performerInput.getNextAudioBlock(bufferToFill);
+
+		performerInput[0].process(*bufferToFill.buffer);
+		performerInput[1].process(*bufferToFill.buffer);
+
+
 		// Since fileplayers use a resamplingaudiosource and doesn't just "process data"
 		// all fileplayers need to be added to a mixeraudiosource and removed if 
 		// the audiopanel doesn't have its input set to fileplayer.
@@ -55,7 +64,8 @@
 		// For each audiopanel which has its input set to performer 1 or 2
 		for (int panel = 0; panel < audioPanel.size(); panel++)
 		{
-			if (audioPanel[panel]->getAudioInputID() >= 2)
+			//if (audioPanel[panel]->getAudioInputID() >= 2)
+			if (audioPanel[panel]->getAudioInputID() == 2)
 			{
 				// Remove the fileplayer audiosource from the mixer and then process
 				mixerAudioSource.removeInputSource(audioPanel[panel]);
@@ -63,8 +73,24 @@
 			}
 		}
 		// Copy the processed audio into a buffer.
-		processedPerformerBuffer.makeCopyOf(*bufferToFill.buffer, false);
+		processedPerformerBuffer[0].makeCopyOf(*bufferToFill.buffer, false);
+		bufferToFill.clearActiveBufferRegion();
 
+
+		for (int panel = 0; panel < audioPanel.size(); panel++)
+		{
+			//if (audioPanel[panel]->getAudioInputID() >= 2)
+			if (audioPanel[panel]->getAudioInputID() == 3)
+			{
+				// Remove the fileplayer audiosource from the mixer and then process
+				mixerAudioSource.removeInputSource(audioPanel[panel]);
+				audioPanel[panel]->getNextAudioBlock(bufferToFill);
+			}
+		}
+
+		processedPerformerBuffer[1].makeCopyOf(*bufferToFill.buffer, false);
+		bufferToFill.clearActiveBufferRegion();
+		
 		// For each audiopanel which has its input set to Fileplayer
 		for (int panel = 0; panel < audioPanel.size(); panel++)
 		{
@@ -81,8 +107,11 @@
 		float* OutputL = bufferToFill.buffer->getWritePointer(0);
 		float* OutputR = bufferToFill.buffer->getWritePointer(1);
 
-		float* ProcessedPerformerL = processedPerformerBuffer.getWritePointer(0);
-		float* ProcessedPerformerR = processedPerformerBuffer.getWritePointer(1);
+		float* ProcessedPerformer1L = processedPerformerBuffer[0].getWritePointer(0);
+		float* ProcessedPerformer1R = processedPerformerBuffer[0].getWritePointer(1);
+
+		float* ProcessedPerformer2L = processedPerformerBuffer[1].getWritePointer(0);
+		float* ProcessedPerformer2R = processedPerformerBuffer[1].getWritePointer(1);
 
 		float* filePlayerBufferL = filePlayerBuffer.getWritePointer(0);
 		float* filePlayerBufferR = filePlayerBuffer.getWritePointer(1);
@@ -90,8 +119,8 @@
 		for (int sample = 0; sample < bufferToFill.numSamples; sample++)
 		{
 			// Set the output to be the processed performer audio and the fileplayer audio.
-			OutputL[sample] = ProcessedPerformerL[sample] + filePlayerBufferL[sample] * 0.5;
-			OutputR[sample] = ProcessedPerformerR[sample] + filePlayerBufferR[sample] * 0.5;
+			OutputL[sample] = ProcessedPerformer1L[sample] + ProcessedPerformer2L[sample] + filePlayerBufferL[sample] * 0.5;
+			OutputR[sample] = ProcessedPerformer1R[sample] + ProcessedPerformer2R[sample] + filePlayerBufferR[sample] * 0.5;
 		}
 		
 		for (int sample = 0; sample < bufferToFill.numSamples; sample++)
@@ -289,12 +318,29 @@
 
 	void LTLAAudioEngine::setPerformerParameters(int ActualInputChannel, int MaxOutputChannels)
 	{
-		performerInput.initialise(ActualInputChannel, MaxOutputChannels);
+	//	performerInput.initialise(ActualInputChannel, MaxOutputChannels);
 	}
 
 	void LTLAAudioEngine::setDeviceManagerToUse(AudioDeviceManager *deviceManager)
 	{
-		performerInput.setDeviceManagerToUse(deviceManager);
+		performerInput[0].setDeviceManagerToUse(deviceManager);
+		performerInput[1].setDeviceManagerToUse(deviceManager);
+		
+		AudioIODevice* device = deviceManager->getCurrentAudioDevice();
+
+		const BigInteger activeInputChannels = device->getActiveInputChannels();
+		const BigInteger activeOutputChannels = device->getActiveOutputChannels();
+		const int maxInputChannels = activeInputChannels.getHighestBit() + 1;
+		const int maxOutputChannels = activeOutputChannels.getHighestBit() + 1;
+
+		if (maxInputChannels == 1 || maxInputChannels == 2)
+		{
+			performerInput[0].initialise(0, 2);
+		}
+		else if (maxInputChannels >= 3)
+		{
+			performerInput[1].initialise(2, 2);
+		}
 	}
 
 	

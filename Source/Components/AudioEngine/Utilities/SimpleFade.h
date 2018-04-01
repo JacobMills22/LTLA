@@ -4,6 +4,11 @@
 
 // Based off this guide - http://www.martin-finke.de/blog/articles/audio-plugins-011-envelopes/
 
+/** This simple class is used to fade an audio buffer between two levels,
+	It must be initialised with the start and end levels (0.0 to 1.0)
+	and the duration that the fade will take in samples. The process 
+	function must then be multiplied by the current output sample. */
+
 class SimpleFade
 {
 

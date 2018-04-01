@@ -2,7 +2,11 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "AudioPanel.h"
-#include "PerformerInput.h"
+#include "PerformerInput\PerformerInput.h"
+
+/** This class represents the whole audio higher level audio engine
+	which contains a dynamic array of audio panels which do the
+	majority of the processing. */
 
 class LTLAAudioEngine : public AudioSource,
 					    public Component,
@@ -102,8 +106,8 @@ private:
 	float autoPannerAmount = 0;
 	float meterData[2];
 
-	PerformerInput performerInput;
-	AudioSampleBuffer rawInputBuffer, processedPerformerBuffer, filePlayerBuffer;
+	PerformerInput performerInput[2];
+	AudioSampleBuffer rawInputBuffer, processedPerformerBuffer[2], filePlayerBuffer;
 
 	enum { continuePlaybackID = 1, stopPlaybackID, triggeredByBothPerformers = 2 };
 

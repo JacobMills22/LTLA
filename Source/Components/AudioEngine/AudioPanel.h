@@ -1,14 +1,17 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "../AudioEngine/FilePlayer.h"
-#include "AutoPanner.h"
-#include "PerformerInput.h"
+#include "../AudioEngine/FilePlayer/FilePlayer.h"
+#include "AutoPanner\AutoPanner.h"
+#include "PerformerInput\PerformerInput.h"
 #include "Filtering&EQ\AutoFilter.h"
 #include "Filtering&EQ\AutoEQ.h"
 #include "Delay&Reverb\AutoReverb.h"
 #include "Utilities\SimpleFade.h"
 
+/** A new LTLAAudioPanel class is created or removed every time a 
+	stage area is added or removed. This class contains one instance
+	of all Audio modules and is used to process incomming aduio. */
 
 class LTLAAudioPanel : public AudioSource,
 					   public Component,
@@ -35,8 +38,6 @@ public:
 	{
 		leftChannelValue = leftChannel;
 		leftChannelValue = rightChannel;
-
-
 	}
 
 /**	Standard JUCE Function: sets the bounds of DSP modules */

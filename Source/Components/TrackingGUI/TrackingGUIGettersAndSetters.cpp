@@ -64,7 +64,7 @@ void TrackingGUI::setCurrentlySelectedArea(int index)
 	}
 
 	if (getCurrentlySelectedArea() != index)
-		setStageAreaHasChangedState(true);
+		newStageAreaIsSelected(true);
 
 	selectedAreaIndex = index;
 	stageAreas[index]->setAreaSelectedState(true);
@@ -74,12 +74,12 @@ int TrackingGUI::getCurrentlySelectedArea()
 	return selectedAreaIndex;
 }
 
-void TrackingGUI::setStageAreaHasChangedState(bool state)
+void TrackingGUI::newStageAreaIsSelected(bool state)
 {
 	selectedAreaHasChanged = state;
 }
 
-bool TrackingGUI::hasStageAreaChanged()
+bool TrackingGUI::hasNewStageAreaBeenSelected()
 {
 	return selectedAreaHasChanged;
 }

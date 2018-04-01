@@ -1,9 +1,17 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "../Source/Components/StageAreas.h"
+#include "../Source/Components/StageAreas/StageAreas.h"
 
 #define SKELETON_COUNT 2
+
+
+
+/** This class sits inside the MainComponent and receives tracking data
+from the KinectTracker via the MainComponent and handles all tracking related
+functions along with various other UI related features and parameters. 
+This class also  responds to vairous callbacks from the mouse, and is 
+responsible for setting various states. */
 
 class TrackingGUI : public Component,
 			     public MouseListener
@@ -22,6 +30,7 @@ public:
 	Handles all the GUI drawing code.*/
 	void paint(Graphics& g) override;
 
+/** Paints a simple grid onto the component */
 	void paintGrid(Graphics& g);
 
 /** Overrides JUCE resized function called in MainComponent.
@@ -38,11 +47,17 @@ public:
 /** Paint Stage Areas */
 	void paintStageAreas(Graphics &g);
 
+/** Deselects all of the stageAreas */
+	void deselectAllStageAreas();
+
 	//==============================================================================	
 							/** Object Specific Functions */
 
 /** Converts Stage Coordinates to be in-line with the Grid*/
 	void snapStageToGrid();
+
+/** Returns the performers x position in relation to the AreaID, this is generally used for the autoPanner*/
+	float getPerformerXPosInsideArea(int areaID, int performerID);
 
 /** Called when a mouse is clicked 
 	If Area edit State is Enabled, this will find the corner of the area that's currently
@@ -65,6 +80,8 @@ public:
 	This will simply ensure that all corners are deselected.*/
 	void mouseUp(const MouseEvent& event);
 
+/** Called when the mouse is moved.
+	Used to set the mouse cursor style based on what it is hovering over. */
 	void mouseMove(const MouseEvent& event);
 
 		
@@ -105,25 +122,17 @@ public:
 /** Gets an Index for the Currently Selected Area*/
 	int getCurrentlySelectedArea();
 
-/** Sets the stage area has changed state */
-	void setStageAreaHasChangedState(bool state);
+/** Sets the new stage area is selcted state */
+	void newStageAreaIsSelected(bool state);
 
-/** Returns true if the stage area has been changed*/
-	bool hasStageAreaChanged();
+/** Returns true if a new stage area has been selected*/
+	bool hasNewStageAreaBeenSelected();
 	
 /** Sets whether the audio panel is currently displayed*/
 	void setAudioPanelState(bool state);
 
 /** Returns true if the audio panel is currently displayed*/
 	bool getAudioPanelState();
-
-	void deselectAllStageAreas()
-	{
-		for (int area = 0; area < stageAreas.size(); area++)
-		{
-			stageAreas[area]->setAreaSelectedState(false);
-		}
-	}
 
 	/** GRID */ 
 
@@ -153,9 +162,6 @@ public:
 /** Retuns true if the performerID is currently inside the AreaID*/
 	bool doesAreaIDContainPerfomer(int performerID, int areaID);
 
-/** Returns the performers x position in relation to the AreaID, this is generally used for the autoPanner*/
-	float getPerformerXPosInsideArea(int areaID, int performerID);
-
 /** Sets the valuetree for this class to use */
 	void setValueTree(ValueTree valueTree);
 
@@ -165,7 +171,6 @@ public:
 	int stageCalibrationCounter = 0;
 	int stageCalibrationInterval = 5;
 
-	//ScopedPointer<StageArea> mainStageArea;
 	StageArea mainStageArea;
 	OwnedArray<StageArea> stageAreas;
 	Value numOfStageAreas;
@@ -196,7 +201,6 @@ private:
 
 	 enum { stageFront, stageRight, stageBack, stageLeft, numOfStageSides };
 
-	// ScopedPointer<ValueTree> valueTree;
 	ValueTree valueTree;
 
 

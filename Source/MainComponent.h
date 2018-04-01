@@ -2,19 +2,21 @@
 
 #include "../Source/Components/TrackingGUI/TrackingGUI.h"
 #include "KinectTracking.h"
-#include "Components\LTLAMenuBar.h"
+#include "Components/MenuBar/LTLAMenuBar.h"
 #include "Components\AudioEngine\AudioPanel.h"
 #include "Components\AudioEngine\AudioEngine.h"
-#include "Components\AudioEngine\Meter.h"
-#include "SnapshotManager.h"
+#include "Components\AudioEngine\Metering\Meter.h"
+#include "ValueTree Items\SnapshotManager.h"
 
+/** The MainContentComponent is where all components come together. 
+	This class runs various timers in order to transport data to the
+	various classes it uses. */
 
 class MainContentComponent : public AudioAppComponent,
 	private MultiTimer,
 	public Button::Listener,
 	public ApplicationCommandTarget,
 	public ChangeListener,
-	public Slider::Listener,
 	public Label::Listener,
 	public ValueTree::Listener
 
@@ -31,18 +33,17 @@ public:
 	void releaseResources() override;
 	
 	//==============================================================================
-	/** GUI Function Callers*/
+	/** GUI Function Callers */
 	void paint(Graphics& g) override;
 	void resized() override;
 
-	void timerCallback(int timerID) override;
+	void timerCallback(int timerID) override; // Timer used to send various data between classes.
 	void buttonClicked(Button* button) override;
-	void sliderValueChanged(Slider* slider) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	void labelTextChanged(Label* labelThatHasChanged) override;
 	
 	//==============================================================================
-	/** Command Manager Functions. Implemented in Source/Components/CommandManager.cpp */
+	/** Command Manager Functions. Implemented in Source/Components/CommandManager/CommandManager.cpp */
 
 	/** Returns a Command Target to Use.*/
 	ApplicationCommandTarget* getNextCommandTarget() override;
@@ -69,63 +70,56 @@ public:
 
 	//==============================================================================
 
+	/** ValueTree functions need overriding but are currently unused. */
 	void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
-
 	void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
-
 	void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override;
-
 	void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex) override;
-
 	void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override;
-
-
-	//==============================================================================
-	// Save and Loading Manager
 	
+	//==============================================================================
+
+	/** Saves project as a new XML file.*/
 	void saveProjectAs();
 
+	/** Saves over the existing XML file. */
 	void saveProject();
 	
+	/** Loads a saved XML ile into the current valuetree. */
 	void loadProjectFile(ValueTree valueTreeToLoadInto);
-
-
+	
 	//==============================================================================
 
 private:
 	//==============================================================================
 
-	TrackingGUI trackingGUI;
-	KinectTracker kinectSensor;
-	LTLAMenuBar menuBar;
-	LTLAAudioEngine audioEngine;
-
-	ColourSelector areaColourSelector{(ColourSelector::showColourspace), 4, 7 };
-	AudioDeviceSelectorComponent audioDeviceSelector;
-	Label areaNameLabel;
-	Label calibrationCountDownLabel;
-
 	enum TimerID { kinectUpdateTimer, guiTimer, calibrationIntervalTimer, numOfTimerIDs };
 
-	double samplerate = 0;
-	int samplesPerBlock = 0;
+	TrackingGUI trackingGUI;
+	KinectTracker kinectSensor;
+	LTLAAudioEngine audioEngine;
 
-	int oldAreaIDContainingPerfromer[2]; 
-
-	// Global Parameters
-	enum { selectNextAreaButtonID, selectPreviousAreaButtonID, numOfButtons};
-	TextButton globalButton[numOfButtons];
-
+	LTLAMenuBar menuBar;
+	LTLACommandManager LTLAcmd;
 	AudioMeter stereoAudioMeter;
 
 	ResizableWindow audioSettingsWindow;
+	AudioDeviceSelectorComponent audioDeviceSelector;
 
 	ValueTree valueTree;
 	SnapshotManager snapshotManager;
 
 	String currentProjectFullPath = "";
+	double samplerate = 48000;
+	int samplesPerBlock = 480;
+	int oldAreaIDContainingPerfromer[2];
 
-	LTLACommandManager LTLAcmd;
+	// Global Parameters
+	enum { selectNextAreaButtonID, selectPreviousAreaButtonID, numOfButtons };
+	TextButton globalButton[numOfButtons];
+	ColourSelector areaColourSelector{ (ColourSelector::showColourspace), 4, 7 };
+	Label areaNameLabel;
+	Label calibrationCountDownLabel;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };
