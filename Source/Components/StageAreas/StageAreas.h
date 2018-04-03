@@ -100,7 +100,13 @@ public:
 /** Gets the index value of the valuetree */
 	int getValueTreeChildIndex();
 
-	
+	void snapshotFired()
+	{
+		Colour newColour;
+		String colourString = areaColourString.getValue();
+		newColour = newColour.fromString(colourString);
+		setAreaColour(newColour);
+	}
 
 	//==============================================================================	
 
@@ -130,6 +136,7 @@ private:
 
 	Path areaPath;
 	Colour areaColour = Colours::floralwhite;
+	Value areaColourString;
 
 	float trackingGUIWidth = 900.0;
 	float trackingGUIHeight = 500.0;

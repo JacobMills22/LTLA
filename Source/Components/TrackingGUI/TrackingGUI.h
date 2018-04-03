@@ -181,6 +181,14 @@ public:
 
 	}
 
+	void snapshotFired()
+	{
+		for (int areaID = 0; areaID < stageAreas.size(); areaID++)
+		{
+			stageAreas[areaID]->snapshotFired();
+		}
+	}
+
 	//==============================================================================	
 
 	enum { frontLeft, frontRight, backRight, backLeft, centre, numOfStagePositions };

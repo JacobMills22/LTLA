@@ -37,12 +37,19 @@
 		autoFilterValueTree.setProperty("HighPassEnabled", false, nullptr);
 		autoFilterValueTree.setProperty("LowPassCutoff", 20000.0, nullptr);
 		autoFilterValueTree.setProperty("HighPassCutoff", 20.0, nullptr);
+		autoFilterValueTree.setProperty("LowPassQ", 1.0, nullptr);
+		autoFilterValueTree.setProperty("HighPassQ", 1.0, nullptr);
 
 		enableButton[lowPassID].getToggleStateValue().referTo(autoFilterValueTree.getPropertyAsValue("LowPassEnabled", nullptr));
 		enableButton[highPassID].getToggleStateValue().referTo(autoFilterValueTree.getPropertyAsValue("HighPassEnabled", nullptr));
 		cutoffSlider[lowPassID].getValueObject().referTo(autoFilterValueTree.getPropertyAsValue("LowPassCutoff", nullptr));
 		cutoffSlider[highPassID].getValueObject().referTo(autoFilterValueTree.getPropertyAsValue("HighPassCutoff", nullptr));
+		qFactorSlider[lowPassID].getValueObject().referTo(autoFilterValueTree.getPropertyAsValue("LowPassQ", nullptr));
+		qFactorSlider[highPassID].getValueObject().referTo(autoFilterValueTree.getPropertyAsValue("HighPassQ", nullptr));
 
+		lowpassFilter.setParameters(20000.0, 1.0);
+		highpassFilter.setParameters(20.0, 1.0);
+		
 	}
 
 	void AutoFilter::process(AudioSampleBuffer &buffer)
@@ -126,4 +133,6 @@
 		// update the enable state to the new states in the newly fired snapshot.
 		enableState[lowPassID] = enableButton[lowPassID].getToggleState();
 		enableState[highPassID] = enableButton[highPassID].getToggleState();
+		lowpassFilter.setParameters(cutoffSlider[lowPassID].getValue(), qFactorSlider[lowPassID].getValue());
+		highpassFilter.setParameters(cutoffSlider[highPassID].getValue(), qFactorSlider[highPassID].getValue());
 	}

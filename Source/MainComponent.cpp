@@ -183,6 +183,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 				// Reset hasbeenFiredState to false, update the area name label, and tell the audioEngine that it needs to respond to a snapshot recall.  
 				snapshotManager.setHasbeenFiredState(false);
 				areaNameLabel.setText(trackingGUI.stageAreas[trackingGUI.getCurrentlySelectedArea()]->getAreaName(), dontSendNotification);
+				trackingGUI.snapshotFired();
 				audioEngine.snapshotFired();
 			}
 

@@ -5,6 +5,8 @@ StageArea::StageArea() : stageAreaValueTree("StageArea")
 {
 	// Valuetree initialisation.
 
+	areaColourString.setValue(areaColour.toString());
+
 	stageAreaValueTree.setProperty("FrontLeftX", 50.0, nullptr);
 	stageAreaValueTree.setProperty("FrontLeftY", 50.0, nullptr);
 	stageAreaValueTree.setProperty("FrontRightX", 100.0, nullptr);
@@ -17,6 +19,7 @@ StageArea::StageArea() : stageAreaValueTree("StageArea")
 	stageAreaValueTree.setProperty("CentreY", 75.0, nullptr);
 
 	stageAreaValueTree.setProperty("AreaName", "New Area", nullptr);
+	stageAreaValueTree.setProperty("Colour", areaColourString, nullptr);
 	stageAreaValueTree.setProperty("Active", true, nullptr);
 
 
@@ -32,6 +35,7 @@ StageArea::StageArea() : stageAreaValueTree("StageArea")
 	areaPosition[centre].y.referTo(stageAreaValueTree.getPropertyAsValue("CentreY", nullptr));
 
 	areaName.referTo(stageAreaValueTree.getPropertyAsValue("AreaName", nullptr));
+	areaColourString.referTo(stageAreaValueTree.getPropertyAsValue("Colour", nullptr));
 	activeState.referTo(stageAreaValueTree.getPropertyAsValue("Active", nullptr));
 
 }
@@ -239,6 +243,7 @@ bool StageArea::getAreaSelectedState()
 void StageArea::setAreaColour(Colour colour)
 {
 	areaColour = colour;
+	areaColourString.setValue(colour.toString());
 }
 
 Colour StageArea::getAreaColour()
@@ -277,7 +282,7 @@ void StageArea::setActive(bool state)
 
 	if (stageAreaValueTree.getPropertyAsValue("Active", nullptr) == true)
 	{
-		setVisible(false);
+		setVisible(false); 
 	}
 }
 

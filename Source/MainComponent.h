@@ -117,7 +117,9 @@ private:
 	// Global Parameters
 	enum { selectNextAreaButtonID, selectPreviousAreaButtonID, numOfButtons };
 	TextButton globalButton[numOfButtons];
-	ColourSelector areaColourSelector{ (ColourSelector::showColourspace), 4, 7 };
+	//ColourSelector areaColourSelector{ (ColourSelector::showColourspace), 4, 7 };
+	ColourSelector areaColourSelector{ (ColourSelector::showColourspace + ColourSelector::showColourAtTop), 4, 7 };
+
 	Label areaNameLabel;
 	Label calibrationCountDownLabel;
 
