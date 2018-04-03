@@ -98,7 +98,7 @@
 	{
 		// Add a new snapshot to the array.
 		snapshots.add(new Snapshot);
-		valueTree.addChild(snapshots.getLast()->getValueTree(), -1, nullptr);
+		//valueTree.addChild(snapshots.getLast()->getValueTree(), -1, nullptr);
 
 		// (Save and Loading Manager)
 		if (valueTree.getNumChildren() <= 3)
@@ -110,6 +110,8 @@
 			// Set the child tree index of the new snapshot
 			snapshots.getLast()->setValueTreeChildIndex(valueTree.getNumChildren() - 1);
 		}
+
+
 
 		// Automatically update the newly created snapshot to the current settings, set the name of the new snapshot.
 		snapshots.getLast()->updateSnapshot(valueTree);
@@ -174,29 +176,6 @@
 		{
 			// if the update snapshot button is pressed, update the snapshot.
 			snapshots[currentSnapshotID]->updateSnapshot(valueTree);
-
-			//(Save and Loading Manager)
-			// ============== ============== ============== ==============
-			ValueTree currentTree = valueTree.getChild(snapshots[currentSnapshotID]->getValueTreeChildIndex());
-			int totalSnapshots = numberOfSnapshots.getValue();
-
-			// For each childtree
-			for (int childTree = 0; childTree < valueTree.getNumChildren() - totalSnapshots; childTree++)
-			{
-				// Check if it is valid
-				if (currentTree.getChild(childTree).isValid())
-				{
-					// Replace the childtree by removing the old one and adding a new one at the same index.
-					currentTree.removeChild(childTree, nullptr);
-					currentTree.addChild(valueTree.getChild(childTree).createCopy(), childTree, nullptr);
-				}
-				else
-				{
-					// Add the new child tree at the end.
-					currentTree.addChild(valueTree.getChild(childTree).createCopy(), -1, nullptr);
-				}
-			}
-			// ============== ============== ============== ==============
 		}
 		else if (button == &snapshotButtons[addNewSnapshotID])
 		{
@@ -214,15 +193,15 @@
 		}
 	}
 
-	void SnapshotManager::addNewBlankSnapshot(ValueTree valueTreeFromXml, int numOfStageAreas)
+	void SnapshotManager::addNewBlankSnapshot(ValueTree valueTreeFromXml, int index)
 	{
 		//(Save and Loading Manager)
 		//Adds a snapshot ready for update from a loaded XML project file (Used for the save and loading manager)
 		snapshots.add(new Snapshot);
 		snapshots.getLast()->setSnapshotName("Snapshot " + (String)(snapshots.size()));
 
-		valueTree.addChild(snapshots.getLast()->getValueTree(), -1, nullptr);
-		snapshots.getLast()->updateSnapshotAtProjectLoad(valueTreeFromXml, numOfStageAreas + snapshots.size() - 1);
+		//valueTree.addChild(snapshots.getLast()->getValueTree(), -1, nullptr);
+		snapshots.getLast()->updateSnapshotAtProjectLoad(valueTreeFromXml, index);
 	}
 
 	void SnapshotManager::clearAllSnapshots(bool deleteObjects)

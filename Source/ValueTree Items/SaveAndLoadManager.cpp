@@ -10,13 +10,30 @@ void MainContentComponent::saveProjectAs()
 
 	if (fileChooser.getResult().getFullPathName().isEmpty() == false)
 	{
+		int numOfSnapshots = snapshotManager.getNumberOfSnapshots();
+		snapshotManager.setCurrentSnapshot(numOfSnapshots - 1, true);
+
 		currentProjectFullPath = fileChooser.getResult().getFullPathName();
 		File fileToSave(currentProjectFullPath);
 
 		XmlElement xmlElement("SavedProject");
-		xmlElement = *valueTree.createXml();
+		ValueTree treeToSave = valueTree.createCopy();
+		int childrenNum = treeToSave.getNumChildren();
+
+		for (int id = 0; id < childrenNum; id++)
+		{
+			treeToSave.removeChild(id, nullptr);
+		}
+
+		for (int s = 0; s < numOfSnapshots; s++)
+		{
+			treeToSave.addChild(snapshotManager.getSnapshotValueTree(s), -1, nullptr);
+		}
+
+		xmlElement = *treeToSave.createXml();
 		xmlElement.writeToFile(fileToSave, "", "UTF-8", 60);
 	}	
+
 }
 
 void MainContentComponent::saveProject()
@@ -57,29 +74,19 @@ void MainContentComponent::loadProjectFile(ValueTree valueTreeToLoadInto)
 			int numOfStageAreas = ValueTree::fromXml(*xml).getPropertyAsValue("NumberOfStageAreas", nullptr).getValue();
 			int numOfSnapshots = ValueTree::fromXml(*xml).getPropertyAsValue("NumberOfSnapshots", nullptr).getValue();
 
-			for (int c = 0; c < numOfSnapshots; c++)
-			{
-				snapshotManager.addNewBlankSnapshot(ValueTree::fromXml(*xml), numOfStageAreas * 2);
-			}
-
 			for (int c = 0; c < numOfStageAreas; c++)
 			{
 				addStageAreaIDPressed();
 			}
 
-			valueTreeToLoadInto.copyPropertiesFrom(ValueTree::fromXml(*xml), nullptr);
-
-			for (int childTree = 0; childTree < numOfStageAreas * 2; childTree++)
+			for (int c = 0; c < numOfSnapshots; c++)
 			{
-				valueTreeToLoadInto.getChild(childTree).copyPropertiesFrom(ValueTree::fromXml(*xml).getChild(childTree), nullptr);
-
-				for (int subChildTree = 0; subChildTree < ValueTree::fromXml(*xml).getChild(childTree).getNumChildren(); subChildTree++)
-				{
-					valueTreeToLoadInto.getChild(childTree).getChild(subChildTree).copyPropertiesFrom(ValueTree::fromXml(*xml).getChild(childTree).getChild(subChildTree), nullptr);
-				}
+				snapshotManager.addNewBlankSnapshot(ValueTree::fromXml(*xml), c + numOfStageAreas);
 			}
 
-			snapshotManager.setCurrentSnapshot(0, false);
+			valueTreeToLoadInto = ValueTree::fromXml(*xml).createCopy();
+			
+			snapshotManager.setCurrentSnapshot(0, true);
 			audioEngine.snapshotFired();
 		}
 	}

@@ -82,6 +82,8 @@ void TrackingGUI::mouseDoubleClick(const MouseEvent & event)
 		}
 	}
 
+	// If performer 1 should be simulated, check the coordinates are valid then update
+	// the posiiton of the ellipse.
 	if (shouldSimulatePerformer1 == true)
 	{
 		if (event.x >= 0 && event.x <= getWidth())
@@ -120,6 +122,8 @@ void TrackingGUI::mouseDrag(const MouseEvent& event)
 		}
 	}
 
+	// If performer 1 should be simulated and is selected, 
+	// check the coordinates are valid then update the posiiton of the ellipse.
 	if (shouldSimulatePerformer1 == true && performer1EllipseSelected == true)
 	{
 		if (event.x >= 0 && event.x <= getWidth())
@@ -127,8 +131,6 @@ void TrackingGUI::mouseDrag(const MouseEvent& event)
 
 		if (event.y >= 0 && event.y <= getHeight())
 			ellipseCoordinates[0].y = event.y;
-
-		DBG((String)ellipseCoordinates[0].x + " " + (String)ellipseCoordinates[0].y);
 	}
 }
 

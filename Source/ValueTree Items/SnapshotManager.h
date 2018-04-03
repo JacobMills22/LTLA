@@ -75,7 +75,7 @@ public:
 	void labelTextChanged(Label* labelThatHasChanged) override;
 	
 	/** Adds a snapshot ready for update from a loaded XML project file (Used for the save and loading manager)*/
-	void addNewBlankSnapshot(ValueTree valueTreeFromXml, int numOfStageAreas);
+	void addNewBlankSnapshot(ValueTree valueTreeFromXml, int index);
 
 	/** Clears all snapshots with the option to delete them aswell */
 	void clearAllSnapshots(bool deleteObjects);
@@ -91,6 +91,11 @@ public:
 	
 	/** Returns the number of snapshots currently created */
 	int getNumberOfSnapshots();
+
+	ValueTree getSnapshotValueTree(int ID)
+	{
+		return snapshots[ID]->getValueTree();
+	}
 
 private:
 
