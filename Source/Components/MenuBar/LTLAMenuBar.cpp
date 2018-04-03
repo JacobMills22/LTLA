@@ -68,6 +68,7 @@
 		else if (menuIndex == preferencesID)
 		{
 			menu.addCommandItem(&commandManager, audioDeviceSettingsID);
+			menu.addCommandItem(&commandManager, performerSimulation);
 		}
 		return menu;
 	}

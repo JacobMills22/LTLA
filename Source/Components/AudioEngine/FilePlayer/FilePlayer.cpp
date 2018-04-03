@@ -39,7 +39,7 @@ FilePlayer::FilePlayer() : thread("AudioFileStreamThread"), filePlayerValueTree(
 	}
 
 	fileplayerSlider[levelSliderID].setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-	fileplayerSlider[levelSliderID].setSkewFactor(1.5, false);
+	fileplayerSlider[levelSliderID].setSkewFactor(0.6, false);
 	fileplayerSlider[levelSliderID].setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 
 	// Label Initialisation
@@ -226,8 +226,8 @@ void FilePlayer::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
 
 	for (int sample = 0; sample < bufferToFill.numSamples; sample++) // For each sample.
 	{
-		outputL[sample] *= playbackLevel * 0.5;	// Scale audio down.
-		outputR[sample] *= playbackLevel * 0.5;	// Scale audio down.
+		outputL[sample] *= playbackLevel * 0.75;	// Scale audio down.
+		outputR[sample] *= playbackLevel * 0.75;	// Scale audio down.
 	}
 }
 

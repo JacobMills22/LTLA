@@ -15,7 +15,7 @@
 		setMeterData(0, 0.0);
 		setMeterData(1, 0.0);
 
-		startTimer(30);
+		startTimer(15);
 	}
 
 	void LTLAAudioEngine::prepareToPlay(int samplesPerBlockExpected, double sampleRate) 

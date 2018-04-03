@@ -238,7 +238,6 @@
 		}
 
 		// Store the delay paths outputs in the feedback Matrix buffers
-
 		for (int pathNum = 0; pathNum < numOfDelays; pathNum++)
 		{
 			feedbackMatrixBuffer[pathNum].makeCopyOf(delayPathBuffer[pathNum]);
@@ -486,6 +485,10 @@
 		{
 			bypassState = bypassButton.getToggleState();
 		}
+	}
+
+	void AutoReverb::labelTextChanged(Label* labelThatHasChanged)
+	{
 	}
 
 	void AutoReverb::resized() 

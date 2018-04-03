@@ -21,11 +21,11 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 	{
 		// Initialise Components
 
-		setSize(1000, 600);
+		setSize(1280, 720);
 		setAudioChannels(4, 2);
 		kinectSensor.startKinectST();
 		startTimer(kinectUpdateTimer, 40);
-		startTimer(guiTimer, 30);
+		startTimer(guiTimer, 15);
 
 		addAndMakeVisible(trackingGUI);
 		addAndMakeVisible(menuBar);

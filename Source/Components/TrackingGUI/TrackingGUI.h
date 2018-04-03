@@ -165,6 +165,22 @@ public:
 /** Sets the valuetree for this class to use */
 	void setValueTree(ValueTree valueTree);
 
+	bool isPerformerBeingSimulated()
+	{
+		return shouldSimulatePerformer1;
+	}
+
+	void simulatePerformer1(bool state)
+	{
+		shouldSimulatePerformer1 = state;
+		if (state == true)
+		{
+			ellipseCoordinates[0].x = 10;
+			ellipseCoordinates[0].y = 10;
+		}
+
+	}
+
 	//==============================================================================	
 
 	enum { frontLeft, frontRight, backRight, backLeft, centre, numOfStagePositions };
@@ -187,6 +203,9 @@ private:
 	bool stageAreaEditState = false;
 	bool audioPanelState = false;
 	bool selectedAreaHasChanged = false;
+
+	bool shouldSimulatePerformer1 = false;
+	bool performer1EllipseSelected = false;
 
 	int gridIncrement = 15;
 	int selectedAreaIndex = 0;

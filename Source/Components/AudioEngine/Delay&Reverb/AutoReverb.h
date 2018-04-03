@@ -132,6 +132,10 @@ public:
 	/** Called when a button is clicked, used to set toggle the bypass state */
 	void buttonClicked(Button* button) override;
 
+	/** Called when a labels text is changed */
+	void labelTextChanged(Label* labelThatHasChanged) override;
+
+
 	/** Sets the bounds of all components */
 	void resized() override;
 

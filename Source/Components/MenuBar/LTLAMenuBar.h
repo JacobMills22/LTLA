@@ -35,7 +35,7 @@ public:
 	enum MainCommandManagerIDs {saveID = 1, saveAsID, loadID, calibrationStartID, interval5SecondsID, interval10SecondsID, 
 		interval20SecondsID, drawStageID, editStageID, drawGridID, snaptoGridID, gridSize10ID, 
 		gridSize15ID, gridSize20ID, addStageAreaID, editStageAreasID, removeStageAreaID, 
-		audioParametersID, audioDeviceSettingsID, numOfCommandIDs};
+		audioParametersID, audioDeviceSettingsID, performerSimulation, numOfCommandIDs};
 
 private:
 

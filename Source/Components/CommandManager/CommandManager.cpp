@@ -16,7 +16,7 @@ void MainContentComponent::getAllCommands(Array<CommandID>& commands)
 	const CommandID ids[] = {  menuBar.saveID, menuBar.saveAsID, menuBar.loadID, menuBar.interval5SecondsID, menuBar.interval10SecondsID, menuBar.interval20SecondsID,
 		menuBar.calibrationStartID, menuBar.drawStageID, menuBar.editStageID, menuBar.drawGridID, menuBar.snaptoGridID, menuBar.gridSize10ID,
 		menuBar.gridSize15ID, menuBar.gridSize20ID, menuBar.addStageAreaID, menuBar.editStageAreasID, menuBar.removeStageAreaID, menuBar.audioParametersID,
-		menuBar.audioDeviceSettingsID };
+		menuBar.audioDeviceSettingsID, menuBar.performerSimulation };
 	
 	commands.addArray(ids, numElementsInArray(ids));
 	
@@ -95,6 +95,10 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 	case LTLAMenuBar::audioDeviceSettingsID:
 		result.setInfo("Audio Device Settings", "Open a panel to edit audio device settings", "Preferences", 0);
 		audioSettingsWindow.isVisible() == true ? result.setTicked(true) : result.setTicked(false);
+		break;
+	case LTLAMenuBar::performerSimulation:
+		result.setInfo("Simulate Performer 1", "Allows performer 1s position to be manipulated by mouse", "Preferences", 0);
+		result.setTicked(trackingGUI.isPerformerBeingSimulated());
 	}
 }
 
@@ -150,6 +154,8 @@ bool MainContentComponent::perform(const InvocationInfo& info)
 	case LTLAMenuBar::audioParametersID: editAudioParametersPressed();
 		break;
 	case LTLAMenuBar::audioDeviceSettingsID: audioSettingsWindow.isVisible() == true ? audioSettingsWindow.setVisible(false) : audioSettingsWindow.setVisible(true);
+		break;
+	case LTLAMenuBar::performerSimulation: trackingGUI.isPerformerBeingSimulated() == true ? trackingGUI.simulatePerformer1(false) : trackingGUI.simulatePerformer1(true);
 		break;
 	default: return false; 
 	}

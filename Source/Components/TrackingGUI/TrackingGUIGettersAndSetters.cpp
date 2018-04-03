@@ -7,8 +7,11 @@
 
 void TrackingGUI::setEllipseCoordinates(float positionX, float positionY, int skeltonNum)
 {	// Coordinates are mapped based on the size of the window.
-	ellipseCoordinates[skeltonNum].x = getLocalBounds().getWidth() * 0.5 * positionX;
-	ellipseCoordinates[skeltonNum].y = getLocalBounds().getHeight() * 0.5 * positionY;
+	if (shouldSimulatePerformer1 == false)
+	{
+		ellipseCoordinates[skeltonNum].x = getLocalBounds().getWidth() * 0.5 * positionX;
+		ellipseCoordinates[skeltonNum].y = getLocalBounds().getHeight() * 0.5 * positionY;
+	}
 }
 
 // ========================================================================================

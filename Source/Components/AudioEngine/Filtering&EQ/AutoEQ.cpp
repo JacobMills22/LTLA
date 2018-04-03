@@ -173,9 +173,9 @@
 		eqSliderNameLabel[qFactorSliderID].setBounds(eqSlider[qFactorSliderID].getX() - 45, eqSlider[qFactorSliderID].getY() + 15, 50, 20);
 		eqSliderNameLabel[gainSliderID].setBounds(eqSlider[gainSliderID].getX() - 45, eqSlider[gainSliderID].getY() + 15, 50, 20);
 
-		eqSliderValueLabel[frequencySliderID].setBounds(eqSlider[frequencySliderID].getX() + 45, eqSlider[frequencySliderID].getY() + 15, 50, 20);
-		eqSliderValueLabel[qFactorSliderID].setBounds(eqSlider[qFactorSliderID].getX() + 45, eqSlider[qFactorSliderID].getY() + 15, 50, 20);
-		eqSliderValueLabel[gainSliderID].setBounds(eqSlider[gainSliderID].getX() + 45, eqSlider[gainSliderID].getY() + 15, 50, 20);
+		eqSliderValueLabel[frequencySliderID].setBounds(eqSlider[frequencySliderID].getX() + 45, eqSlider[frequencySliderID].getY() + 15, 60, 20);
+		eqSliderValueLabel[qFactorSliderID].setBounds(eqSlider[qFactorSliderID].getX() + 45, eqSlider[qFactorSliderID].getY() + 15, 60, 20);
+		eqSliderValueLabel[gainSliderID].setBounds(eqSlider[gainSliderID].getX() + 45, eqSlider[gainSliderID].getY() + 15, 60, 20);
 	}
 
 	void AutoEQ::paint(Graphics &g) 
@@ -393,7 +393,7 @@
 		eqBand[band].sliderValues.gain = gain;
 
 		// Set the label text to the new values.
-		eqSliderValueLabel[frequencySliderID].setText((String)frequency + " Hz", dontSendNotification);
+		eqSliderValueLabel[frequencySliderID].setText((String)(int)frequency + " Hz", dontSendNotification);
 		eqSliderValueLabel[qFactorSliderID].setText((String)qFactor, dontSendNotification);
 		eqSliderValueLabel[gainSliderID].setText((String)gain + " dB", dontSendNotification);
 
