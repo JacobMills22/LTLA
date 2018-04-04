@@ -7,7 +7,9 @@
 
 	Snapshot::Snapshot() : snapshotValueTree("Snapshot")
 	{
-		snapshotValueTree.setProperty("snapshotName", "SnapshotNameProperty", nullptr);
+		snapshotValueTree.setProperty("SnapshotName", "New Snapshot", nullptr);
+		snapshotName = "New Snapshot";
+		snapshotName.referTo(snapshotValueTree.getPropertyAsValue("SnapshotName", nullptr));
 	}
 
 	void Snapshot::recallSnapshot(ValueTree valueTree)
@@ -61,7 +63,7 @@
 
 	String Snapshot::getSnapshotName()
 	{
-		return snapshotName;
+		return snapshotName.getValue();
 	}
 
 	ValueTree Snapshot::getValueTree()
@@ -110,9 +112,7 @@
 			// Set the child tree index of the new snapshot
 			snapshots.getLast()->setValueTreeChildIndex(valueTree.getNumChildren() - 1);
 		}
-
-
-
+		
 		// Automatically update the newly created snapshot to the current settings, set the name of the new snapshot.
 		snapshots.getLast()->updateSnapshot(valueTree);
 		snapshots.getLast()->setSnapshotName("Snapshot " + (String)(snapshots.size()));
@@ -122,6 +122,12 @@
 		valueTree.setProperty("NumberOfSnapshots", snapshots.size(), nullptr);
 
 	}
+
+	void SnapshotManager::updateCurrentSnapshot()
+	{
+		snapshots[currentSnapshotID]->updateSnapshot(valueTree);
+	}
+
 
 	void SnapshotManager::setValueTree(ValueTree ValueTree)
 	{
@@ -175,7 +181,7 @@
 		else if (button == &snapshotButtons[updateSnapshotID])
 		{
 			// if the update snapshot button is pressed, update the snapshot.
-			snapshots[currentSnapshotID]->updateSnapshot(valueTree);
+			updateCurrentSnapshot();
 		}
 		else if (button == &snapshotButtons[addNewSnapshotID])
 		{
@@ -202,6 +208,8 @@
 
 		//valueTree.addChild(snapshots.getLast()->getValueTree(), -1, nullptr);
 		snapshots.getLast()->updateSnapshotAtProjectLoad(valueTreeFromXml, index);
+		snapshots.getLast()->setSnapshotName(snapshots.getLast()->getSnapshotName());
+
 	}
 
 	void SnapshotManager::clearAllSnapshots(bool deleteObjects)

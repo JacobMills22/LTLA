@@ -14,7 +14,7 @@
 		addAndMakeVisible(enablePanButton);
 		enablePanButton.addListener(this);
 		enablePanButton.setToggleState(false, dontSendNotification);
-		enablePanButton.setButtonText("Auto Panning Disabled");
+		enablePanButton.setButtonText("Enable Auto Panning");
 		enablePanButton.getToggleStateValue().referTo(autoPannerValueTree.getPropertyAsValue("EnableAutoPan", nullptr));
 
 		addAndMakeVisible(resetPanButton);
@@ -24,16 +24,12 @@
 		startTimer(50);
 	}
 
-	/** Initialises the resampling audio sources parameters.*/
-	void AutoPanner::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
+	void AutoPanner::setPanAmount(float value)
 	{
-		// Not nessesarily needed since this class just processes existing data.
-	}
-
-	/** Processes the audio data (Resampling Audio Source)*/
-	void AutoPanner::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)
-	{
-		// Using process function instead.
+		if (enablePanState == true)
+		{
+			panAmount = value;
+		}
 	}
 
 	void AutoPanner::process(AudioSampleBuffer &buffer)
@@ -43,21 +39,21 @@
 
 		for (int sample = 0; sample < buffer.getNumSamples(); sample++)
 		{
-			// 6dB Pan Law
-			//	OutputL[sample] *= pow(sin((1 - panAmount) * (float_Pi * 0.5)), 2) * 1.98;
-			//	OutputR[sample] *= pow(sin(panAmount * (float_Pi * 0.5)), 2) * 1.98;
+			// Researched and experimented with different pan laws
+			// Future developers can easily switch the methods out if desired.
 
-			// 3dB Pan Law
-			OutputL[sample] *= sin((1 - panAmount) * (float_Pi * 0.5));
-			OutputR[sample] *= sin((panAmount) * (float_Pi * 0.5));
+			// -3dB Pan Law
+			//OutputL[sample] *= sin((1 - panAmount) * halfPi);
+			//OutputR[sample] *= sin((panAmount) * halfPi);
 
+			// -4.5 dB center law :
+			OutputL[sample] *= pow(sin((1 - panAmount) * halfPi), 1.5);
+			OutputR[sample] *= pow(sin(panAmount * halfPi), 1.5);
+
+			// -6dB Pan Law
+			//	OutputL[sample] *= pow(sin((1 - panAmount) * halfPi), 2) * 1.98;
+			//	OutputR[sample] *= pow(sin(panAmount * halfPi, 2) * 1.98;
 		}
-	}
-
-	/** Releases the resampling audio sources resources. */
-	void AutoPanner::releaseResources()
-	{
-		// Not nessesarily needed since this class just processes existing data.
 	}
 
 	void AutoPanner::resized()
@@ -83,17 +79,7 @@
 	{
 		if (button == &enablePanButton)
 		{
-
-			if (enablePanButton.getToggleState() == true)
-			{
-				enablePanButton.setButtonText("Auto Panning Enabled");
-				enablePanState = true;
-			}
-			else
-			{
-				enablePanButton.setButtonText("Auto Panning Disabled");
-				enablePanState = false;
-			}
+			enablePanButton.getToggleState() == true ? enablePanState = true : enablePanState = false;
 		}
 		else if (button == &resetPanButton)
 		{
@@ -107,12 +93,23 @@
 	{
 		panningSlider.setValue(panAmount, dontSendNotification);
 	}
-
-
-	void AutoPanner::setPanAmount(float value)
+	
+	ValueTree AutoPanner::getValueTree()
 	{
-		if (enablePanState == true)
+		return autoPannerValueTree;
+	}
+
+	void AutoPanner::snapshotFired()
+	{
+		// Update the enable button and state.
+		enablePanState = autoPannerValueTree.getPropertyAsValue("EnableAutoPan", nullptr).getValue();
+		enablePanButton.setToggleState(enablePanState, dontSendNotification);
+
+		// A a snapshot has been fired which doesn't have aurto panning enabled
+		// Reset the pan amount to the centre.
+		if (enablePanState == false)
 		{
-			panAmount = value;
+			setPanAmount(0.5);
+			panningSlider.setValue(0.5);
 		}
 	}

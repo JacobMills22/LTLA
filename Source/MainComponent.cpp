@@ -17,7 +17,7 @@
 	*/
 	//==============================================================================
 MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager, 0, 256, 0, 256, false, false, true, true),
-	                                           audioSettingsWindow("Audio Device Settings", false), valueTree("LTLAValueTree")            
+	                                           audioSettingsWindow("Audio Device Settings", false), valueTree("LTLAValueTree")
 	{
 		// Initialise Components
 

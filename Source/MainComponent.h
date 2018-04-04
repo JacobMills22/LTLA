@@ -87,6 +87,9 @@ public:
 	
 	/** Loads a saved XML ile into the current valuetree. */
 	void loadProjectFile(ValueTree valueTreeToLoadInto);
+
+	/** Displays an alert window asking the user if the current snapshot needs updating.*/
+	void askUserIfSnapshotShouldBeUpdated();
 	
 	//==============================================================================
 
@@ -122,6 +125,8 @@ private:
 
 	Label areaNameLabel;
 	Label calibrationCountDownLabel;
+
+	static NativeMessageBox messageBox;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };

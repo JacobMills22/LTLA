@@ -78,7 +78,6 @@
 		rawInputBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
 
 		filePlayer.prepareToPlay(samplesPerBlockExpected, sampleRate);
-		autoPanner.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoFilter.setSampleRate(sampleRate);
 		autoEQ.prepareToPlay(samplesPerBlockExpected, sampleRate);
 		autoReverb.prepareToPlay(samplesPerBlockExpected, sampleRate);
@@ -87,7 +86,6 @@
 	void LTLAAudioPanel::releaseResources()
 	{
 		filePlayer.releaseResources();
-		autoPanner.releaseResources();
 	}
 
 	void LTLAAudioPanel::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill)

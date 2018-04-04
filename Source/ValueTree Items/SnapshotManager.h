@@ -39,7 +39,7 @@ public:
 private:
 
 	ValueTree snapshotValueTree;
-	String snapshotName = "New Snapshot";
+	Value snapshotName;
 	int valueTreeChildIndex = 3;
 
 };
@@ -61,6 +61,9 @@ public:
 
 	/** Adds a new snapshot to the list */
 	void createNewSnapshot();
+
+	/** updates the current snapshot */
+	void updateCurrentSnapshot();
 
 	/** Sets the valuetree for use*/
 	void setValueTree(ValueTree ValueTree);

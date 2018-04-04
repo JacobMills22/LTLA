@@ -3,8 +3,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../Source/Components/AudioEngine/AudioPanelObject.h"
 
-class AutoPanner : public AudioSource,
-				   public AudioPanelObject,
+/** This component simply pans an audio buffer by
+using the process and setPanAmount functions. The
+pan amount can be updated bya  performers position
+so a timer is used to upfdate the slider and pan amount. */
+
+class AutoPanner : public AudioPanelObject,
 				   public Slider::Listener,
 				   public Timer,
 	               public Button::Listener
@@ -14,15 +18,12 @@ public:
 
 /** Constructor: Initialisation. */
 	AutoPanner();
+	
+/** Sets the pan amount. */
+	void setPanAmount(float value);
 
-/** Initialises the  audio source, Not nessesarily needed since this class just processes existing data. */
-	void prepareToPlay(int samplesPerBlockExpected, double sampleRate)override;
-
-/** Processes the audio data (Resampling Audio Source)*/
-	void getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) override;
-
-/** Releases the audio sources resources. Not nessesarily needed since this class just processes existing data. */
-	void releaseResources() override;
+/** Applys the panning to the buffer */
+	void process(AudioSampleBuffer &buffer);
 
 /** Sets the bounds of the auto-panner panels objects*/
 	void resized() override;
@@ -38,27 +39,11 @@ public:
 /** Updates the pan amount slider*/
 	void timerCallback() override;
 
-/** Sets the pan amount. */
-	void setPanAmount(float value);
-	
-	void process(AudioSampleBuffer &buffer);
+/** Returns the Autopanner valueTree */
+	ValueTree getValueTree();
 
-	ValueTree getValueTree()
-	{
-		return autoPannerValueTree;
-	}
-
-	void snapshotFired()
-	{
-		bool enableAutoPanState = autoPannerValueTree.getPropertyAsValue("EnableAutoPan", nullptr).getValue();
-
-		enablePanButton.setToggleState(enableAutoPanState, dontSendNotification);
-		if (enableAutoPanState == false)
-		{
-			setPanAmount(0.5);
-			panningSlider.setValue(0.5);
-		}
-	}
+/** Called when a snapshot is fired, used to set parameters */
+	void snapshotFired();
 
 private:
 
@@ -69,6 +54,7 @@ private:
 
 	float panAmount = 0.5;
 	bool enablePanState = false;
+	double halfPi = double_Pi * 0.5;
 
 	ValueTree autoPannerValueTree;
 

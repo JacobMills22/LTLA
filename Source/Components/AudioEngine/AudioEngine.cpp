@@ -39,9 +39,6 @@
 		performerInput[0].prepareToPlay(samplesPerBlockExpected, sampleRate);
 		performerInput[1].prepareToPlay(samplesPerBlockExpected, sampleRate);
 
-		//performerInput.initialise(1, 2);
-
-		DBG("PREPARETOPLAY!");
 	}
 
 	void LTLAAudioEngine::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) 
@@ -64,7 +61,6 @@
 		// For each audiopanel which has its input set to performer 1 or 2
 		for (int panel = 0; panel < audioPanel.size(); panel++)
 		{
-			//if (audioPanel[panel]->getAudioInputID() >= 2)
 			if (audioPanel[panel]->getAudioInputID() == 2)
 			{
 				// Remove the fileplayer audiosource from the mixer and then process
@@ -79,7 +75,6 @@
 
 		for (int panel = 0; panel < audioPanel.size(); panel++)
 		{
-			//if (audioPanel[panel]->getAudioInputID() >= 2)
 			if (audioPanel[panel]->getAudioInputID() == 3)
 			{
 				// Remove the fileplayer audiosource from the mixer and then process
