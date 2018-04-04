@@ -1,33 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="ED1iIK" name="LTLA" displaySplashScreen="1" reportAppUsage="1"
-              splashScreenColour="Dark" projectType="guiapp" version="1.0.0"
-              bundleIdentifier="com.yourcompany.LTLA" includeBinaryInAppConfig="1"
+<JUCERPROJECT id="ED1iIK" name="LTLA (Location Tracking for Live Audio)" displaySplashScreen="1"
+              reportAppUsage="1" splashScreenColour="Dark" projectType="guiapp"
+              version="1.0.0" bundleIdentifier="com.yourcompany.LTLA" includeBinaryInAppConfig="1"
               jucerVersion="5.0.2">
-  <MAINGROUP id="PRrKAX" name="LTLA">
+  <MAINGROUP id="PRrKAX" name="LTLA (Location Tracking for Live Audio)">
+    <FILE id="uqXW2s" name="LTLA Icon.PNG" compile="0" resource="1" file="Resources/LTLA Icon.PNG"/>
     <GROUP id="{793C7987-EDF1-70BF-F31C-B9924CA5CB4B}" name="Source">
       <GROUP id="{D72C7A8E-DF15-287E-06E8-2732F081C84A}" name="Components">
-        <FILE id="uP9a2x" name="LTLAMenuBar.cpp" compile="1" resource="0" file="Source/Components/LTLAMenuBar.cpp"/>
-        <FILE id="XpQb5p" name="LTLAMenuBar.h" compile="0" resource="0" file="Source/Components/LTLAMenuBar.h"/>
+        <GROUP id="{CEFE8FC0-F29C-341D-21BB-47A02FD70702}" name="AudioEngine">
+          <GROUP id="{64363850-4199-D82E-A63F-E1BF8165122F}" name="AutoPanner">
+            <FILE id="lWGaEx" name="AutoPanner.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/AutoPanner/AutoPanner.cpp"/>
+            <FILE id="tQoHLE" name="AutoPanner.h" compile="0" resource="0" file="Source/Components/AudioEngine/AutoPanner/AutoPanner.h"/>
+          </GROUP>
+          <GROUP id="{46F153C8-FE7B-E532-F0B5-822425F439DC}" name="Delay&amp;Reverb">
+            <FILE id="cJ0FLZ" name="AutoReverb.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/Delay&amp;Reverb/AutoReverb.cpp"/>
+            <FILE id="qaE8MI" name="AutoReverb.h" compile="0" resource="0" file="Source/Components/AudioEngine/Delay&amp;Reverb/AutoReverb.h"/>
+            <FILE id="GdnSBp" name="DelayUnit.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/Delay&amp;Reverb/DelayUnit.cpp"/>
+            <FILE id="rXSVbi" name="DelayUnit.h" compile="0" resource="0" file="Source/Components/AudioEngine/Delay&amp;Reverb/DelayUnit.h"/>
+          </GROUP>
+          <GROUP id="{4F4FCE73-B431-31CA-0116-57B9C9EF6D33}" name="FilePlayer">
+            <FILE id="ezVAL2" name="FilePlayer.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/FilePlayer/FilePlayer.cpp"/>
+            <FILE id="bd8U8f" name="FilePlayer.h" compile="0" resource="0" file="Source/Components/AudioEngine/FilePlayer/FilePlayer.h"/>
+          </GROUP>
+          <GROUP id="{2A1F63B9-9A75-AFD9-7DD5-0361DC15BCA2}" name="Filtering&amp;EQ">
+            <FILE id="g86TaC" name="AutoEQ.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/Filtering&amp;EQ/AutoEQ.cpp"/>
+            <FILE id="cS5Bcc" name="AutoEQ.h" compile="0" resource="0" file="Source/Components/AudioEngine/Filtering&amp;EQ/AutoEQ.h"/>
+            <FILE id="auAdS6" name="AutoFilter.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/Filtering&amp;EQ/AutoFilter.cpp"/>
+            <FILE id="voTpbF" name="AutoFilter.h" compile="0" resource="0" file="Source/Components/AudioEngine/Filtering&amp;EQ/AutoFilter.h"/>
+            <FILE id="NS6A13" name="FilterProcesses.cpp" compile="1" resource="0"
+                  file="Source/Components/AudioEngine/Filtering&amp;EQ/FilterProcesses.cpp"/>
+            <FILE id="QFo1BH" name="FilterProcesses.h" compile="0" resource="0"
+                  file="Source/Components/AudioEngine/Filtering&amp;EQ/FilterProcesses.h"/>
+          </GROUP>
+          <GROUP id="{06289F58-B916-639B-F5BA-7C926F717272}" name="Metering">
+            <FILE id="LFnBt9" name="Meter.h" compile="0" resource="0" file="Source/Components/AudioEngine/Metering/Meter.h"/>
+          </GROUP>
+          <GROUP id="{594EADB7-9FD5-96F0-0EAC-F3B47F97FF1D}" name="PerformerInput">
+            <FILE id="mxtUVQ" name="PerfomerInput.cpp" compile="1" resource="0"
+                  file="Source/Components/AudioEngine/PerformerInput/PerfomerInput.cpp"/>
+            <FILE id="tyTfsq" name="PerformerInput.h" compile="0" resource="0"
+                  file="Source/Components/AudioEngine/PerformerInput/PerformerInput.h"/>
+          </GROUP>
+          <GROUP id="{419361BE-92EB-D9A4-8971-4F290FCD218D}" name="Utilities">
+            <FILE id="QkGl50" name="GainToDecimalConverter.h" compile="0" resource="0"
+                  file="Source/Components/AudioEngine/Utilities/GainToDecimalConverter.h"/>
+            <FILE id="dxzA39" name="RangeRemapper.h" compile="0" resource="0" file="Source/Components/AudioEngine/Utilities/RangeRemapper.h"/>
+            <FILE id="XbRD0r" name="SimpleFade.h" compile="0" resource="0" file="Source/Components/AudioEngine/Utilities/SimpleFade.h"/>
+          </GROUP>
+          <FILE id="GjxRBx" name="AudioEngine.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/AudioEngine.cpp"/>
+          <FILE id="t1yzd3" name="AudioEngine.h" compile="0" resource="0" file="Source/Components/AudioEngine/AudioEngine.h"/>
+          <FILE id="B3X9CY" name="AudioPanel.cpp" compile="1" resource="0" file="Source/Components/AudioEngine/AudioPanel.cpp"/>
+          <FILE id="WpQQ5s" name="AudioPanel.h" compile="0" resource="0" file="Source/Components/AudioEngine/AudioPanel.h"/>
+          <FILE id="AxhhDb" name="AudioPanelObject.h" compile="0" resource="0"
+                file="Source/Components/AudioEngine/AudioPanelObject.h"/>
+        </GROUP>
+        <GROUP id="{EC003C7E-72DB-0C88-F5BB-DED281217ED1}" name="CommandManager">
+          <FILE id="sMXlv9" name="CommandManager.cpp" compile="1" resource="0"
+                file="Source/Components/CommandManager/CommandManager.cpp"/>
+          <FILE id="xzZYWe" name="CommandManager.h" compile="0" resource="0"
+                file="Source/Components/CommandManager/CommandManager.h"/>
+        </GROUP>
+        <GROUP id="{739E0C83-4D53-3D28-C406-BABDBE04677F}" name="MenuBar">
+          <FILE id="BAeAJ9" name="LTLAMenuBar.cpp" compile="1" resource="0" file="Source/Components/MenuBar/LTLAMenuBar.cpp"/>
+          <FILE id="wt7OTa" name="LTLAMenuBar.h" compile="0" resource="0" file="Source/Components/MenuBar/LTLAMenuBar.h"/>
+        </GROUP>
+        <GROUP id="{4333C857-CC58-E233-AFDD-BDBD21A5789B}" name="StageAreas">
+          <FILE id="aPWRK2" name="StageAreas.cpp" compile="1" resource="0" file="Source/Components/StageAreas/StageAreas.cpp"/>
+          <FILE id="Bni8Bp" name="StageAreas.h" compile="0" resource="0" file="Source/Components/StageAreas/StageAreas.h"/>
+        </GROUP>
+        <GROUP id="{F28A4628-B2F3-E2ED-8399-E79E9B647748}" name="TrackingGUI">
+          <FILE id="Rb2qPG" name="TrackingGUI.cpp" compile="1" resource="0" file="Source/Components/TrackingGUI/TrackingGUI.cpp"/>
+          <FILE id="S0ehXQ" name="TrackingGUI.h" compile="0" resource="0" file="Source/Components/TrackingGUI/TrackingGUI.h"/>
+          <FILE id="Jsv8bV" name="TrackingGUIGettersAndSetters.cpp" compile="1"
+                resource="0" file="Source/Components/TrackingGUI/TrackingGUIGettersAndSetters.cpp"/>
+          <FILE id="TyPxog" name="TrackingGUIMouseEvents.cpp" compile="1" resource="0"
+                file="Source/Components/TrackingGUI/TrackingGUIMouseEvents.cpp"/>
+        </GROUP>
       </GROUP>
-      <FILE id="lTxaHV" name="KinectTracking.cpp" compile="1" resource="0"
+      <GROUP id="{A491CC8A-096C-2355-305E-52BE6E06610B}" name="ValueTree Items">
+        <FILE id="KjpTwU" name="SaveAndLoadManager.cpp" compile="1" resource="0"
+              file="Source/ValueTree Items/SaveAndLoadManager.cpp"/>
+        <FILE id="Rm7I30" name="SnapshotManager.cpp" compile="1" resource="0"
+              file="Source/ValueTree Items/SnapshotManager.cpp"/>
+        <FILE id="u35RXN" name="SnapshotManager.h" compile="0" resource="0"
+              file="Source/ValueTree Items/SnapshotManager.h"/>
+        <FILE id="VYjy0L" name="ValueTree.cpp" compile="1" resource="0" file="Source/ValueTree Items/ValueTree.cpp"/>
+      </GROUP>
+      <FILE id="pEfXEv" name="KinectTracking.cpp" compile="1" resource="0"
             file="Source/KinectTracking.cpp"/>
-      <FILE id="DSyXSZ" name="KinectTracking.h" compile="0" resource="0"
+      <FILE id="X0CWp7" name="KinectTracking.h" compile="0" resource="0"
             file="Source/KinectTracking.h"/>
-      <FILE id="AnN82u" name="LTLA_GUI.cpp" compile="1" resource="0" file="Source/LTLA_GUI.cpp"/>
-      <FILE id="fMXRIu" name="LTLA_GUI.h" compile="0" resource="0" file="Source/LTLA_GUI.h"/>
-      <FILE id="Vw4UIn" name="MainComponent.cpp" compile="1" resource="0"
+      <FILE id="o2ddOY" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="hp5SBy" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
-      <FILE id="QEoFAX" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="lMt3Db" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <VS2017 targetFolder="Builds/VisualStudio2017">
+    <VS2017 targetFolder="Builds/VisualStudio2017" externalLibraries="C:\Program Files\Microsoft SDKs\Kinect\v1.8\lib\amd64\Kinect10.lib"
+            smallIcon="uqXW2s" bigIcon="uqXW2s">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="LTLA"/>
+                       isDebug="1" optimisation="1" targetName="LTLA" headerPath="C:\Program Files\Microsoft SDKs\Kinect\v1.8\inc"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="LTLA"/>
+                       isDebug="0" optimisation="3" targetName="LTLA" headerPath="C:\Program Files\Microsoft SDKs\Kinect\v1.8\inc"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="..\..\..\..\Coding\JUCE 5.0\modules"/>
