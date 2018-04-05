@@ -99,6 +99,77 @@ public:
 /** Called when a snapshot is fired and is used to uodate GUI parameters */
 	void snapshotFired();
 
+	void processPerfomer(AudioSampleBuffer &buffer, int performerID)
+	{
+		if (getAudioInputID() == Performer1 || getAudioInputID() == Performer2)
+		{
+			//int performerID = getAudioInputID() - 2; // Store the performer ID (0 or 1)
+
+			rawInputBuffer.makeCopyOf(buffer); // Store a raw copy of the buffer
+																		 // Process audio.
+			autoPanner.process(buffer);
+			autoFilter.process(buffer);
+			autoEQ.process(buffer);
+			autoReverb.process(buffer);
+
+			// If the performer has just enetered the area.
+			if (performerInsideArea[performerID] == true && performerPreviouslyEnteredArea[performerID] == false)
+			{
+				// Initialise the crossfade, (fade in the processed buffer and fade out the raw buffer)
+				processedBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
+				rawBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
+
+				// Initialise the short unmute fade if enabled.
+				if (autoMuteState == true)
+				{
+					autoMuteFade.initialiseFade(0.0, 1.0, samplerate * 0.1);
+				}
+			}
+
+			// If the performer has just exited the area.
+			if (performerInsideArea[performerID] == false && performerPreviouslyExitedArea[performerID] == false)
+			{
+				// Initialise the crossfade, (fade in the raw buffer and fade out the processed buffer)
+				processedBufferFade.initialiseFade(1.0, 0.0, fadeTimeInSamples);
+				rawBufferFade.initialiseFade(0.0, 1.0, fadeTimeInSamples);
+
+				// Initialise the short mute fade if enabled.
+				if (autoMuteState == true)
+				{
+					autoMuteFade.initialiseFade(1.0, 0.0, samplerate * 0.1);
+				}
+			}
+
+			float* outputL = buffer.getWritePointer(0);
+			float* outputR = buffer.getWritePointer(1);
+
+			float* rawInputL = rawInputBuffer.getWritePointer(0);
+			float* rawInputR = rawInputBuffer.getWritePointer(1);
+
+			// Set the output to the sum of both crossfaded buffers.
+			for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+			{
+				outputL[sample] = (outputL[sample] * processedBufferFade.process()) + (rawInputL[sample] * rawBufferFade.process());
+				outputR[sample] = (outputR[sample] * processedBufferFade.process()) + (rawInputR[sample] * rawBufferFade.process());
+			}
+
+			// Mute or unmute the output if enabled 
+			if (autoMuteState == true)
+			{
+				for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+				{
+					outputL[sample] = (outputL[sample] * autoMuteFade.process());
+					outputR[sample] = (outputR[sample] * autoMuteFade.process());
+				}
+			}
+
+			// Update the previously entered or exited states.
+			performerInsideArea[performerID] == true ? performerPreviouslyEnteredArea[performerID] = true : performerPreviouslyEnteredArea[performerID] = false;
+			performerInsideArea[performerID] == false ? performerPreviouslyExitedArea[performerID] = true : performerPreviouslyExitedArea[performerID] = false;
+
+		}
+	}
+
 	enum { FilePlayerInput = 1, Performer1, Performer2 };
 
 private:
@@ -114,6 +185,7 @@ private:
 	ValueTree audioPanelValueTree;
 
 	ComboBox inputComboBox;
+	Value audioInputID;
 	Slider areaFadeTimeSlider;
 	TextButton audioPanelButton[numOfButtons];
 	ToggleButton autoMuteButton;

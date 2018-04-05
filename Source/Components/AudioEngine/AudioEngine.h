@@ -72,7 +72,7 @@ public:
 	void snapshotFired();
 
 /** Updates the AutoPanning amount of an area */
-	void setAutoPannerAmount(float value, int areaID);
+	void setAutoPannerAmount(float value, int areaID, int performerID);
 
 /** Sets the meter sample data*/
 	void setMeterData(int channel, float value);
@@ -107,7 +107,12 @@ private:
 	float meterData[2];
 
 	PerformerInput performerInput[2];
-	AudioSampleBuffer rawInputBuffer, processedPerformerBuffer[2], filePlayerBuffer;
+	AudioSampleBuffer rawInputBuffer, rawPerformerBuffer[2], processedPerformerBuffer[2], filePlayerBuffer;
+
+	static NativeMessageBox messageBox;
+	bool messageBoxHasBeenDisplayed = false;
+
+	bool usingTwoMics = false;
 
 	enum { continuePlaybackID = 1, stopPlaybackID, triggeredByBothPerformers = 2 };
 

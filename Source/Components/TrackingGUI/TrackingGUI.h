@@ -167,16 +167,18 @@ public:
 
 	bool isPerformerBeingSimulated()
 	{
-		return shouldSimulatePerformer1;
+		return shouldSimulatePerformers;
 	}
 
 	void simulatePerformer1(bool state)
 	{
-		shouldSimulatePerformer1 = state;
+		shouldSimulatePerformers = state;
 		if (state == true)
 		{
-			ellipseCoordinates[0].x = 10;
-			ellipseCoordinates[0].y = 10;
+			ellipseCoordinates[0].x = 20;
+			ellipseCoordinates[0].y = 20;
+			ellipseCoordinates[1].x = 60;
+			ellipseCoordinates[1].y = 20;
 		}
 
 	}
@@ -212,8 +214,8 @@ private:
 	bool audioPanelState = false;
 	bool selectedAreaHasChanged = false;
 
-	bool shouldSimulatePerformer1 = false;
-	bool performer1EllipseSelected = false;
+	bool shouldSimulatePerformers = false;
+	bool performerEllipseSelected[2];
 
 	int gridIncrement = 15;
 	int selectedAreaIndex = 0;

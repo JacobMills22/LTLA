@@ -57,7 +57,7 @@ void PerformerInput::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFil
 	}
 }
 
-void PerformerInput::process(AudioSampleBuffer buffer)
+void PerformerInput::process(AudioSampleBuffer &buffer)
 {
 	for (int channel = 0; channel < maxOutputChannels; channel++)
 	{

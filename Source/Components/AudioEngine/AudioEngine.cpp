@@ -24,6 +24,10 @@
 		rawInputBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
 		processedPerformerBuffer[0].setSize(2, samplesPerBlockExpected, false, false, false);
 		processedPerformerBuffer[1].setSize(2, samplesPerBlockExpected, false, false, false);
+
+		rawPerformerBuffer[0].setSize(2, samplesPerBlockExpected, false, false, false);
+		rawPerformerBuffer[1].setSize(2, samplesPerBlockExpected, false, false, false);
+		
 		filePlayerBuffer.setSize(2, samplesPerBlockExpected, false, false, false);
 
 		if (audioPanel.size() > 0)
@@ -45,16 +49,18 @@
 	{
 		// Store a raw copy of the input buffer
 		rawInputBuffer.makeCopyOf(*bufferToFill.buffer, true);
+		rawPerformerBuffer[0].makeCopyOf(*bufferToFill.buffer, true);
+		rawPerformerBuffer[1].makeCopyOf(*bufferToFill.buffer, true);
 
 		// Set the Input to the copy of the input buffer and process
 	//	performerInput.setInputBuffer(rawInputBuffer);
 	//	performerInput.getNextAudioBlock(bufferToFill);
 
-		performerInput[0].process(*bufferToFill.buffer);
-		performerInput[1].process(*bufferToFill.buffer);
+		performerInput[0].process(rawPerformerBuffer[0]);
+		performerInput[1].process(rawPerformerBuffer[1]);
 
 
-		// Since fileplayers use a resamplingaudiosource and doesn't just "process data"
+		// Since fileplayers use a resamplingaudiosource and doesn't just process data
 		// all fileplayers need to be added to a mixeraudiosource and removed if 
 		// the audiopanel doesn't have its input set to fileplayer.
 
@@ -65,11 +71,12 @@
 			{
 				// Remove the fileplayer audiosource from the mixer and then process
 				mixerAudioSource.removeInputSource(audioPanel[panel]);
-				audioPanel[panel]->getNextAudioBlock(bufferToFill);
+			//	audioPanel[panel]->getNextAudioBlock(bufferToFill);
+				audioPanel[panel]->processPerfomer(rawPerformerBuffer[0], 0);
 			}
 		}
 		// Copy the processed audio into a buffer.
-		processedPerformerBuffer[0].makeCopyOf(*bufferToFill.buffer, false);
+		processedPerformerBuffer[0].makeCopyOf(rawPerformerBuffer[0], false);
 		bufferToFill.clearActiveBufferRegion();
 
 
@@ -79,11 +86,13 @@
 			{
 				// Remove the fileplayer audiosource from the mixer and then process
 				mixerAudioSource.removeInputSource(audioPanel[panel]);
-				audioPanel[panel]->getNextAudioBlock(bufferToFill);
+			//	audioPanel[panel]->getNextAudioBlock(bufferToFill);
+				audioPanel[panel]->processPerfomer(rawPerformerBuffer[1], 1);
+
 			}
 		}
 
-		processedPerformerBuffer[1].makeCopyOf(*bufferToFill.buffer, false);
+		processedPerformerBuffer[1].makeCopyOf(rawPerformerBuffer[1], false);
 		bufferToFill.clearActiveBufferRegion();
 		
 		// For each audiopanel which has its input set to Fileplayer
@@ -98,15 +107,20 @@
 		// process all fileplayers and make a copy of the buffer.
 		mixerAudioSource.getNextAudioBlock(bufferToFill);
 		filePlayerBuffer.makeCopyOf(*bufferToFill.buffer, false);
+
+		if (usingTwoMics == false)
+		{
+			rawPerformerBuffer[1].clear();
+		}
 		
 		float* OutputL = bufferToFill.buffer->getWritePointer(0);
 		float* OutputR = bufferToFill.buffer->getWritePointer(1);
 
-		float* ProcessedPerformer1L = processedPerformerBuffer[0].getWritePointer(0);
-		float* ProcessedPerformer1R = processedPerformerBuffer[0].getWritePointer(1);
+		float* ProcessedPerformer1L = rawPerformerBuffer[0].getWritePointer(0);
+		float* ProcessedPerformer1R = rawPerformerBuffer[0].getWritePointer(1);
 
-		float* ProcessedPerformer2L = processedPerformerBuffer[1].getWritePointer(0);
-		float* ProcessedPerformer2R = processedPerformerBuffer[1].getWritePointer(1);
+		float* ProcessedPerformer2L = rawPerformerBuffer[1].getWritePointer(0);
+		float* ProcessedPerformer2R = rawPerformerBuffer[1].getWritePointer(1);
 
 		float* filePlayerBufferL = filePlayerBuffer.getWritePointer(0);
 		float* filePlayerBufferR = filePlayerBuffer.getWritePointer(1);
@@ -296,9 +310,13 @@
 		}
 	}
 
-	void LTLAAudioEngine::setAutoPannerAmount(float value, int areaID)
+	void LTLAAudioEngine::setAutoPannerAmount(float value, int areaID, int performerID)
 	{
-		audioPanel[areaID]->setAutoPannerAmount(value);
+		// Performer ID is either a 0 or a 1, getAudioInputID refers to the fileplayer (1), performer 1 (2) and performer 2 (3).
+		if (performerID == (audioPanel[areaID]->getAudioInputID() - 2))
+		{
+			audioPanel[areaID]->setAutoPannerAmount(value);
+		}
 	}
 
 	void LTLAAudioEngine::setMeterData(int channel, float value)
@@ -322,7 +340,24 @@
 		performerInput[1].setDeviceManagerToUse(deviceManager);
 		
 		AudioIODevice* device = deviceManager->getCurrentAudioDevice();
+	
+		if (messageBoxHasBeenDisplayed == false)
+		{
+			usingTwoMics = messageBox.showYesNoBox(AlertWindow::QuestionIcon, "How many Inputs?", "Are you using two microphones?", nullptr, nullptr);
+			messageBoxHasBeenDisplayed = true;
+		}
 
+		if (usingTwoMics == true)
+		{
+			performerInput[0].initialise(0, 2);
+			performerInput[1].initialise(1, 2);
+		}
+		else
+		{
+			performerInput[0].initialise(0, 2);
+		}
+
+		/*
 		const BigInteger activeInputChannels = device->getActiveInputChannels();
 		const BigInteger activeOutputChannels = device->getActiveOutputChannels();
 		const int maxInputChannels = activeInputChannels.getHighestBit() + 1;
@@ -331,11 +366,15 @@
 		if (maxInputChannels == 1 || maxInputChannels == 2)
 		{
 			performerInput[0].initialise(0, 2);
+			DBG("INITIALISING MIC 1");
 		}
 		else if (maxInputChannels >= 3)
 		{
-			performerInput[1].initialise(2, 2);
+			performerInput[1].initialise(1, 2);
+			DBG("INITIALISING MIC 2");
+
 		}
+		*/
 	}
 
 	

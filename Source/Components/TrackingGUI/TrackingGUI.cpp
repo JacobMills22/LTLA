@@ -35,10 +35,19 @@ void TrackingGUI::paint(Graphics& g)
 	paintStageAreas(g);
 
 	// Draw performer ellipses if they're being tracked.
-	if (trackingState[0] == true) { paintTrackedEllipse(g, ellipseCoordinates[0].x, ellipseCoordinates[0].y, Colours::blue); }
-	else if (shouldSimulatePerformer1 == true) { paintTrackedEllipse(g, ellipseCoordinates[0].x, ellipseCoordinates[0].y, Colours::lightgreen); }
 
-	if (trackingState[1] == true) { paintTrackedEllipse(g, ellipseCoordinates[1].x, ellipseCoordinates[1].y, Colours::red); }
+	if (shouldSimulatePerformers == true) 
+	{ 
+		paintTrackedEllipse(g, ellipseCoordinates[0].x, ellipseCoordinates[0].y, Colours::cyan); 
+		paintTrackedEllipse(g, ellipseCoordinates[1].x, ellipseCoordinates[1].y, Colours::orangered);
+	}
+	else
+	{
+		if (trackingState[0] == true) { paintTrackedEllipse(g, ellipseCoordinates[0].x, ellipseCoordinates[0].y, Colours::blue); }
+		if (trackingState[1] == true) { paintTrackedEllipse(g, ellipseCoordinates[1].x, ellipseCoordinates[1].y, Colours::red); }
+	}
+
+
 }
 
 void TrackingGUI::paintTrackedEllipse(Graphics& g, float PositionX, float PositionY, Colour colour)

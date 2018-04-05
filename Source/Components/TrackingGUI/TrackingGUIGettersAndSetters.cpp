@@ -7,7 +7,7 @@
 
 void TrackingGUI::setEllipseCoordinates(float positionX, float positionY, int skeltonNum)
 {	// Coordinates are mapped based on the size of the window.
-	if (shouldSimulatePerformer1 == false)
+	if (shouldSimulatePerformers == false)
 	{
 		ellipseCoordinates[skeltonNum].x = getLocalBounds().getWidth() * 0.5 * positionX;
 		ellipseCoordinates[skeltonNum].y = getLocalBounds().getHeight() * 0.5 * positionY;
@@ -65,7 +65,7 @@ void TrackingGUI::setCurrentlySelectedArea(int index)
 	{
 		stageAreas[areaIndex]->setAreaSelectedState(false);
 	}
-
+	
 	if (getCurrentlySelectedArea() != index)
 		newStageAreaIsSelected(true);
 

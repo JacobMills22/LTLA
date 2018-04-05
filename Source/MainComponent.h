@@ -125,6 +125,7 @@ private:
 
 	Label areaNameLabel;
 	Label calibrationCountDownLabel;
+	Label waterMark;
 
 	static NativeMessageBox messageBox;
 

@@ -54,12 +54,18 @@ void TrackingGUI::mouseDown(const MouseEvent &event)
 	}
 
 	// If the mouse was clicked on performer1s ellipse and performer simulation is enabled, select it.
-	if (shouldSimulatePerformer1 == true)
+	if (shouldSimulatePerformers == true)
 	{
 		if (event.getMouseDownX() <= ellipseCoordinates[0].x + 10 && event.getMouseDownX() >= ellipseCoordinates[0].x - 10 &&
 			event.getMouseDownY() <= ellipseCoordinates[0].y + 10 && event.getMouseDownY() >= ellipseCoordinates[0].y - 10)
 		{
-			performer1EllipseSelected = true;
+			performerEllipseSelected[0] = true;
+		}
+
+		if (event.getMouseDownX() <= ellipseCoordinates[1].x + 10 && event.getMouseDownX() >= ellipseCoordinates[1].x - 10 &&
+			event.getMouseDownY() <= ellipseCoordinates[1].y + 10 && event.getMouseDownY() >= ellipseCoordinates[1].y - 10)
+		{
+			performerEllipseSelected[1] = true;
 		}
 	}
 }
@@ -84,13 +90,19 @@ void TrackingGUI::mouseDoubleClick(const MouseEvent & event)
 
 	// If performer 1 should be simulated, check the coordinates are valid then update
 	// the posiiton of the ellipse.
-	if (shouldSimulatePerformer1 == true)
+	if (shouldSimulatePerformers == true && event.getNumberOfClicks() >= 3)
 	{
 		if (event.x >= 0 && event.x <= getWidth())
+		{
 			ellipseCoordinates[0].x = event.x;
+			ellipseCoordinates[1].x = event.x + 40;
+		}
 
 		if (event.y >= 0 && event.y <= getHeight())
+		{
 			ellipseCoordinates[0].y = event.y;
+			ellipseCoordinates[1].y = event.y;
+		}
 	}
 }
 
@@ -124,13 +136,16 @@ void TrackingGUI::mouseDrag(const MouseEvent& event)
 
 	// If performer 1 should be simulated and is selected, 
 	// check the coordinates are valid then update the posiiton of the ellipse.
-	if (shouldSimulatePerformer1 == true && performer1EllipseSelected == true)
+	for (int performerNum = 0; performerNum < 2; performerNum++)
 	{
-		if (event.x >= 0 && event.x <= getWidth())
-			ellipseCoordinates[0].x = event.x;
+		if (shouldSimulatePerformers == true && performerEllipseSelected[performerNum] == true)
+		{
+			if (event.x >= 0 && event.x <= getWidth())
+				ellipseCoordinates[performerNum].x = event.x;
 
-		if (event.y >= 0 && event.y <= getHeight())
-			ellipseCoordinates[0].y = event.y;
+			if (event.y >= 0 && event.y <= getHeight())
+				ellipseCoordinates[performerNum].y = event.y;
+		}
 	}
 }
 
@@ -158,7 +173,9 @@ void TrackingGUI::mouseUp(const MouseEvent& event)
 	}
 
 	// Reset the ellipse selected state false (Performer simulation)
-	performer1EllipseSelected = false;
+	performerEllipseSelected[0] = false;
+	performerEllipseSelected[1] = false;
+
 }
 
 void TrackingGUI::mouseMove(const MouseEvent& event)

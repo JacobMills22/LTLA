@@ -97,7 +97,7 @@ void MainContentComponent::getCommandInfo(CommandID commandID, ApplicationComman
 		audioSettingsWindow.isVisible() == true ? result.setTicked(true) : result.setTicked(false);
 		break;
 	case LTLAMenuBar::performerSimulation:
-		result.setInfo("Simulate Performer 1", "Allows performer 1s position to be manipulated by mouse", "Preferences", 0);
+		result.setInfo("Simulate Performers", "Allows performer 1s position to be manipulated by mouse", "Preferences", 0);
 		result.setTicked(trackingGUI.isPerformerBeingSimulated());
 	}
 }

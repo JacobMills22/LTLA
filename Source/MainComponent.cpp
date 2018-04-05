@@ -22,7 +22,8 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		// Initialise Components
 
 		setSize(1280, 720);
-		setAudioChannels(4, 2);
+		setAudioChannels(2, 2);
+	//	deviceManager.initialise(2, 2, nullptr, false);
 		kinectSensor.startKinectST();
 		startTimer(kinectUpdateTimer, 40);
 		startTimer(guiTimer, 15);
@@ -75,6 +76,13 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 		// Create one snapshot to begin with.
 		snapshotManager.createNewSnapshot();
+
+		//addAndMakeVisible(waterMark);
+		Font newfont;
+		newfont.setHeight(100); newfont.setHorizontalScale(1.0);
+		waterMark.setFont(newfont);
+		waterMark.setText("DEMO VERSION", dontSendNotification);
+		waterMark.setBounds(900, 10, 300, 400);
 	}
 
 	MainContentComponent::~MainContentComponent()
@@ -259,7 +267,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 					audioEngine.setPerformerExitedAreaState(performerNum, false, areaID);
 
 					// Update the audio engines panning amount based on the performers position relative the the areas bounds.
-					audioEngine.setAutoPannerAmount(trackingGUI.getPerformerXPosInsideArea(areaID, performerNum), areaID);
+					audioEngine.setAutoPannerAmount(trackingGUI.getPerformerXPosInsideArea(areaID, performerNum), areaID, performerNum);
 				}
 				else // else if the current performer is not stood inside the current area.
 				{
@@ -277,15 +285,31 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 	void MainContentComponent::buttonClicked(Button* button)
 	{
-		// Simple logic to select either the next or previous stage area in the array when 
+		// Logic to select either the next or previous stage area in the array when 
 		// either the next or previous buttons are pressed.
-		if (button == &globalButton[selectPreviousAreaButtonID] && trackingGUI.getCurrentlySelectedArea() > 0)
+		// Skips over inactive areas so areas invisible to the user cannot be selected.
+
+		int selectedAreaID = trackingGUI.getCurrentlySelectedArea();
+
+		if (button == &globalButton[selectPreviousAreaButtonID] && selectedAreaID > 0)
 		{
-			trackingGUI.setCurrentlySelectedArea(trackingGUI.getCurrentlySelectedArea() - 1);
+			while (trackingGUI.stageAreas[selectedAreaID - 1]->getActiveState() == false)
+				selectedAreaID--;
+
+			if (selectedAreaID > 0)
+				selectedAreaID--;
+			
+			trackingGUI.setCurrentlySelectedArea(selectedAreaID);
 		}
-		else if (button == &globalButton[selectNextAreaButtonID] && trackingGUI.getCurrentlySelectedArea() < trackingGUI.stageAreas.size() - 1)
+		else if (button == &globalButton[selectNextAreaButtonID] && selectedAreaID < trackingGUI.stageAreas.size() - 1)
 		{
-			trackingGUI.setCurrentlySelectedArea(trackingGUI.getCurrentlySelectedArea() + 1);
+			while (trackingGUI.stageAreas[selectedAreaID + 1]->getActiveState() == false)
+				selectedAreaID++;
+
+			if (selectedAreaID < trackingGUI.stageAreas.size() - 1)
+				selectedAreaID++;
+
+			trackingGUI.setCurrentlySelectedArea(selectedAreaID);
 		}
 	}
 

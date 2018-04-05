@@ -61,7 +61,9 @@
 		autoEQ.closePanel();
 		autoReverb.closePanel();
 		
+		audioInputID = FilePlayerInput;
 		audioPanelValueTree.setProperty("InputSource", FilePlayerInput, nullptr);
+		audioInputID.referTo(audioPanelValueTree.getPropertyAsValue("InputSource", nullptr));
 
 		audioPanelValueTree.addChild(filePlayer.getValueTree(), 0, nullptr);
 		audioPanelValueTree.addChild(autoPanner.getValueTree(), 0, nullptr);
@@ -270,12 +272,12 @@
 
 	void LTLAAudioPanel::setAudioInputID(int ID)
 	{
-		audioPanelValueTree.setProperty("InputSource", ID, nullptr);
+		audioInputID = ID;
 	}
 
 	int LTLAAudioPanel::getAudioInputID()
 	{
-		return audioPanelValueTree.getPropertyAsValue("InputSource", nullptr).getValue();
+		return audioInputID.getValue();
 	}
 
 	ValueTree LTLAAudioPanel::getValueTree()
@@ -326,7 +328,7 @@
 
 	void LTLAAudioPanel::snapshotFired()
 	{
-		inputComboBox.setSelectedId(audioPanelValueTree.getPropertyAsValue("InputSource", nullptr).getValue(), dontSendNotification);
+		inputComboBox.setSelectedId(audioInputID.getValue(), dontSendNotification);
 		filePlayer.snapshotFired();
 		autoPanner.snapshotFired();
 		autoFilter.snapshotFired();

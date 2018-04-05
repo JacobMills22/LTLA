@@ -32,7 +32,7 @@ public:
 	/** Sets the output level (0.0 to 1.0) */
 	void setLevel(float value);
 
-	void process(AudioSampleBuffer buffer);
+	void process(AudioSampleBuffer &buffer);
 
 
 private:
