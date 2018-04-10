@@ -96,14 +96,14 @@ public:
 private:
 	//==============================================================================
 
-	enum TimerID { kinectUpdateTimer, guiTimer, calibrationIntervalTimer, numOfTimerIDs };
+	enum TimerID { kinectUpdateTimer, guiTimer, calibrationIntervalTimer, infoLoggerTimeoutTimer, numOfTimerIDs };
 
 	TrackingGUI trackingGUI;
 	KinectTracker kinectSensor;
 	LTLAAudioEngine audioEngine;
 
 	LTLAMenuBar menuBar;
-	LTLACommandManager LTLAcmd;
+	LTLACommandManager ltlaCommandManager;
 	AudioMeter stereoAudioMeter;
 
 	ResizableWindow audioSettingsWindow;
@@ -120,12 +120,10 @@ private:
 	// Global Parameters
 	enum { selectNextAreaButtonID, selectPreviousAreaButtonID, numOfButtons };
 	TextButton globalButton[numOfButtons];
-	//ColourSelector areaColourSelector{ (ColourSelector::showColourspace), 4, 7 };
-	ColourSelector areaColourSelector{ (ColourSelector::showColourspace + ColourSelector::showColourAtTop), 4, 7 };
+	ColourSelector areaColourSelector{ (ColourSelector::showColourspace), 4, 7 };
 
 	Label areaNameLabel;
 	Label calibrationCountDownLabel;
-	Label waterMark;
 
 	static NativeMessageBox messageBox;
 

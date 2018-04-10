@@ -100,13 +100,9 @@ public:
 /** Gets the index value of the valuetree */
 	int getValueTreeChildIndex();
 
-	void snapshotFired()
-	{
-		Colour newColour;
-		String colourString = areaColourString.getValue();
-		newColour = newColour.fromString(colourString);
-		setAreaColour(newColour);
-	}
+/** Called when a snapshot is fired, used to update the stage areas colour*/
+	void snapshotFired();
+
 
 	//==============================================================================	
 

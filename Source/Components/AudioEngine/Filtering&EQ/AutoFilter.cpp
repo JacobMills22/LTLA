@@ -22,6 +22,10 @@
 			enableButton[filterNum].addListener(this);
 			enableButton[filterNum].setToggleState(false, dontSendNotification);
 			
+			addAndMakeVisible(qfactorLabel[filterNum]);
+			qfactorLabel[filterNum].setText("Q Factor", dontSendNotification);
+			qfactorLabel[filterNum].setJustificationType(Justification::centred);
+
 			enableState[filterNum] = false;
 		}
 
@@ -46,6 +50,7 @@
 		cutoffSlider[highPassID].getValueObject().referTo(autoFilterValueTree.getPropertyAsValue("HighPassCutoff", nullptr));
 		qFactorSlider[lowPassID].getValueObject().referTo(autoFilterValueTree.getPropertyAsValue("LowPassQ", nullptr));
 		qFactorSlider[highPassID].getValueObject().referTo(autoFilterValueTree.getPropertyAsValue("HighPassQ", nullptr));
+
 
 		lowpassFilter.setParameters(20000.0, 1.0);
 		highpassFilter.setParameters(20.0, 1.0);
@@ -74,17 +79,20 @@
 		cutoffSlider[lowPassID].setBounds(getWidth() * 0.1, (getHeight() * 0.65) - sliderHeight, sliderWidth, sliderHeight);
 		cutoffSlider[highPassID].setBounds(getWidth() * 0.1 + gap + sliderWidth, (getHeight() * 0.65) - sliderHeight, sliderWidth, sliderHeight);
 
-		qFactorSlider[lowPassID].setBounds(0, cutoffSlider[lowPassID].getY(), getWidth() * 0.07, cutoffSlider[lowPassID].getHeight());
-		qFactorSlider[highPassID].setBounds(cutoffSlider[highPassID].getRight() + getWidth() * 0.01, cutoffSlider[highPassID].getY(), getWidth() * 0.07, cutoffSlider[highPassID].getHeight());
+		qFactorSlider[lowPassID].setBounds(getWidth() * 0.04, cutoffSlider[lowPassID].getY(), getWidth() * 0.07, cutoffSlider[lowPassID].getHeight());
+		qFactorSlider[highPassID].setBounds(cutoffSlider[highPassID].getRight(), cutoffSlider[highPassID].getY(), getWidth() * 0.07, cutoffSlider[highPassID].getHeight());
 
 		cutoffSlider[lowPassID].setTextBoxStyle(Slider::TextBoxBelow, false, cutoffSlider[lowPassID].getWidth() * 0.25, 20);
 		cutoffSlider[highPassID].setTextBoxStyle(Slider::TextBoxBelow, false, cutoffSlider[highPassID].getWidth() * 0.25, 20);
 
-		float centerXLowPass = getWidth() * 0.2;
-		float centerXHighPass = getWidth() * 0.5;
+		float centerXLowPass = getWidth() * 0.165;
+		float centerXHighPass = getWidth() * 0.485;
 
 		enableButton[lowPassID].setBounds(centerXLowPass, cutoffSlider[lowPassID].getY() - 20, 120, 30);
 		enableButton[highPassID].setBounds(centerXHighPass, cutoffSlider[highPassID].getY() - 20, 120, 30);
+
+		qfactorLabel[lowPassID].setBounds(getWidth() * 0.04, -10, getWidth() * 0.07, 50);
+		qfactorLabel[highPassID].setBounds(cutoffSlider[highPassID].getRight(), -10, getWidth() * 0.07, 50);
 
 	}
 

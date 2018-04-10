@@ -49,6 +49,7 @@ private:
 	Slider cutoffSlider[numOfFilters];
 	Slider qFactorSlider[numOfFilters];
 	ToggleButton enableButton[numOfFilters];
+	Label qfactorLabel[numOfFilters];
 
 	ValueTree autoFilterValueTree;
 

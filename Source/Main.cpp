@@ -64,11 +64,11 @@ public:
         MainWindow (String name)  : DocumentWindow (name,
                                                     Desktop::getInstance().getDefaultLookAndFeel()
                                                                           .findColour (ResizableWindow::backgroundColourId),
-                                                    DocumentWindow::allButtons)
+                                                    DocumentWindow::closeButton + DocumentWindow::minimiseButton)
         {
             setUsingNativeTitleBar (true);
             setContentOwned (createMainContentComponent(), true);
-            setResizable (true, true);
+            setResizable (false, false);
 
             centreWithSize (getWidth(), getHeight());
             setVisible (true);

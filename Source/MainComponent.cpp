@@ -23,7 +23,6 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 		setSize(1280, 720);
 		setAudioChannels(2, 2);
-	//	deviceManager.initialise(2, 2, nullptr, false);
 		kinectSensor.startKinectST();
 		startTimer(kinectUpdateTimer, 40);
 		startTimer(guiTimer, 15);
@@ -65,7 +64,7 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 		audioSettingsWindow.setVisible(false);
 		audioSettingsWindow.setContentNonOwned(&audioDeviceSelector, true);
 		
-		auto& commandManager = LTLAcmd.getApplicationCommandManager();
+		auto& commandManager = ltlaCommandManager.getApplicationCommandManager();
 		commandManager.registerAllCommandsForTarget(this);
 
 		addAndMakeVisible(snapshotManager);
@@ -76,18 +75,11 @@ MainContentComponent::MainContentComponent() : audioDeviceSelector(deviceManager
 
 		// Create one snapshot to begin with.
 		snapshotManager.createNewSnapshot();
-
-		//addAndMakeVisible(waterMark);
-		Font newfont;
-		newfont.setHeight(100); newfont.setHorizontalScale(1.0);
-		waterMark.setFont(newfont);
-		waterMark.setText("DEMO VERSION", dontSendNotification);
-		waterMark.setBounds(900, 10, 300, 400);
 	}
 
 	MainContentComponent::~MainContentComponent()
 	{
-		LTLAcmd.makeNullptr();
+		ltlaCommandManager.makeNullptr();
 		shutdownAudio();
 	}
 

@@ -37,7 +37,7 @@
 		inputComboBox.addItem("Performer 1", 2);
 		inputComboBox.addItem("Performer 2", 3);
 		inputComboBox.addListener(this);
-		inputComboBox.setSelectedId(1, dontSendNotification);
+		inputComboBox.setSelectedId(Performer1, dontSendNotification);
 
 		addAndMakeVisible(areaFadeTimeSlider);
 		areaFadeTimeSlider.addListener(this);
@@ -61,8 +61,8 @@
 		autoEQ.closePanel();
 		autoReverb.closePanel();
 		
-		audioInputID = FilePlayerInput;
-		audioPanelValueTree.setProperty("InputSource", FilePlayerInput, nullptr);
+		audioInputID = Performer1;
+		audioPanelValueTree.setProperty("InputSource", Performer1, nullptr);
 		audioInputID.referTo(audioPanelValueTree.getPropertyAsValue("InputSource", nullptr));
 
 		audioPanelValueTree.addChild(filePlayer.getValueTree(), 0, nullptr);
@@ -165,6 +165,7 @@
 		{
 			// Process the audio.
 			filePlayer.getNextAudioBlock(bufferToFill);
+			autoPanner.process(*bufferToFill.buffer);
 			autoFilter.process(*bufferToFill.buffer);
 			autoEQ.process(*bufferToFill.buffer);
 			autoReverb.process(*bufferToFill.buffer);

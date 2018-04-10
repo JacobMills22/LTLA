@@ -290,3 +290,11 @@ bool StageArea::getActiveState()
 {
 	return stageAreaValueTree.getPropertyAsValue("Active", nullptr).getValue();
 }
+
+void StageArea::snapshotFired()
+{
+	Colour newColour;
+	String colourString = areaColourString.getValue();
+	newColour = newColour.fromString(colourString);
+	setAreaColour(newColour);
+}

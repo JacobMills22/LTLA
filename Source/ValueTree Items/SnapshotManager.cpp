@@ -100,7 +100,6 @@
 	{
 		// Add a new snapshot to the array.
 		snapshots.add(new Snapshot);
-		//valueTree.addChild(snapshots.getLast()->getValueTree(), -1, nullptr);
 
 		// (Save and Loading Manager)
 		if (valueTree.getNumChildren() <= 3)
@@ -240,4 +239,9 @@
 	int SnapshotManager::getNumberOfSnapshots()
 	{
 		return snapshots.size();
+	}
+
+	ValueTree SnapshotManager::getSnapshotValueTree(int ID)
+	{
+		return snapshots[ID]->getValueTree();
 	}

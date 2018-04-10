@@ -521,9 +521,9 @@
 		labels[filterLabel].setBounds(getWidth() * 0.001, 0, 80, 30);
 		labels[gainLabel].setBounds(getWidth() * 0.3, 0, 80, 30);
 		labels[directGain].setBounds(getWidth() * 0.18, labelY, 50, 30);
-		labels[earlyReflectionsLabel].setBounds(getWidth() * 0.3, labelY, 50, 30);
-		labels[lateReflections1Label].setBounds(getWidth() * 0.39, labelY, 50, 30);
-		labels[lateReflections2Label].setBounds(getWidth() * 0.49, labelY, 50, 30);
+		labels[earlyReflectionsLabel].setBounds(getWidth() * 0.305, labelY, 50, 30);
+		labels[lateReflections1Label].setBounds(getWidth() * 0.398, labelY, 50, 30);
+		labels[lateReflections2Label].setBounds(getWidth() * 0.498, labelY, 50, 30);
 
 		labels[preDelayLabel].setBounds(getWidth() * 0.62, 0, 100, 30);
 		labels[feedbackLabel].setBounds(getWidth() * 0.60, getHeight() * 0.3, 100, 30);

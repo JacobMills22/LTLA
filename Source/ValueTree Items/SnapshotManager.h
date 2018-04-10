@@ -95,10 +95,7 @@ public:
 	/** Returns the number of snapshots currently created */
 	int getNumberOfSnapshots();
 
-	ValueTree getSnapshotValueTree(int ID)
-	{
-		return snapshots[ID]->getValueTree();
-	}
+	ValueTree getSnapshotValueTree(int ID);
 
 private:
 

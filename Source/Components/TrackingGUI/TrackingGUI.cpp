@@ -35,7 +35,6 @@ void TrackingGUI::paint(Graphics& g)
 	paintStageAreas(g);
 
 	// Draw performer ellipses if they're being tracked.
-
 	if (shouldSimulatePerformers == true) 
 	{ 
 		paintTrackedEllipse(g, ellipseCoordinates[0].x, ellipseCoordinates[0].y, Colours::cyan); 
@@ -82,10 +81,15 @@ void TrackingGUI::paintStageAreas(Graphics &g)
 	for (int areaIndex = 0; areaIndex < stageAreas.size(); areaIndex++)
 	{
 		// If a perfomer is stood inside a stage area increase the alpha colour channel to draw with.
-		if (stageAreas[areaIndex]->getAreaPath().contains(ellipseCoordinates[0].x, ellipseCoordinates[0].y) == true)
+		if (stageAreas[areaIndex]->getAreaPath().contains(ellipseCoordinates[0].x, ellipseCoordinates[0].y) == true ||
+		    stageAreas[areaIndex]->getAreaPath().contains(ellipseCoordinates[1].x, ellipseCoordinates[1].y) == true)
+		{
 			stageAreas[areaIndex]->setAreaColour(stageAreas[areaIndex]->getAreaColour().withAlpha(0.5f));
+		}
 		else
+		{
 			stageAreas[areaIndex]->setAreaColour(stageAreas[areaIndex]->getAreaColour().withAlpha(0.3f));
+		}
 
 		// Draw the stage area
 		stageAreas[areaIndex]->drawArea(g, stageAreas[areaIndex]->getAreaSelectedState());
@@ -135,7 +139,6 @@ void TrackingGUI::deselectAllStageAreas()
 void TrackingGUI::snapStageToGrid()
 {
 	// Snap each area to the grid by rounding each corners (except for the centre) current position. 
-
 	for (int corner = 0; corner < mainStageArea.numOfAreaCorners - 1; corner++)
 	{
 		float snappedStageCornerX = round(mainStageArea.getX(corner) / gridIncrement) * gridIncrement;
