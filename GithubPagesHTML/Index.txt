@@ -1,0 +1,22 @@
+<script src="http://api.html5media.info/1.1.8/html5media.min.js"></script>
+
+<h1><center>Quick Demo</center></h1>
+<video src="QuickDemo.mp4" style="display:block; margin: 0 auto;" width="1290" height="760" align="right" controls preload></video>
+
+<h1><center>Stage Calibration</center></h1>
+<video src="StageCalibration.mp4" style="display:block; margin: 0 auto;" width="1290" height="760" align="right" controls preload></video>
+
+<h1><center>Automatic Panning</center></h1>
+<video src="AutoPan.mp4" style="display:block; margin: 0 auto;" width="1290" height="760" align="right" controls preload></video>
+
+<h1><center>Filtering</center></h1>
+<video src="Filtering.mp4" style="display:block; margin: 0 auto;" width="1290" height="760" align="right" controls preload></video>
+
+<h1><center>EQ</center></h1>
+<video src="EQ.mp4" style="display:block; margin: 0 auto;" width="1290" height="760" align="right" controls preload></video>
+
+<h1><center>Reverb</center></h1>
+<video src="Reverb.mp4" style="display:block; margin: 0 auto;" width="1290" height="760" align="right" controls preload></video>
+
+<h1><center>Full Demo</center></h1>
+<video src="Full_Demo.mp4" style="display:block; margin: 0 auto;" width="1290" height="760" align="right" controls preload></video>
